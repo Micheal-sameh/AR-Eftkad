@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/documentation', function () {
+    $documentation = config('l5-swagger.documentation') ?? 'default';
+    $useAbsolutePath = true;
+
+    return view('vendor.l5-swagger.index', compact('documentation', 'useAbsolutePath'));
+});
