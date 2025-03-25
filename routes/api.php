@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,11 @@ Route::get('/documentation', function () {
     $useAbsolutePath = true;
 
     return view('vendor.l5-swagger.index', compact('documentation', 'useAbsolutePath'));
+});
+
+Route::group(['middleware' => 'setlocale'], function () {
+    Route::group(['prefix' => 'auth'], function () {
+        Route::post('login', [AuthController::class, 'login']);
+        Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    });
 });
