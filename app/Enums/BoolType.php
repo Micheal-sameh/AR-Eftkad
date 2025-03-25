@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\App;
 
 class BoolType
 {
+    public const FALSE = 0;
     public const True = 1;
-    public const FALSE = 2;
 
     private static function localizedNames(): array
     {

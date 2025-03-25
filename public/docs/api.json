@@ -71,6 +71,146 @@
 
           ]
         }
+      },
+      "/eftkads": {
+        "get": {
+        "tags": ["Eftkads"],
+          "summary": "all eftkads",
+          "description": "get all eftkads.",
+          "parameters": [
+          ],
+          "responses": {
+            "200": {
+              "description": "collection of eftkads",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/eftkads ": {
+        "post": {
+        "tags": ["Eftkads"],
+          "summary": "create new eftkad",
+          "description": "create new eftkad",
+          "parameters": [
+            {
+              "name": "membership_code",
+              "required": true,
+              "type": "string",
+              "description": "E1C1FxNRy"
+            },
+            {
+              "name": "date",
+              "required": true,
+              "type": "date",
+              "description": "d-m-Y"
+            },
+            {
+              "name": "correspondence_address",
+              "required": false,
+              "type": "string",
+              "description": "address"
+            },
+            {
+              "name": "mass_attendence",
+              "required": true,
+              "type": "integer",
+              "description": "1 or 2 or 3"
+            },
+            {
+              "name": "needs",
+              "required": false,
+              "type": "array",
+              "description": "array of integers [1,2,3]"
+            },
+            {
+              "name": "communication_means",
+              "required": false,
+              "type": "array",
+              "description": "array of integers [1,2,3,4]"
+            },
+            {
+              "name": "attend_meetings",
+              "required": false,
+              "type": "boolean",
+              "description": "0 or 1"
+            },
+            {
+              "name": "need_eftkad_from_meeting",
+              "required": false,
+              "type": "string",
+              "description": "name of meeting "
+            },
+            {
+              "name": "father_confession",
+              "required": false,
+              "type": "string",
+              "description": "name of Father and church"
+            },
+            {
+              "name": "mother_confession",
+              "required": false,
+              "type": "string",
+              "description": "name of Father and church"
+            },
+            {
+              "name": "children_confession",
+              "required": false,
+              "type": "string",
+              "description": "name of Father and church"
+            },
+            {
+              "name": "need_eftkad_by_father",
+              "required": false,
+              "type": "boolean",
+              "description": "0 or 1"
+            },
+            {
+              "name": "location",
+              "required": false,
+              "type": "string",
+              "description": "location on google map"
+            },
+            {
+              "name": "general_notes",
+              "required": false,
+              "type": "string",
+              "description": "notes"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "collection of eftkads",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

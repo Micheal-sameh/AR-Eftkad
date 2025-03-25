@@ -15,7 +15,7 @@ class EftkadCreateRequest extends FormRequest
         return [
             'membership_code' => 'required',
             'date' => 'required|date_format:d-m-Y',
-            'correspondence_address' => 'required|string',
+            'correspondence_address' => 'string',
             'mass_attendence' => 'required|integer|in:'.implode(',', array_column(MassAttendanceType::all(), 'value')),
             'needs' => 'array|min:1',
             'needs.*' => 'integer|in:'.implode(',', array_column(NeedType::all(), 'value')),
