@@ -211,6 +211,15 @@
             }
           }
         }
+      },
+      "/settings/enums": {
+        "get": {
+        "tags": ["Settings"],
+          "summary": "all settings",
+          "description": "get all settings , enum .",
+          "parameters": [
+          ]
+        }
       }
     }
   }
