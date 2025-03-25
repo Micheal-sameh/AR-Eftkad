@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EftkadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,5 +31,11 @@ Route::group(['middleware' => 'setlocale'], function () {
     Route::group(['prefix' => 'auth'], function () {
         Route::post('login', [AuthController::class, 'login']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    });
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::group(['prefix' => 'eftkads'], function () {
+            Route::get('{all?}', [EftkadController::class, 'index']);
+            Route::post('', [EftkadController::class, 'create']);
+        });
     });
 });
