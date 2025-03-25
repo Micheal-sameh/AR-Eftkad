@@ -12,7 +12,8 @@ class SetLocale
     {
         // $lang = $request->route('lang', session('lang', 'en')); // Default to 'en' if not set
         $lang = $request->header('Accept-Language') ?? 'en';
-        App::setLocale($lang);
+        $languageCode = explode(',', $lang)[0];
+        App::setLocale($languageCode);
         session(['lang' => $lang]);
 
         return $next($request);
