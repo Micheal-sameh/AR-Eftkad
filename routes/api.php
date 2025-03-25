@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EftkadController;
+use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,10 @@ Route::group(['middleware' => 'setlocale'], function () {
         Route::group(['prefix' => 'eftkads'], function () {
             Route::get('{all?}', [EftkadController::class, 'index']);
             Route::post('', [EftkadController::class, 'create']);
+        });
+
+        Route::group(['as' => 'api.', 'prefix' => 'settings'], function () {
+            Route::get('/enums', [SettingController::class, 'enums']);
         });
     });
 });
