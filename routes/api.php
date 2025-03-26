@@ -41,6 +41,7 @@ Route::group(['middleware' => 'setlocale'], function () {
 
         Route::group(['as' => 'api.', 'prefix' => 'settings'], function () {
             Route::get('/enums', [SettingController::class, 'enums']);
+            Route::get('/filters', [SettingController::class, 'filters']);
         });
     });
 });

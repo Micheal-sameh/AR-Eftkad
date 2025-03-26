@@ -27,6 +27,9 @@ return new class extends Migration
             $table->string('need_eftkad_by_father');
             $table->text('location')->nullable();
             $table->text('general_notes')->nullable();
+            $table->string('father_membership_code');
+            $table->string('servant_membership_code');
+            $table->intger('type');
             $table->timestamps();
         });
     }

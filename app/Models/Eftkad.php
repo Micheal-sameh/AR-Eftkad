@@ -24,6 +24,9 @@ class Eftkad extends Model
         'need_eftkad_by_father',
         'location',
         'general_notes',
+        'father_membership_code',
+        'servant_membership_code',
+        'type',
     ];
 
     protected $casts = [

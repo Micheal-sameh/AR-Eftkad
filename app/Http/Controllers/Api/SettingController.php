@@ -18,4 +18,11 @@ class SettingController extends BaseController
 
         return $this->apiResponse($enums);
     }
+
+    public function filters()
+    {
+        $filters = $this->settingRepository->filters();
+
+        return $this->apiResponse($filters);
+    }
 }
