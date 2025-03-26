@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Enums\BoolType;
 use App\Enums\CommunicationType;
+use App\Enums\EftkadType;
 use App\Enums\MassAttendanceType;
 use App\Enums\NeedType;
 use App\Enums\UserType;
@@ -13,10 +14,12 @@ class SettingRepository
 {
     public function enums()
     {
-        $enums['user_type'] = BoolType::all();
+        $enums['bool_type'] = BoolType::all();
         $enums['user_status'] = CommunicationType::all();
         $enums['visits_status'] = MassAttendanceType::all();
         $enums['visits_status'] = NeedType::all();
+        $enums['user_type'] = UserType::all();
+        $enums['eftkad_type'] = EftkadType::all();
 
         return $enums;
     }
