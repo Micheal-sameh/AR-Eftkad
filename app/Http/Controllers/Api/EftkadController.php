@@ -17,7 +17,8 @@ class EftkadController extends BaseController
         $input = new EftkadCreateDTO(...$request->only(
             'membership_code', 'date', 'correspondence_address', 'mass_attendence', 'needs',
             'communication_means', 'attend_meetings', 'need_eftkad_from_meeting', 'father_confession',
-            'mother_confession', 'children_confession', 'need_eftkad_by_father', 'location', 'general_notes'
+            'mother_confession', 'children_confession', 'need_eftkad_by_father', 'location', 'general_notes',
+            'father_membership_code', 'servant_membership_code', 'type'
         ));
 
         $eftkad = $this->eftkadService->create($input);

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\BoolType;
 use App\Enums\CommunicationType;
+use App\Enums\EftkadType;
 use App\Enums\MassAttendanceType;
 use App\Enums\NeedType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,6 +32,7 @@ class EftkadCreateRequest extends FormRequest
             'general_notes' => 'string',
             'father_membership_code' => 'required|string|exists:users,membership_code',
             'servant_membership_code' => 'required|string|exists:users,membership_code',
+            'type' => 'required|integer|in:'.implode(',', array_column(EftkadType::all(), 'value')),
         ];
     }
 }

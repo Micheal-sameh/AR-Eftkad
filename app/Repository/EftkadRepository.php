@@ -57,6 +57,9 @@ class EftkadRepository
             'need_eftkad_by_father' => $input->need_eftkad_by_father,
             'location' => $input->location,
             'general_notes' => $input->general_notes,
+            'father_membership_code' => $input->father_membership_code,
+            'servant_membership_code' => $input->servant_membership_code,
+            'type' => $input->type,
         ]);
     }
 }

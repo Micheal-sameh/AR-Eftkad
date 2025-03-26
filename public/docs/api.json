@@ -189,6 +189,24 @@
               "required": false,
               "type": "string",
               "description": "notes"
+            },
+            {
+              "name": "father_membership_code",
+              "required": true,
+              "type": "string",
+              "description": "E1C1FxNRy"
+            },
+            {
+              "name": "servant_membership_code",
+              "required": true,
+              "type": "string",
+              "description": "E1C1FxNRy"
+            },
+            {
+              "name": "type",
+              "required": true,
+              "type": "integer",
+              "description": "eftkad type"
             }
           ],
           "responses": {

@@ -21,6 +21,9 @@ class EftkadCreateDTO extends DTO
     public string $need_eftkad_by_father;
     public ?string $location;
     public ?string $general_notes;
+    public string $father_membership_code;
+    public string $servant_membership_code;
+    public int $type;
 
     public function __construct(
 
@@ -38,6 +41,9 @@ class EftkadCreateDTO extends DTO
         string $need_eftkad_by_father = parent::STRING,
         string $location = parent::STRING,
         string $general_notes = parent::STRING,
+        string $father_membership_code = parent::STRING,
+        string $servant_membership_code = parent::STRING,
+        int $type = parent::INT,
     ) {
         parent::__construct(compact(...$this->getParameterList()));
     }
