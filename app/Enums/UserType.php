@@ -4,9 +4,10 @@ namespace App\Enums;
 
 use Illuminate\Support\Facades\App;
 
-class BoolType
+class UserType
 {
     public const FATHER = 1;
+
     public const SERVANT = 2;
 
     private static function localizedNames(): array

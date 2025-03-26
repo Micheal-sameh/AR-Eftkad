@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,15 +15,12 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $locale = app()->getLocale();
-
         return [
-            'id'     => $this->id,
-            'name'   => $this->name[$locale],
-            'phone'  => $this->phone,
-            'membership_code' => $this->E1C1F . $this->NR,
-            'E1C1F'  => $this->E1C1F,
-            'NR'     => $this->NR,
+            'id' => $this->id,
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'type' => new EnumResource($this->type, UserType::class),
+            'membership_code' => $this->mebership_code,
         ];
     }
 }
