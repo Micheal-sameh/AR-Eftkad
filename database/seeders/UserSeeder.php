@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'email' => 'abouna.mina@gmail.com',
             'password' => bcrypt('123456'),
             'membership_code' => 'E1C1F1NR1',
-            'phone' => '01012345678',
+            'phone' => '1227343176',
             'type' => 1,
         ]);
 
@@ -29,6 +29,15 @@ class UserSeeder extends Seeder
             'password' => bcrypt('123456'),
             'membership_code' => 'E1C1F2NR1',
             'phone' => '01278783887',
+            'type' => 2,
+        ]);
+
+        User::create([
+            'name' => 'مارك',
+            'email' => 'mark@gmail.com',
+            'password' => bcrypt('123456'),
+            'membership_code' => 'E1C1F3NR1',
+            'phone' => '01208486948',
             'type' => 2,
         ]);
     }
