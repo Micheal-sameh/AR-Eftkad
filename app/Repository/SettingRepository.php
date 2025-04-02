@@ -16,7 +16,7 @@ class SettingRepository
     {
         $enums['bool_type'] = BoolType::all();
         $enums['user_status'] = CommunicationType::all();
-        $enums['visits_status'] = MassAttendanceType::all();
+        $enums['mass_attendence_type'] = MassAttendanceType::all();
         $enums['visits_status'] = NeedType::all();
         $enums['user_type'] = UserType::all();
         $enums['eftkad_type'] = EftkadType::all();
