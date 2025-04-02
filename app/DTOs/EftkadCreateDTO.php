@@ -18,7 +18,7 @@ class EftkadCreateDTO extends DTO
     public ?string $father_confession;
     public ?string $mother_confession;
     public ?string $children_confession;
-    public string $need_eftkad_by_father;
+    public ?int $need_eftkad_by_father;
     public ?string $location;
     public ?string $general_notes;
     public string $father_membership_code;
@@ -31,14 +31,14 @@ class EftkadCreateDTO extends DTO
         string $date = parent::STRING,
         string $correspondence_address = parent::STRING,
         int $mass_attendence = parent::INT,
-        array $needs = parent::STRING,
-        array $communication_means = parent::STRING,
+        array $needs = parent::ARRAY,
+        array $communication_means = parent::ARRAY,
         int $attend_meetings = parent::INT,
         string $need_eftkad_from_meeting = parent::STRING,
         string $father_confession = parent::STRING,
         string $mother_confession = parent::STRING,
         string $children_confession = parent::STRING,
-        string $need_eftkad_by_father = parent::STRING,
+        int $need_eftkad_by_father = parent::INT,
         string $location = parent::STRING,
         string $general_notes = parent::STRING,
         string $father_membership_code = parent::STRING,

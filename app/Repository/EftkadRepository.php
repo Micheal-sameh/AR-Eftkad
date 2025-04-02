@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Enums\BoolType;
 use App\Models\Eftkad;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,7 +55,7 @@ class EftkadRepository
             'father_confession' => $input->father_confession,
             'mother_confession' => $input->mother_confession,
             'children_confession' => $input->children_confession,
-            'need_eftkad_by_father' => $input->need_eftkad_by_father,
+            'need_eftkad_by_father' => $input->need_eftkad_by_father ?? BoolType::FALSE,
             'location' => $input->location,
             'general_notes' => $input->general_notes,
             'father_membership_code' => $input->father_membership_code,
