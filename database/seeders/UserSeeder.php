@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'name' => 'ميشيل',
             'email' => 'misho@gmail.com',
             'password' => bcrypt('123456'),
-            'membership_code' => 'E1C1F2NR1',
+            'membership_code' => 'E1C1F1NR3',
             'phone' => '01278783887',
             'type' => 2,
         ]);
@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
             'name' => 'مارك',
             'email' => 'mark@gmail.com',
             'password' => bcrypt('123456'),
-            'membership_code' => 'E1C1F3NR1',
+            'membership_code' => 'E1C1F1NR3',
             'phone' => '01208486948',
             'type' => 2,
         ]);
