@@ -23,7 +23,7 @@ class AuthController extends BaseController
             return $this->apiErrorResponse(message: trans('messages.wrong credentials'), status_code: 401);
         }
         $user = auth()->user();
-        $token = $user->createToken(config('app.name'))->plainTextToken;
+        $token = $this->generateToken($user);
 
         return $this->apiResponse([
             'token' => $token,
@@ -33,12 +33,22 @@ class AuthController extends BaseController
 
     public function logout()
     {
-        auth()->guard('web')->logout();
         $user = auth()->user();
-
         $token = $user->currentAccessToken();
         $token->delete();
+        auth()->guard('web')->logout();
 
         return $this->apiResponse(message: 'logout successfuly');
+    }
+
+    private function generateToken($user)
+    {
+        $lastTokens = $user->tokens;
+        $lastTokens->each(function ($token) {
+            $token->delete();
+        });
+        $token = $user->createToken(config('app.name'))->plainTextToken;
+
+        return $token;
     }
 }
