@@ -96,7 +96,7 @@ return [
     'failed' => 'فشل',
     'Request was successful.' => 'تمت الطلب بنجاح',
     'login successfuly' => 'تم تسجيل الدخول بنجاح',
-    'avarewase no matching account' => 'لا يوجد حساب مرتبط بهذا الحساب على أفارويز. برجاء التواصل مع الإدارة لإنشاء حسابك أولاً.',
+    'avarewase no matching account' => 'حساب أفارويز الخاص بك لا يحمل رقم عضوية، لذلك تعذر إنشاء حساب على إفتقاد تلقائياً. برجاء التواصل مع الإدارة.',
     'avarewase login failed' => 'فشل تسجيل الدخول عبر أفارويز. برجاء المحاولة مرة أخرى.',
     'avarewase sso unavailable' => 'خادم تسجيل الدخول لأفارويز غير متاح حالياً. برجاء المحاولة بعد قليل.',
     'please contact Ava Rewase Church Admins' => 'الرجاء التواصل مع ادارة كنيسة الانبا رويس',

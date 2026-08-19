@@ -7,15 +7,19 @@ use App\Models\User;
 use Avarewase\SsoClient\Contracts\ProvisionsAvarewaseUsers;
 use Avarewase\SsoClient\DataObjects\AvarewaseUserInfo;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Str;
 
 /**
- * Finds an existing AR-Eftkad user matching the SSO identity (by
- * avarewase_sub, then by email), linking/backfilling avarewase_sub on
- * match. Never creates a new user: membership_code and Father/Servant
- * type are required domain fields with no SSO equivalent, so an admin
- * must create the account through the normal flow first.
+ * Finds an AR-Eftkad user matching the SSO identity — by avarewase_sub,
+ * then membership_code, then email — backfilling those identity fields
+ * from the latest SSO data on every login. If no match exists, creates
+ * one from the SSO identity (Avarewase now returns membership_code).
  *
- * @throws AvarewaseAccountNotFoundException
+ * `type` (Father/Servant) has no SSO equivalent, so newly-created users
+ * are left with type = null until an admin assigns it.
+ *
+ * @throws AvarewaseAccountNotFoundException if no user matches and the
+ *         SSO identity carries no membership_code to create one with.
  */
 class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
 {
@@ -23,19 +27,32 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
     {
         $user = User::query()->where('avarewase_sub', $userInfo->sub)->first();
 
+        if (! $user && $userInfo->membershipCode) {
+            $user = User::query()->where('membership_code', $userInfo->membershipCode)->first();
+        }
+
         if (! $user && $userInfo->email) {
             $user = User::query()->where('email', $userInfo->email)->first();
         }
 
         if (! $user) {
-            throw new AvarewaseAccountNotFoundException(
-                "No AR-Eftkad account matches Avarewase identity {$userInfo->sub} (email: {$userInfo->email}).",
-            );
+            if (! $userInfo->membershipCode) {
+                throw new AvarewaseAccountNotFoundException(
+                    "No AR-Eftkad account matches Avarewase identity {$userInfo->sub}, and it carries no membership_code to create one with.",
+                );
+            }
+
+            $user = new User([
+                'name' => $userInfo->name ?: $userInfo->membershipCode,
+                'password' => bcrypt(Str::random(40)),
+            ]);
         }
 
         $user->forceFill(array_filter([
             'avarewase_sub' => $userInfo->sub,
             'avarewase_avatar' => $userInfo->picture,
+            'membership_code' => $userInfo->membershipCode,
+            'email' => $userInfo->email,
         ], fn ($value) => ! is_null($value)))->save();
 
         return $user;

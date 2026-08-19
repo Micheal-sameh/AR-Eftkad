@@ -96,7 +96,7 @@ return [
     'failed' => 'Failed',
     'Request was successful.' => 'Request was successful.',
     'login successfuly' => 'Login successfuly',
-    'avarewase no matching account' => 'No account was found for this Avarewase login. Contact an administrator to have your account created first.',
+    'avarewase no matching account' => 'Your Avarewase account has no membership code on file, so an AR-Eftkad account could not be created automatically. Contact an administrator.',
     'avarewase login failed' => 'Avarewase login failed. Please try again.',
     'avarewase sso unavailable' => 'The Avarewase login server is unreachable right now. Please try again shortly.',
     'value for exists in users table' => 'The value for the en language already exists in the users table',

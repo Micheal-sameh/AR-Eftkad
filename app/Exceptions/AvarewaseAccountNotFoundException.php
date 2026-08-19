@@ -5,12 +5,10 @@ namespace App\Exceptions;
 use RuntimeException;
 
 /**
- * Thrown when a user authenticates successfully via Avarewase SSO but no
- * local account matches them. Unlike a generic web app, AR-Eftkad accounts
- * require domain fields (membership_code, Father/Servant type) that the SSO
- * identity has no way to supply, so this app never auto-creates a user from
- * an SSO login — an admin must create the account first, with SSO then
- * linking to it (by email, backfilling avarewase_sub) on the next login.
+ * Thrown when a user authenticates successfully via Avarewase SSO, no local
+ * account matches them (by avarewase_sub, membership_code, or email), and
+ * the SSO identity carries no membership_code — the one domain field
+ * required to create an AR-Eftkad account — so none can be provisioned.
  */
 class AvarewaseAccountNotFoundException extends RuntimeException
 {

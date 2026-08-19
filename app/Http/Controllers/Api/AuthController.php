@@ -38,6 +38,10 @@ class AuthController extends BaseController
      * either as the raw browser redirect from the SSO (GET) or as a
      * direct call from a client that intercepted the redirect itself
      * (POST) — same response shape as the normal login() either way.
+     *
+     * Creates the local user on first login (or updates the matching one)
+     * via AvarewaseUserProvisioner; see its docblock for the matching and
+     * creation rules.
      */
     public function avarewaseCallback(Request $request, AvarewaseClient $client, ProvisionsAvarewaseUsers $provisioner)
     {

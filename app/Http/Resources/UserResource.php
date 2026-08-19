@@ -19,8 +19,8 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'phone' => $this->phone,
-            'type' => new EnumResource($this->type, UserType::class),
-            'membership_code' => $this->mebership_code,
+            'type' => is_null($this->type) ? null : new EnumResource($this->type, UserType::class),
+            'membership_code' => $this->membership_code,
         ];
     }
 }
