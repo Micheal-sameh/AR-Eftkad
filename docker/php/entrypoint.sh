@@ -10,7 +10,7 @@ if ! grep -q "^APP_KEY=base64" /var/www/html/.env; then
 fi
 
 echo "Waiting for database..."
-until php artisan db:show > /dev/null 2>&1; do
+until php artisan tinker --execute="DB::connection()->getPdo();" > /dev/null 2>&1; do
     sleep 2
 done
 
