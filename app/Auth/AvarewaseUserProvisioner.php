@@ -11,9 +11,12 @@ use Illuminate\Support\Str;
 
 /**
  * Finds an AR-Eftkad user matching the SSO identity — by avarewase_sub,
- * then membership_code, then email — backfilling those identity fields
- * from the latest SSO data on every login. If no match exists, creates
- * one from the SSO identity (Avarewase now returns membership_code).
+ * then membership_code, then email — and, on every login (not just the
+ * first), refreshes that user's profile (name, email, membership_code,
+ * avatar, date of birth, email-verified status) from the latest SSO data,
+ * so Avarewase stays the source of truth for identity fields. If no match
+ * exists, creates one from the SSO identity (Avarewase now returns
+ * membership_code).
  *
  * `type` (Father/Servant) has no SSO equivalent, so newly-created users
  * are left with type = null until an admin assigns it.
@@ -52,8 +55,14 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
             'avarewase_sub' => $userInfo->sub,
             'avarewase_avatar' => $userInfo->picture,
             'membership_code' => $userInfo->membershipCode,
+            'name' => $userInfo->name,
             'email' => $userInfo->email,
+            'date_of_birth' => $userInfo->dateOfBirth,
         ], fn ($value) => ! is_null($value)))->save();
+
+        if ($userInfo->emailVerified && ! $user->email_verified_at) {
+            $user->forceFill(['email_verified_at' => now()])->save();
+        }
 
         return $user;
     }
