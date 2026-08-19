@@ -30,8 +30,10 @@ Route::get('/documentation', function () {
 
 Route::group(['middleware' => 'setlocale'], function () {
     Route::group(['prefix' => 'auth'], function () {
-        Route::post('login', [AuthController::class, 'login']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+        Route::get('avarewase/redirect', [AuthController::class, 'avarewaseRedirect']);
+        Route::match(['get', 'post'], 'avarewase/callback', [AuthController::class, 'avarewaseCallback']);
     });
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'eftkads'], function () {

@@ -2,33 +2,79 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\AvarewaseAccountNotFoundException;
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
+use Avarewase\SsoClient\Client\AvarewaseClient;
+use Avarewase\SsoClient\Contracts\ProvisionsAvarewaseUsers;
+use Avarewase\SsoClient\Exceptions\AvarewaseConnectionException;
+use Avarewase\SsoClient\Exceptions\AvarewaseTokenException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends BaseController
 {
-    public function login(LoginRequest $request)
+    /**
+     * Start "Login with Avarewase": returns the authorize URL for the
+     * client (mobile app / webview) to open. PKCE verifier is cached
+     * server-side, keyed by a one-time state value, so this stays
+     * stateless from the client's point of view (no session cookie needed).
+     */
+    public function avarewaseRedirect(AvarewaseClient $client)
     {
-        // preg_match('/E1C1F(\d+)NR/', $request->membership_code, $matches);
-        // $E1C1F = $matches[1];
-        // preg_match('/NR(\d+)/', $request->membership_code, $matchesNR);
-        // $NR = $matchesNR[1];
+        $state = $client->pkce()->state();
+        $verifier = $client->pkce()->verifier();
+        $challenge = $client->pkce()->challengeFor($verifier);
 
-        // $credentials = $request->only('password', 'membership_code');
-        // $credentials['E1C1F'] = $E1C1F;
-        // $credentials['NR'] = $NR;
+        Cache::put($this->avarewaseCacheKey($state), $verifier, now()->addMinutes(5));
 
-        if (! auth()->attempt($request->only('password', 'membership_code'))) {
-            return $this->apiErrorResponse(message: trans('messages.wrong credentials'), status_code: 401);
+        return $this->apiResponse([
+            'url' => $client->authorizationUrl($state, $challenge),
+        ]);
+    }
+
+    /**
+     * Complete "Login with Avarewase". Accepts the `code`/`state` pair
+     * either as the raw browser redirect from the SSO (GET) or as a
+     * direct call from a client that intercepted the redirect itself
+     * (POST) — same response shape as the normal login() either way.
+     */
+    public function avarewaseCallback(Request $request, AvarewaseClient $client, ProvisionsAvarewaseUsers $provisioner)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'state' => 'required|string',
+        ]);
+
+        $verifier = Cache::pull($this->avarewaseCacheKey($request->string('state')->toString()));
+
+        if (! $verifier) {
+            return $this->apiErrorResponse(message: trans('messages.avarewase login failed'), status_code: 422);
         }
-        $user = auth()->user();
+
+        try {
+            $tokens = $client->exchangeCodeForTokens($request->string('code')->toString(), $verifier);
+            $userInfo = $client->userInfo($tokens->accessToken);
+            $user = $provisioner->resolve($userInfo);
+        } catch (AvarewaseAccountNotFoundException $e) {
+            return $this->apiErrorResponse(message: trans('messages.avarewase no matching account'), status_code: 404);
+        } catch (AvarewaseConnectionException $e) {
+            return $this->apiErrorResponse(message: trans('messages.avarewase sso unavailable'), status_code: 503);
+        } catch (AvarewaseTokenException $e) {
+            return $this->apiErrorResponse(message: trans('messages.avarewase login failed'), status_code: 422);
+        }
+
         $token = $this->generateToken($user);
 
         return $this->apiResponse([
             'token' => $token,
             'user' => new UserResource($user),
         ], trans('messages.login successfuly'));
+    }
+
+    private function avarewaseCacheKey(string $state): string
+    {
+        return "avarewase_sso:verifier:{$state}";
     }
 
     public function logout()

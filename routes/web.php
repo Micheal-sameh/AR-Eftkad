@@ -26,6 +26,10 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+Route::get('/login/avarewase/callback', function () {
+    return view('auth.avarewase-callback');
+})->name('login.avarewase.callback');
+
 Route::get('/visits', function () {
     return view('eftkads.index');
 })->name('visits.index');

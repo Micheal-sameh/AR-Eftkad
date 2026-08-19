@@ -22,40 +22,11 @@
         <span id="login-error-text">حدث خطأ ما</span>
     </div>
 
-    <!-- Login Form -->
-    <form id="login-form" class="space-y-6">
-        <!-- Membership Code Field -->
-        <div class="space-y-2">
-            <label class="block font-label-sm text-label-sm text-on-surface-variant" for="membership_code">رقم العضوية</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <span class="material-symbols-outlined text-outline">badge</span>
-                </div>
-                <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pr-12 pl-4 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="membership_code" name="membership_code" placeholder="أدخل رقم العضوية الخاص بك" type="text" autocomplete="username" required />
-            </div>
-            <p class="field-error" id="error-membership_code"></p>
-        </div>
-
-        <!-- Password Field -->
-        <div class="space-y-2">
-            <div class="flex justify-between items-center">
-                <label class="block font-label-sm text-label-sm text-on-surface-variant" for="password">كلمة المرور</label>
-            </div>
-            <div class="relative">
-                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                    <span class="material-symbols-outlined text-outline">lock</span>
-                </div>
-                <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pr-12 pl-4 text-on-surface font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="password" name="password" placeholder="••••••••" type="password" autocomplete="current-password" required />
-            </div>
-            <p class="field-error" id="error-password"></p>
-        </div>
-
-        <!-- Submit Button -->
-        <button class="w-full bg-primary-container text-on-primary font-title-md text-title-md py-4 rounded-xl hover:bg-primary transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 mt-8 disabled:opacity-60 disabled:cursor-not-allowed" type="submit" id="login-submit">
-            <span id="login-submit-label">تسجيل الدخول</span>
-            <span class="material-symbols-outlined" style="font-size: 20px; transform: scaleX(-1);">arrow_forward</span>
-        </button>
-    </form>
+    <!-- SSO Login -->
+    <button class="w-full bg-primary-container text-on-primary font-title-md text-title-md py-4 rounded-xl hover:bg-primary transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed" type="button" id="login-sso-btn">
+        <span class="material-symbols-outlined" style="font-size: 20px;">passkey</span>
+        <span id="login-sso-label">تسجيل الدخول عبر أفارويز</span>
+    </button>
 
     <!-- Support Link -->
     <div class="mt-8 text-center">
@@ -76,57 +47,33 @@
             return;
         }
 
-        var form = document.getElementById('login-form');
-        var submitBtn = document.getElementById('login-submit');
-        var submitLabel = document.getElementById('login-submit-label');
+        var btn = document.getElementById('login-sso-btn');
+        var label = document.getElementById('login-sso-label');
         var errorBox = document.getElementById('login-error');
         var errorText = document.getElementById('login-error-text');
 
-        function clearErrors() {
-            errorBox.classList.add('hidden');
-            document.querySelectorAll('.field-error').forEach(function (el) {
-                el.textContent = '';
-                el.classList.remove('show');
-            });
+        // A failed callback bounces back here with ?error=... — surface it.
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('error')) {
+            errorText.textContent = params.get('error');
+            errorBox.classList.remove('hidden');
         }
 
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            clearErrors();
+        btn.addEventListener('click', async function () {
+            btn.disabled = true;
+            label.textContent = 'جاري التحويل...';
+            errorBox.classList.add('hidden');
 
-            submitBtn.disabled = true;
-            submitLabel.textContent = 'جاري تسجيل الدخول...';
+            var res = await Eftkad.api('/auth/avarewase/redirect');
 
-            var payload = {
-                membership_code: document.getElementById('membership_code').value.trim(),
-                password: document.getElementById('password').value,
-            };
-
-            var res = await Eftkad.api('/auth/login', { method: 'POST', body: payload });
-
-            submitBtn.disabled = false;
-            submitLabel.textContent = 'تسجيل الدخول';
-
-            if (res.ok && res.data && res.data.data && res.data.data.token) {
-                Eftkad.setAuth(res.data.data.token, res.data.data.user);
-                window.location.href = '/visits';
+            if (res.ok && res.data && res.data.data && res.data.data.url) {
+                window.location.href = res.data.data.url;
                 return;
             }
 
-            if (res.status === 422 && res.data && res.data.errors) {
-                Object.keys(res.data.errors).forEach(function (field) {
-                    var el = document.getElementById('error-' + field);
-                    if (el) {
-                        el.textContent = res.data.errors[field][0];
-                        el.classList.add('show');
-                    }
-                });
-                errorText.textContent = 'برجاء التحقق من البيانات المدخلة';
-                errorBox.classList.remove('hidden');
-                return;
-            }
-
-            errorText.textContent = (res.data && res.data.message) || 'رقم العضوية أو كلمة المرور غير صحيحة';
+            btn.disabled = false;
+            label.textContent = 'تسجيل الدخول عبر أفارويز';
+            errorText.textContent = (res.data && res.data.message) || 'تعذر الاتصال بخدمة تسجيل الدخول';
             errorBox.classList.remove('hidden');
         });
     });
