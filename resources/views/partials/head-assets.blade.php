@@ -1,5 +1,5 @@
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <meta name="theme-color" content="#1976d2" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -103,10 +103,13 @@
     }
 </script>
 <style>
+    html, body {
+        overflow-x: hidden;
+    }
     body {
         background-color: theme('colors.background');
         color: theme('colors.on-background');
-        min-height: max(884px, 100dvh);
+        min-height: 100dvh;
     }
     .glass-card {
         background: rgba(255, 255, 255, 0.95);
@@ -163,4 +166,18 @@
         display: block;
     }
     [x-cloak] { display: none !important; }
+
+    /* Standalone PWA: avoid the notch/status bar and the home-indicator
+       area (iOS "black-translucent" status bar lets content draw under it).
+       !important because these must win over whatever Tailwind padding
+       utility is also on the element, regardless of stylesheet order. */
+    .safe-top {
+        padding-top: max(0.5rem, env(safe-area-inset-top, 0px)) !important;
+    }
+    .safe-bottom {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+    }
+    .pb-nav-safe {
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
 </style>

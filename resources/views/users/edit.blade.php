@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-50 flex justify-center pb-8 md:pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
+    <div class="safe-bottom fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
         <button type="button" id="save-type-btn" onclick="submitForm()" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">save</span>
             <span id="save-type-label">{{ __('ui.user_edit.save_button') }}</span>

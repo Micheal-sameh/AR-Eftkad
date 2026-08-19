@@ -4,11 +4,11 @@
 @include('partials.head-assets')
 <title>@yield('title', 'Eftkad')</title>
 </head>
-<body class="font-body-md min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+<body class="font-body-md min-h-screen flex flex-col md:flex-row pb-nav-safe md:pb-0">
 @include('partials.api-js')
 
 <!-- Install App Prompt (shown once, right after login) -->
-<div id="install-prompt" class="hidden fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/40 p-4">
+<div id="install-prompt" class="safe-bottom hidden fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/40 p-4">
     <div class="w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl p-4 sm:p-card-padding relative">
         <button type="button" id="install-dismiss" class="absolute top-3 rtl:left-3 ltr:right-3 p-1 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined">close</span>
@@ -86,7 +86,7 @@
 <!-- Main Content Area -->
 <div class="flex-grow flex flex-col md:rtl:mr-64 md:ltr:ml-64 w-full relative min-w-0">
     <!-- TopAppBar (Mobile & Desktop Header Area) -->
-    <header class="flex justify-between items-center w-full px-container-margin md:px-8 py-unit md:py-4 max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
+    <header class="safe-top flex justify-between items-center w-full px-container-margin md:px-8 py-unit md:py-4 max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
         <div class="flex items-center gap-stack-gap md:hidden">
             <div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center">
                 <span class="material-symbols-outlined text-outline">person</span>
@@ -113,7 +113,7 @@
 @endif
 
 <!-- BottomNavBar (Mobile Only) -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-1 sm:px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
+<nav class="safe-bottom fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-1 sm:px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
     <a href="/visits" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
         <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'visits' ? 'filled' : '' }}">home</span>
         <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'visits' ? 'font-bold' : '' }}">{{ __('ui.nav.visits_short') }}</span>

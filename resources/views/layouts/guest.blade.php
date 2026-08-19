@@ -12,7 +12,7 @@
 <div class="absolute top-0 rtl:right-0 ltr:left-0 w-96 h-96 bg-primary-fixed opacity-20 rounded-full blur-3xl -translate-y-1/2 rtl:translate-x-1/2 ltr:-translate-x-1/2 pointer-events-none"></div>
 <div class="absolute bottom-0 rtl:left-0 ltr:right-0 w-96 h-96 bg-tertiary-fixed opacity-20 rounded-full blur-3xl translate-y-1/2 rtl:-translate-x-1/2 ltr:translate-x-1/2 pointer-events-none"></div>
 
-<header class="w-full p-container-margin flex justify-end z-10 relative">
+<header class="safe-top w-full p-container-margin flex justify-end z-10 relative">
     <button type="button" onclick="Eftkad.toggleLocale()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-sm text-label-sm">
         <span class="material-symbols-outlined" style="font-size: 18px;">language</span>
         <span id="locale-toggle-label">EN</span>
