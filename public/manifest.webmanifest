@@ -1,0 +1,20 @@
+{
+    "name": "إفتقاد - نظام الخدمة الرعوية",
+    "short_name": "إفتقاد",
+    "description": "تسجيل ومتابعة الافتقادات الرعوية للآباء والخدام",
+    "start_url": "/visits",
+    "id": "/visits",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#f9f9ff",
+    "theme_color": "#1976d2",
+    "dir": "rtl",
+    "lang": "ar",
+    "orientation": "portrait-primary",
+    "icons": [
+        { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+        { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ]
+}

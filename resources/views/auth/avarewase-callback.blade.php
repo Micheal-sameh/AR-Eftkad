@@ -60,6 +60,7 @@
 
         if (res.ok && res.data && res.data.data && res.data.data.token) {
             Eftkad.setAuth(res.data.data.token, res.data.data.user);
+            Eftkad.markShowInstallPromptAfterLogin();
             window.location.href = '/visits';
             return;
         }

@@ -96,5 +96,35 @@
             this.clearAuth();
             window.location.href = '/login';
         },
+
+        // PWA install: the browser fires beforeinstallprompt asynchronously
+        // (any time before or after DOMContentLoaded), so this listener is
+        // registered eagerly, here, on every page - not inside a page's own
+        // DOMContentLoaded handler, or the event could be missed.
+        INSTALL_FLAG_KEY: 'eftkad_show_install_prompt',
+        deferredInstallPrompt: null,
+
+        markShowInstallPromptAfterLogin() {
+            sessionStorage.setItem(this.INSTALL_FLAG_KEY, '1');
+        },
+
+        isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        },
+
+        isIos() {
+            return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+        },
     };
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        Eftkad.deferredInstallPrompt = e;
+    });
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+    }
 </script>
