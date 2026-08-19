@@ -45,3 +45,15 @@ Route::get('/visits/{id}', function ($id) {
 Route::get('/directory', function () {
     return view('directory.index');
 })->name('directory.index');
+
+Route::get('/users', function () {
+    return view('users.index');
+})->name('users.index');
+
+Route::get('/users/{id}', function ($id) {
+    return view('users.show', ['id' => $id]);
+})->name('users.show');
+
+Route::get('/users/{id}/edit', function ($id) {
+    return view('users.edit', ['id' => $id]);
+})->name('users.edit');

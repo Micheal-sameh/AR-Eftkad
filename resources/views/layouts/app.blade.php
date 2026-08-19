@@ -40,6 +40,12 @@
                 <span class="font-title-md text-title-md">دليل الخدمة</span>
             </a>
         </li>
+        <li>
+            <a href="/users" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                <span class="material-symbols-outlined">manage_accounts</span>
+                <span class="font-title-md text-title-md">إدارة المستخدمين</span>
+            </a>
+        </li>
     </ul>
     <div class="mt-auto">
         <button type="button" id="nav-locale-toggle" class="w-full flex items-center gap-stack-gap text-on-surface-variant px-4 py-3 hover:bg-surface-container-low rounded-lg transition-all">
@@ -84,19 +90,23 @@
 
 <!-- BottomNavBar (Mobile Only) -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
-    <a href="/visits" class="flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+    <a href="/visits" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
         <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'visits' ? 'filled' : '' }}">home</span>
         <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'visits' ? 'font-bold' : '' }}">الزيارات</span>
     </a>
-    <a href="/visits/create" class="flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+    <a href="/visits/create" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
         <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'create' ? 'filled' : '' }}">add_circle</span>
         <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'create' ? 'font-bold' : '' }}">جديد</span>
     </a>
-    <a href="/directory" class="flex flex-col items-center justify-center px-4 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+    <a href="/directory" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
         <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'directory' ? 'filled' : '' }}">settings</span>
         <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'directory' ? 'font-bold' : '' }}">أدوات</span>
     </a>
-    <a href="#" id="bottomnav-signout" class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors">
+    <a href="/users" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+        <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'users' ? 'filled' : '' }}">manage_accounts</span>
+        <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'users' ? 'font-bold' : '' }}">مستخدمين</span>
+    </a>
+    <a href="#" id="bottomnav-signout" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-colors">
         <span class="material-symbols-outlined">logout</span>
         <span class="font-label-sm text-label-sm mt-1">خروج</span>
     </a>

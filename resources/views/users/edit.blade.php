@@ -1,0 +1,145 @@
+@extends('layouts.app')
+
+@php($activeNav = 'users')
+
+@section('title', 'تعديل نوع المستخدم - افتقاد')
+@section('page-title', 'تعديل نوع المستخدم')
+@section('page-title-mobile', 'تعديل نوع المستخدم')
+
+@section('content')
+<div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
+    <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <span>العودة</span>
+    </button>
+</div>
+
+<div id="form-error" class="hidden mb-2 px-4 py-3 rounded-lg bg-error-container text-on-error-container font-body-md text-sm flex items-center gap-2">
+    <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
+    <span id="form-error-text">حدث خطأ ما</span>
+</div>
+
+<div id="edit-loading" class="text-center py-12 text-on-surface-variant">Loading...</div>
+<div id="edit-load-error" class="hidden text-center py-12 text-error">Failed to load user.</div>
+
+<form id="type-form" class="hidden space-y-6 pb-24">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-r-4 border-r-primary p-card-padding space-y-4">
+        <div>
+            <p class="font-title-md text-title-md text-on-surface" id="f-name">—</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant" id="f-membership_code">—</p>
+        </div>
+        <div>
+            <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">نوع المستخدم</label>
+            <div class="flex gap-4" id="type-options"></div>
+            <p class="field-error" id="error-type"></p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 w-full md:w-[calc(100%-20rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-50 flex justify-center pb-8 md:pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
+        <button type="button" id="save-type-btn" onclick="submitForm()" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">save</span>
+            <span id="save-type-label">حفظ</span>
+        </button>
+    </div>
+</form>
+@endsection
+
+@section('scripts')
+<script>
+    const USER_ID = {{ (int) $id }};
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function renderTypeOptions(options, currentValue) {
+        const container = document.getElementById('type-options');
+        container.innerHTML = options.map(function (o) {
+            const checked = String(o.value) === String(currentValue) ? 'checked' : '';
+            return `<label class="flex-1 cursor-pointer">
+                <input ${checked} class="peer sr-only" name="user_type" type="radio" value="${o.value}" />
+                <div class="w-full text-center px-4 py-3 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:border-primary-container peer-checked:text-on-primary-container transition-all">
+                    ${escapeHtml(o.name)}
+                </div>
+            </label>`;
+        }).join('');
+    }
+
+    function clearErrors() {
+        document.getElementById('form-error').classList.add('hidden');
+        document.querySelectorAll('.field-error').forEach(function (el) {
+            el.textContent = '';
+        });
+    }
+
+    async function loadTypeOptions(currentValue) {
+        const res = await Eftkad.api('/settings/enums');
+        if (!res.ok || !res.data) return;
+        renderTypeOptions((res.data.data && res.data.data.user_type) || [], currentValue);
+    }
+
+    async function loadUser() {
+        const loading = document.getElementById('edit-loading');
+        const errorBox = document.getElementById('edit-load-error');
+        const form = document.getElementById('type-form');
+
+        const res = await Eftkad.api('/users/' + USER_ID);
+
+        loading.classList.add('hidden');
+
+        if (!res.ok || !res.data || !res.data.data) {
+            errorBox.classList.remove('hidden');
+            return;
+        }
+
+        const user = res.data.data;
+        document.getElementById('f-name').textContent = user.name || '—';
+        document.getElementById('f-membership_code').textContent = user.membership_code || '—';
+
+        await loadTypeOptions(user.type ? user.type.value : null);
+        form.classList.remove('hidden');
+    }
+
+    async function submitForm() {
+        clearErrors();
+
+        const saveBtn = document.getElementById('save-type-btn');
+        const saveLabel = document.getElementById('save-type-label');
+        saveBtn.disabled = true;
+        saveLabel.textContent = 'جاري الحفظ...';
+
+        const typeEl = document.querySelector('input[name="user_type"]:checked');
+        const payload = { type: typeEl ? parseInt(typeEl.value, 10) : null };
+
+        const res = await Eftkad.api('/users/' + USER_ID + '/type', { method: 'PATCH', body: payload });
+
+        saveBtn.disabled = false;
+        saveLabel.textContent = 'حفظ';
+
+        if (res.ok) {
+            window.location.href = '/users/' + USER_ID;
+            return;
+        }
+
+        if (res.status === 422 && res.data && res.data.errors) {
+            const errors = res.data.errors;
+            const el = document.getElementById('error-type');
+            if (el && errors.type) el.textContent = errors.type[0];
+            document.getElementById('form-error-text').textContent = 'برجاء مراجعة الحقول أدناه';
+            document.getElementById('form-error').classList.remove('hidden');
+            return;
+        }
+
+        document.getElementById('form-error-text').textContent = (res.data && res.data.message) || 'حدث خطأ أثناء الحفظ';
+        document.getElementById('form-error').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!Eftkad.requireAuth()) return;
+        loadUser();
+    });
+</script>
+@endsection

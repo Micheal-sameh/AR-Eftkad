@@ -18,6 +18,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'email' => $this->email,
             'phone' => $this->phone,
             'type' => is_null($this->type) ? null : new EnumResource($this->type, UserType::class),
             'membership_code' => $this->membership_code,
