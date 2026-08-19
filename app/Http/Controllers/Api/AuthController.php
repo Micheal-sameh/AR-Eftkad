@@ -91,20 +91,23 @@ class AuthController extends BaseController
         return $this->apiResponse(message: 'logout successfuly');
     }
 
+    /**
+     * No revocation here - every login just adds a new token, so other
+     * open tabs/devices are never logged out. Accumulated tokens are
+     * pruned weekly instead; see PruneStaleTokens.
+     */
     private function generateToken($user, Request $request)
     {
         $deviceName = $this->deviceName($request);
-
-        $user->tokens()->where('name', $deviceName)->delete();
 
         return $user->createToken($deviceName)->plainTextToken;
     }
 
     /**
-     * Identifies the requesting device so a new login only replaces that
-     * device's own token, leaving other tabs/devices logged in. Clients
-     * may send a stable `device_id` (e.g. persisted in local storage);
-     * otherwise we fall back to a hash of user agent + IP.
+     * Identifies the requesting device for the token's name (shown in any
+     * "active sessions" listing). Clients may send a stable `device_id`
+     * (e.g. persisted in local storage); otherwise falls back to a hash
+     * of user agent + IP.
      */
     private function deviceName(Request $request): string
     {
