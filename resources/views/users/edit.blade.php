@@ -7,6 +7,7 @@
 @section('page-title-mobile', __('ui.user_edit.heading'))
 
 @section('content')
+<div class="md:max-w-2xl">
 <div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
     <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
         <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
@@ -23,9 +24,9 @@
 <div id="edit-load-error" class="hidden text-center py-12 text-error">{{ __('ui.user_edit.error') }}</div>
 
 <form id="type-form" class="hidden space-y-6 pb-24">
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary p-4 sm:p-card-padding space-y-4">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary p-4 md:p-5 space-y-4">
         <div>
-            <p class="font-title-md text-title-md text-on-surface" id="f-name">—</p>
+            <p class="font-title-md text-base md:text-lg text-on-surface" id="f-name">—</p>
             <p class="font-label-sm text-label-sm text-on-surface-variant" id="f-membership_code">—</p>
         </div>
         <div>
@@ -35,13 +36,14 @@
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full md:rtl:w-[calc(100%-20rem)] md:ltr:w-[calc(100%-20rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-50 flex justify-center pb-8 md:pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
+    <div class="fixed bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-50 flex justify-center pb-8 md:pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
         <button type="button" id="save-type-btn" onclick="submitForm()" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">save</span>
             <span id="save-type-label">{{ __('ui.user_edit.save_button') }}</span>
         </button>
     </div>
 </form>
+</div>
 @endsection
 
 @section('scripts')

@@ -7,6 +7,7 @@
 @section('page-title-mobile', __('ui.visit_form.heading'))
 
 @section('content')
+<div class="md:max-w-3xl">
 <div class="mb-2 -mt-4">
     <p class="text-on-surface-variant text-sm">{{ __('ui.visit_form.subtitle') }}</p>
 </div>
@@ -19,14 +20,14 @@
 <form id="visit-form" class="space-y-6 pb-24">
     <!-- Section 1: Basic Info -->
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-1')" type="button">
+        <button class="w-full flex items-center justify-between p-4 md:p-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-1')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
-                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_basic') }}</h3>
+                <h3 class="font-title-md text-base md:text-lg text-on-surface">{{ __('ui.visit_form.section_basic') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-1">expand_more</span>
         </button>
-        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-4" id="section-1">
+        <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-4" id="section-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.membership_code') }}</label>
@@ -59,14 +60,14 @@
 
     <!-- Section 2: Attendance & Confession -->
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-2')" type="button">
+        <button class="w-full flex items-center justify-between p-4 md:p-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-2')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">church</span>
-                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_attendance') }}</h3>
+                <h3 class="font-title-md text-base md:text-lg text-on-surface">{{ __('ui.visit_form.section_attendance') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-2">expand_more</span>
         </button>
-        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-6" id="section-2">
+        <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-6" id="section-2">
             <!-- Mass Attendance -->
             <div>
                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.mass_attendance') }}</label>
@@ -134,14 +135,14 @@
 
     <!-- Section 3: Needs -->
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-3')" type="button">
+        <button class="w-full flex items-center justify-between p-4 md:p-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-3')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_needs') }}</h3>
+                <h3 class="font-title-md text-base md:text-lg text-on-surface">{{ __('ui.visit_form.section_needs') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-3">expand_more</span>
         </button>
-        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-6" id="section-3">
+        <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-6" id="section-3">
             <div>
                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.needs_heading') }}</label>
                 <div class="flex flex-wrap gap-3" id="needs-options"></div>
@@ -158,14 +159,14 @@
 
     <!-- Section 4: Admin -->
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-4')" type="button">
+        <button class="w-full flex items-center justify-between p-4 md:p-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-4')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
-                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_admin') }}</h3>
+                <h3 class="font-title-md text-base md:text-lg text-on-surface">{{ __('ui.visit_form.section_admin') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-4">expand_more</span>
         </button>
-        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-4" id="section-4">
+        <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-4" id="section-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.father_code') }}</label>
@@ -188,11 +189,12 @@
 </form>
 
 <!-- Sticky Save Action -->
-<div class="fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-20rem)] md:ltr:w-[calc(100%-20rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+<div class="fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
     <button type="button" id="save-visit-btn" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
         <span class="material-symbols-outlined">save</span>
         <span id="save-visit-label">{{ __('ui.visit_form.save_button') }}</span>
     </button>
+</div>
 </div>
 @endsection
 

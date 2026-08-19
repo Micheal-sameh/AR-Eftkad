@@ -8,7 +8,7 @@
 
 @section('content')
 <!-- Filter Bar -->
-<div class="bg-surface-container-lowest p-4 sm:p-card-padding rounded-xl card-shadow border border-outline-variant grid grid-cols-1 md:grid-cols-4 gap-stack-gap relative z-20">
+<div class="bg-surface-container-lowest p-4 md:p-5 rounded-xl card-shadow border border-outline-variant grid grid-cols-1 md:grid-cols-4 gap-stack-gap relative z-20">
     <!-- Father Dropdown -->
     <div class="relative">
         <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_father') }}</label>
@@ -55,8 +55,8 @@
 @endsection
 
 @section('fab')
-<a href="/visits/create" class="fixed bottom-24 md:bottom-8 rtl:left-6 ltr:right-6 md:rtl:left-8 md:ltr:right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-surface-tint transition-all scale-95 active:opacity-80 z-40">
-    <span class="material-symbols-outlined text-[28px]">add</span>
+<a href="/visits/create" class="fixed bottom-24 md:bottom-8 rtl:left-6 ltr:right-6 md:rtl:left-8 md:ltr:right-8 w-14 h-14 md:w-12 md:h-12 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-surface-tint transition-all scale-95 active:opacity-80 z-40">
+    <span class="material-symbols-outlined text-[28px] md:text-[24px]">add</span>
 </a>
 @endsection
 
@@ -117,12 +117,12 @@
         const accent = ACCENT_STYLES[(eftkad.mass_attendence || {}).value] || 'bg-outline-variant';
         const location = eftkad.location || eftkad.correspondence_address || '—';
         return `
-        <a href="/visits/${eftkad.id}" class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant p-card-padding flex flex-col gap-3 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg">
+        <a href="/visits/${eftkad.id}" class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg">
             <div class="absolute top-0 rtl:right-0 ltr:left-0 bottom-0 w-1 ${accent}"></div>
             <div class="flex justify-between items-start">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-title-md text-title-md text-on-surface">${escapeHtml(eftkad.membership_code)}</span>
+                        <span class="font-title-md text-base text-on-surface">${escapeHtml(eftkad.membership_code)}</span>
                     </div>
                     <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
                         <span class="material-symbols-outlined text-[14px]">event</span> ${escapeHtml(eftkad.date)}

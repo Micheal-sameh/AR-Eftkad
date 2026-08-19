@@ -32,61 +32,61 @@
 </div>
 
 <!-- NavigationDrawer (Desktop) -->
-<nav class="hidden md:flex flex-col h-full p-gutter fixed rtl:right-0 ltr:left-0 top-0 bg-surface rtl:border-l ltr:border-r border-outline-variant w-80 z-40 transition-all duration-200 ease-in-out">
-    <div class="mb-gutter">
-        <h1 class="font-headline-lg text-primary">Eftkad</h1>
+<nav class="hidden md:flex flex-col h-full p-4 fixed rtl:right-0 ltr:left-0 top-0 bg-surface rtl:border-l ltr:border-r border-outline-variant w-64 z-40 transition-all duration-200 ease-in-out">
+    <div class="mb-6">
+        <h1 class="font-headline-lg text-2xl text-primary">Eftkad</h1>
     </div>
-    <div class="flex items-center gap-stack-gap mb-8">
-        <div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0 border border-outline-variant flex items-center justify-center">
-            <span class="material-symbols-outlined text-outline">person</span>
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-9 h-9 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0 border border-outline-variant flex items-center justify-center">
+            <span class="material-symbols-outlined text-outline text-[20px]">person</span>
         </div>
-        <div>
-            <p class="font-title-md text-title-md text-on-surface" id="nav-user-name">&nbsp;</p>
+        <div class="min-w-0">
+            <p class="font-title-md text-sm font-semibold text-on-surface truncate" id="nav-user-name">&nbsp;</p>
             <p class="font-label-sm text-label-sm text-tertiary" id="nav-user-type">&nbsp;</p>
         </div>
     </div>
-    <ul class="flex flex-col gap-2 flex-grow">
+    <ul class="flex flex-col gap-1 flex-grow">
         <li>
-            <a href="/visits" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
-                <span class="material-symbols-outlined">church</span>
-                <span class="font-title-md text-title-md">{{ __('ui.nav.visits') }}</span>
+            <a href="/visits" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                <span class="material-symbols-outlined text-[20px]">church</span>
+                <span class="text-sm">{{ __('ui.nav.visits') }}</span>
             </a>
         </li>
         <li>
-            <a href="/visits/create" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
-                <span class="material-symbols-outlined">edit_calendar</span>
-                <span class="font-title-md text-title-md">{{ __('ui.nav.new_visit') }}</span>
+            <a href="/visits/create" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                <span class="material-symbols-outlined text-[20px]">edit_calendar</span>
+                <span class="text-sm">{{ __('ui.nav.new_visit') }}</span>
             </a>
         </li>
         <li>
-            <a href="/directory" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
-                <span class="material-symbols-outlined">menu_book</span>
-                <span class="font-title-md text-title-md">{{ __('ui.nav.directory') }}</span>
+            <a href="/directory" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                <span class="text-sm">{{ __('ui.nav.directory') }}</span>
             </a>
         </li>
         <li>
-            <a href="/users" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
-                <span class="material-symbols-outlined">manage_accounts</span>
-                <span class="font-title-md text-title-md">{{ __('ui.nav.users') }}</span>
+            <a href="/users" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-all {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                <span class="text-sm">{{ __('ui.nav.users') }}</span>
             </a>
         </li>
     </ul>
     <div class="mt-auto">
-        <button type="button" id="nav-locale-toggle" class="w-full flex items-center gap-stack-gap text-on-surface-variant px-4 py-3 hover:bg-surface-container-low rounded-lg transition-all">
-            <span class="material-symbols-outlined">language</span>
-            <span class="font-title-md text-title-md" id="nav-locale-label">AR/EN</span>
+        <button type="button" id="nav-locale-toggle" class="w-full flex items-center gap-3 text-on-surface-variant px-3 py-2 hover:bg-surface-container-low rounded-lg transition-all">
+            <span class="material-symbols-outlined text-[20px]">language</span>
+            <span class="text-sm" id="nav-locale-label">AR/EN</span>
         </button>
-        <button type="button" id="nav-signout" class="w-full flex items-center gap-stack-gap text-on-surface-variant px-4 py-3 hover:bg-surface-container-low rounded-lg transition-all">
-            <span class="material-symbols-outlined">door_open</span>
-            <span class="font-title-md text-title-md">{{ __('ui.nav.sign_out') }}</span>
+        <button type="button" id="nav-signout" class="w-full flex items-center gap-3 text-on-surface-variant px-3 py-2 hover:bg-surface-container-low rounded-lg transition-all">
+            <span class="material-symbols-outlined text-[20px]">door_open</span>
+            <span class="text-sm">{{ __('ui.nav.sign_out') }}</span>
         </button>
     </div>
 </nav>
 
 <!-- Main Content Area -->
-<div class="flex-grow flex flex-col md:rtl:mr-80 md:ltr:ml-80 w-full relative">
+<div class="flex-grow flex flex-col md:rtl:mr-64 md:ltr:ml-64 w-full relative min-w-0">
     <!-- TopAppBar (Mobile & Desktop Header Area) -->
-    <header class="flex justify-between items-center w-full px-container-margin py-unit max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
+    <header class="flex justify-between items-center w-full px-container-margin md:px-8 py-unit md:py-4 max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
         <div class="flex items-center gap-stack-gap md:hidden">
             <div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center">
                 <span class="material-symbols-outlined text-outline">person</span>
@@ -94,14 +94,14 @@
             <h1 class="font-title-md text-title-md font-semibold text-primary">Eftkad</h1>
         </div>
         <div class="hidden md:flex items-center gap-stack-gap flex-grow justify-between">
-            <h2 class="font-display-lg text-display-lg text-on-surface">@yield('page-title', __('ui.app_name'))</h2>
+            <h2 class="font-headline-lg text-2xl text-on-surface">@yield('page-title', __('ui.app_name'))</h2>
         </div>
         <button type="button" id="topbar-locale-toggle" class="text-primary hover:bg-surface-container p-2 rounded-full transition-colors font-label-sm text-label-sm">
             AR/EN
         </button>
     </header>
 
-    <main class="flex-grow p-container-margin max-w-7xl mx-auto w-full flex flex-col gap-6">
+    <main class="flex-grow p-container-margin md:px-8 md:py-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
         <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden text-on-surface mb-2">@yield('page-title-mobile', __('ui.app_name'))</h2>
 
         @yield('content')

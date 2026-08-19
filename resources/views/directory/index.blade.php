@@ -24,8 +24,8 @@
 
 <div id="directory-lists" class="hidden grid grid-cols-1 md:grid-cols-2 gap-container-margin">
     <!-- Fathers List -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 sm:p-card-padding">
-        <h3 class="font-title-md text-title-md text-primary mb-4 flex items-center gap-2">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 md:p-6">
+        <h3 class="font-title-md text-base md:text-lg text-primary mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined">person</span>
             {{ __('ui.directory.fathers_list') }}
         </h3>
@@ -33,8 +33,8 @@
         <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="fathers-empty">{{ __('ui.directory.no_results') }}</p>
     </div>
     <!-- Servants List -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 sm:p-card-padding">
-        <h3 class="font-title-md text-title-md text-primary mb-4 flex items-center gap-2">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 md:p-6">
+        <h3 class="font-title-md text-base md:text-lg text-primary mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined">group</span>
             {{ __('ui.directory.servants_list') }}
         </h3>

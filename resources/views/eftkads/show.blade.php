@@ -7,6 +7,7 @@
 @section('page-title-mobile', __('ui.visit_detail.title'))
 
 @section('content')
+<div class="md:max-w-3xl">
 <div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
     <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
         <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
@@ -24,11 +25,11 @@
 
 <div id="detail-content" class="hidden space-y-6">
     <!-- Identity & Status Card -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
         <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container"></div>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-variant pb-4 mb-4">
             <div>
-                <h2 class="font-title-md text-title-md text-on-surface mb-1" id="d-membership_code">—</h2>
+                <h2 class="font-title-md text-lg md:text-xl text-on-surface mb-1" id="d-membership_code">—</h2>
                 <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
                     <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
                     <span id="d-date">—</span>
@@ -53,8 +54,8 @@
     </section>
 
     <!-- Address -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">location_on</span>
             {{ __('ui.visit_detail.location_heading') }}
         </h3>
@@ -70,8 +71,8 @@
     </section>
 
     <!-- Responsibility -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">groups</span>
             {{ __('ui.visit_detail.responsibility_heading') }}
         </h3>
@@ -98,8 +99,8 @@
     </section>
 
     <!-- Attendance & confession -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">church</span>
             {{ __('ui.visit_detail.attendance_heading') }}
         </h3>
@@ -115,8 +116,8 @@
     </section>
 
     <!-- Visit Notes -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">sticky_note_2</span>
             {{ __('ui.visit_detail.notes_heading') }}
         </h3>
@@ -124,6 +125,7 @@
             {{ __('ui.visit_detail.no_notes') }}
         </div>
     </section>
+</div>
 </div>
 @endsection
 

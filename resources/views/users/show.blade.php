@@ -7,6 +7,7 @@
 @section('page-title-mobile', __('ui.user_detail.title'))
 
 @section('content')
+<div class="md:max-w-2xl">
 <div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
     <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
         <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
@@ -23,7 +24,7 @@
 <div id="detail-error" class="hidden text-center py-12 text-error">{{ __('ui.user_detail.error') }}</div>
 
 <div id="detail-content" class="hidden space-y-6">
-    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
+    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
         <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container"></div>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-variant pb-4 mb-4">
             <div class="flex items-center gap-4">
@@ -31,7 +32,7 @@
                     <span class="material-symbols-outlined text-[28px]">person</span>
                 </div>
                 <div>
-                    <h2 class="font-title-md text-title-md text-on-surface mb-1" id="d-name">—</h2>
+                    <h2 class="font-title-md text-lg md:text-xl text-on-surface mb-1" id="d-name">—</h2>
                     <p class="font-label-sm text-label-sm text-on-surface-variant" id="d-membership_code">—</p>
                 </div>
             </div>
@@ -55,6 +56,7 @@
             {{ __('ui.user_detail.edit_button') }}
         </a>
     </div>
+</div>
 </div>
 @endsection
 
