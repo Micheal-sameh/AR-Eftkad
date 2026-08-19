@@ -68,7 +68,7 @@ class AuthController extends BaseController
             return $this->apiErrorResponse(message: trans('messages.avarewase login failed'), status_code: 422);
         }
 
-        $token = $this->generateToken($user);
+        $token = $this->generateToken($user, $request);
 
         return $this->apiResponse([
             'token' => $token,
@@ -91,14 +91,26 @@ class AuthController extends BaseController
         return $this->apiResponse(message: 'logout successfuly');
     }
 
-    private function generateToken($user)
+    private function generateToken($user, Request $request)
     {
-        $lastTokens = $user->tokens;
-        $lastTokens->each(function ($token) {
-            $token->delete();
-        });
-        $token = $user->createToken(config('app.name'))->plainTextToken;
+        $deviceName = $this->deviceName($request);
 
-        return $token;
+        $user->tokens()->where('name', $deviceName)->delete();
+
+        return $user->createToken($deviceName)->plainTextToken;
+    }
+
+    /**
+     * Identifies the requesting device so a new login only replaces that
+     * device's own token, leaving other tabs/devices logged in. Clients
+     * may send a stable `device_id` (e.g. persisted in local storage);
+     * otherwise we fall back to a hash of user agent + IP.
+     */
+    private function deviceName(Request $request): string
+    {
+        $deviceId = $request->string('device_id')->toString()
+            ?: sha1($request->userAgent() . '|' . $request->ip());
+
+        return config('app.name') . ':' . $deviceId;
     }
 }

@@ -6,6 +6,18 @@
         TOKEN_KEY: 'eftkad_token',
         USER_KEY: 'eftkad_user',
         LOCALE_KEY: 'eftkad_locale',
+        DEVICE_ID_KEY: 'eftkad_device_id',
+
+        // Stable per-browser id so a new login only replaces this device's
+        // own token, instead of logging out every other open tab/device.
+        deviceId() {
+            let id = localStorage.getItem(this.DEVICE_ID_KEY);
+            if (!id) {
+                id = (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random()));
+                localStorage.setItem(this.DEVICE_ID_KEY, id);
+            }
+            return id;
+        },
 
         locale() {
             return localStorage.getItem(this.LOCALE_KEY) || 'ar';

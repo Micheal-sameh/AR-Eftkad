@@ -55,7 +55,7 @@
 
         var res = await Eftkad.api('/auth/avarewase/callback', {
             method: 'POST',
-            body: { code: code, state: state },
+            body: { code: code, state: state, device_id: Eftkad.deviceId() },
         });
 
         if (res.ok && res.data && res.data.data && res.data.data.token) {
