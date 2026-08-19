@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Enums\BoolType;
 use App\Enums\CommunicationType;
+use App\Enums\EftkadType;
 use App\Enums\MassAttendanceType;
 use App\Enums\NeedType;
 use Carbon\Carbon;
@@ -35,6 +36,9 @@ class EftkadResource extends JsonResource
             'need_eftkad_by_father' => new EnumResource($this->need_eftkad_by_father, BoolType::class),
             'location' => $this->location,
             'general_notes' => $this->general_notes,
+            'father_membership_code' => $this->father_membership_code,
+            'servant_membership_code' => $this->servant_membership_code,
+            'type' => new EnumResource($this->type, EftkadType::class),
         ];
     }
 }

@@ -35,6 +35,7 @@ Route::group(['middleware' => 'setlocale'], function () {
     });
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::group(['prefix' => 'eftkads'], function () {
+            Route::get('detail/{id}', [EftkadController::class, 'show']);
             Route::get('{all?}', [EftkadController::class, 'index']);
             Route::post('', [EftkadController::class, 'create']);
         });

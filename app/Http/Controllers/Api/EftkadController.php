@@ -35,4 +35,15 @@ class EftkadController extends BaseController
                 'eftkads_count' => $data['eftkads_count'],
             ]);
     }
+
+    public function show($id)
+    {
+        $eftkad = $this->eftkadService->show($id);
+
+        if (! $eftkad) {
+            return $this->apiErrorResponse(message: 'Eftkad not found', status_code: 404);
+        }
+
+        return $this->apiResponse(new EftkadResource($eftkad));
+    }
 }
