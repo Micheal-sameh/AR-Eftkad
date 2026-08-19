@@ -13,13 +13,23 @@ RUN npm run build
 FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install \
-    --no-dev \
-    --no-scripts \
-    --no-interaction \
-    --prefer-dist \
-    --no-autoloader \
-    --ignore-platform-reqs
+RUN --mount=type=secret,id=github_token \
+    if [ -s /run/secrets/github_token ]; then \
+        composer config --global github-oauth.github.com "$(cat /run/secrets/github_token)"; \
+    fi \
+    && composer update avarewase/sso-client \
+        --no-dev \
+        --no-scripts \
+        --no-interaction \
+        --prefer-dist \
+        --ignore-platform-reqs \
+    && composer install \
+        --no-dev \
+        --no-scripts \
+        --no-interaction \
+        --prefer-dist \
+        --no-autoloader \
+        --ignore-platform-reqs
 COPY . .
 RUN composer dump-autoload --optimize --no-dev
 

@@ -4,15 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1654f85f4a812220c8963fef9da7b68a",
+    "content-hash": "bac5d00556e472ab4fa13b4a4baf6cfc",
     "packages": [
         {
             "name": "avarewase/sso-client",
-            "version": "dev-main",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:Micheal-sameh/ar-sso-handler.git",
+                "reference": "e7f772967130e57549f872d8ec196c185cce2818"
+            },
             "dist": {
-                "type": "path",
-                "url": "../avarewase-sso-client",
-                "reference": "89aee481e7738e34b97a47f0ccb679e4d7d73844"
+                "type": "zip",
+                "url": "https://api.github.com/repos/Micheal-sameh/ar-sso-handler/zipball/e7f772967130e57549f872d8ec196c185cce2818",
+                "reference": "e7f772967130e57549f872d8ec196c185cce2818",
+                "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.8",
@@ -57,10 +63,11 @@
                 "oidc",
                 "sso"
             ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/Micheal-sameh/ar-sso-handler/tree/v1.3.0",
+                "issues": "https://github.com/Micheal-sameh/ar-sso-handler/issues"
+            },
+            "time": "2026-08-19T12:49:24+00:00"
         },
         {
             "name": "brick/math",
@@ -8517,9 +8524,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "avarewase/sso-client": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
