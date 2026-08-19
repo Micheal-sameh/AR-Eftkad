@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 <link rel="icon" href="/icons/icon-192.png" />
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>window.UI_TEXT = @json(__('ui'));</script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Arabic:wght@400;600;700&amp;family=Noto+Serif:wght@400;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
 <script id="tailwind-config">

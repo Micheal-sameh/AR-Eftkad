@@ -2,101 +2,101 @@
 
 @php($activeNav = 'create')
 
-@section('title', 'تسجيل زيارة جديدة - افتقاد')
-@section('page-title', 'تسجيل زيارة جديدة')
-@section('page-title-mobile', 'تسجيل زيارة جديدة')
+@section('title', __('ui.visit_form.title'))
+@section('page-title', __('ui.visit_form.heading'))
+@section('page-title-mobile', __('ui.visit_form.heading'))
 
 @section('content')
 <div class="mb-2 -mt-4">
-    <p class="text-on-surface-variant text-sm">قم بتعبئة تفاصيل الافتقاد الرعوي</p>
+    <p class="text-on-surface-variant text-sm">{{ __('ui.visit_form.subtitle') }}</p>
 </div>
 
 <div id="form-error" class="hidden mb-2 px-4 py-3 rounded-lg bg-error-container text-on-error-container font-body-md text-sm flex items-center gap-2">
     <span class="material-symbols-outlined" style="font-size: 20px;">error</span>
-    <span id="form-error-text">حدث خطأ ما</span>
+    <span id="form-error-text">{{ __('ui.visit_form.generic_error') }}</span>
 </div>
 
 <form id="visit-form" class="space-y-6 pb-24">
     <!-- Section 1: Basic Info -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-r-4 border-r-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-1')" type="button">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
+        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-1')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
-                <h3 class="font-title-md text-title-md text-on-surface">البيانات الأساسية</h3>
+                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_basic') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-1">expand_more</span>
         </button>
-        <div class="section-content px-card-padding pb-card-padding pt-0 space-y-4" id="section-1">
+        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-4" id="section-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">كود المخدوم</label>
-                    <input id="f-membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="أدخل الكود" type="text" />
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.membership_code') }}</label>
+                    <input id="f-membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.membership_code_placeholder') }}" type="text" />
                     <p class="field-error" id="error-membership_code"></p>
                 </div>
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">تاريخ الزيارة</label>
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.visit_date') }}</label>
                     <input id="f-date" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" type="date" />
                     <p class="field-error" id="error-date"></p>
                 </div>
             </div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">العنوان</label>
-                <input id="f-correspondence_address" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="الشارع، المنطقة..." type="text" />
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.address') }}</label>
+                <input id="f-correspondence_address" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.address_placeholder') }}" type="text" />
                 <p class="field-error" id="error-correspondence_address"></p>
             </div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">الموقع</label>
-                <input id="f-location" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="الحي / المنطقة العامة" type="text" />
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.location') }}</label>
+                <input id="f-location" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.location_placeholder') }}" type="text" />
                 <p class="field-error" id="error-location"></p>
             </div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">نوع الافتقاد</label>
-                <div class="flex gap-4" id="visit-type-options"></div>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">{{ __('ui.visit_form.visit_type') }}</label>
+                <div class="flex flex-wrap gap-4" id="visit-type-options"></div>
                 <p class="field-error" id="error-type"></p>
             </div>
         </div>
     </div>
 
     <!-- Section 2: Attendance & Confession -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-r-4 border-r-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-2')" type="button">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
+        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-2')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">church</span>
-                <h3 class="font-title-md text-title-md text-on-surface">الحضور والاعتراف</h3>
+                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_attendance') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-2">expand_more</span>
         </button>
-        <div class="section-content px-card-padding pb-card-padding pt-0 space-y-6" id="section-2">
+        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-6" id="section-2">
             <!-- Mass Attendance -->
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">حضور القداسات</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.mass_attendance') }}</label>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="mass-attendance-options"></div>
                 <p class="field-error" id="error-mass_attendence"></p>
             </div>
             <div class="h-px bg-outline-variant w-full opacity-50"></div>
             <!-- Confession Toggles -->
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">الاعتراف المنتظم</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.confession_heading') }}</label>
                 <div class="space-y-3">
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">الأب</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.father') }}</span>
                         <div class="relative">
                             <input id="f-father_confession" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">الأم</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.mother') }}</span>
                         <div class="relative">
                             <input id="f-mother_confession" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">الأبناء</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.children') }}</span>
                         <div class="relative">
                             <input id="f-children_confession" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                 </div>
@@ -104,27 +104,27 @@
             <div class="h-px bg-outline-variant w-full opacity-50"></div>
             <!-- Meetings & follow-up Toggles -->
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">الاجتماعات والمتابعة</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.meetings_heading') }}</label>
                 <div class="space-y-3">
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">يحضر الاجتماعات</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.attend_meetings') }}</span>
                         <div class="relative">
                             <input id="f-attend_meetings" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">يحتاج افتقاد من الاجتماع</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.need_from_meeting') }}</span>
                         <div class="relative">
                             <input id="f-need_eftkad_from_meeting" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                     <label class="flex items-center justify-between p-3 border border-outline-variant rounded-lg bg-surface cursor-pointer hover:bg-surface-container-low transition-colors">
-                        <span class="text-on-surface">يحتاج افتقاد من الأب الكاهن</span>
+                        <span class="text-on-surface">{{ __('ui.visit_form.need_by_father') }}</span>
                         <div class="relative">
                             <input id="f-need_eftkad_by_father" class="sr-only peer" type="checkbox" />
-                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[22px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:rtl:-translate-x-full peer-checked:after:ltr:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:rtl:right-[2px] after:ltr:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </div>
                     </label>
                 </div>
@@ -133,23 +133,23 @@
     </div>
 
     <!-- Section 3: Needs -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-r-4 border-r-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-3')" type="button">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
+        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-3')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-                <h3 class="font-title-md text-title-md text-on-surface">الاحتياجات ووسائل التواصل</h3>
+                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_needs') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-3">expand_more</span>
         </button>
-        <div class="section-content px-card-padding pb-card-padding pt-0 space-y-6" id="section-3">
+        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-6" id="section-3">
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">الاحتياجات</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.needs_heading') }}</label>
                 <div class="flex flex-wrap gap-3" id="needs-options"></div>
                 <p class="field-error" id="error-needs"></p>
             </div>
             <div class="h-px bg-outline-variant w-full opacity-50"></div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">وسائل التواصل</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.comm_heading') }}</label>
                 <div class="flex flex-wrap gap-3" id="communication-options"></div>
                 <p class="field-error" id="error-communication_means"></p>
             </div>
@@ -157,30 +157,30 @@
     </div>
 
     <!-- Section 4: Admin -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-r-4 border-r-primary overflow-hidden">
-        <button class="w-full flex items-center justify-between p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-4')" type="button">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
+        <button class="w-full flex items-center justify-between p-4 sm:p-card-padding bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-4')" type="button">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
-                <h3 class="font-title-md text-title-md text-on-surface">بيانات إدارية</h3>
+                <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.visit_form.section_admin') }}</h3>
             </div>
             <span class="material-symbols-outlined text-outline-variant chevron" id="chevron-4">expand_more</span>
         </button>
-        <div class="section-content px-card-padding pb-card-padding pt-0 space-y-4" id="section-4">
+        <div class="section-content px-4 sm:px-card-padding pb-4 sm:pb-card-padding pt-0 space-y-4" id="section-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">كود الأب الكاهن</label>
-                    <input id="f-father_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="مثال: F123" type="text" />
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.father_code') }}</label>
+                    <input id="f-father_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.father_code_placeholder') }}" type="text" />
                     <p class="field-error" id="error-father_membership_code"></p>
                 </div>
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">كود الخادم</label>
-                    <input id="f-servant_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="مثال: S456" type="text" />
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.servant_code') }}</label>
+                    <input id="f-servant_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.servant_code_placeholder') }}" type="text" />
                     <p class="field-error" id="error-servant_membership_code"></p>
                 </div>
             </div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">ملاحظات إضافية</label>
-                <textarea id="f-general_notes" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow min-h-[100px] resize-y" placeholder="اكتب أي ملاحظات أخرى هنا..."></textarea>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.general_notes') }}</label>
+                <textarea id="f-general_notes" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow min-h-[100px] resize-y" placeholder="{{ __('ui.visit_form.general_notes_placeholder') }}"></textarea>
                 <p class="field-error" id="error-general_notes"></p>
             </div>
         </div>
@@ -188,10 +188,10 @@
 </form>
 
 <!-- Sticky Save Action -->
-<div class="fixed bottom-16 md:bottom-0 left-0 w-full md:w-[calc(100%-20rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+<div class="fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-20rem)] md:ltr:w-[calc(100%-20rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
     <button type="button" id="save-visit-btn" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
         <span class="material-symbols-outlined">save</span>
-        <span id="save-visit-label">حفظ الزيارة</span>
+        <span id="save-visit-label">{{ __('ui.visit_form.save_button') }}</span>
     </button>
 </div>
 @endsection
@@ -212,10 +212,10 @@
         const container = document.getElementById('visit-type-options');
         container.innerHTML = options.map(function (o, i) {
             const icon = TYPE_ICONS[o.value] || 'help';
-            return `<label class="flex-1 cursor-pointer">
+            return `<label class="flex-1 min-w-[45%] sm:min-w-0 cursor-pointer">
                 <input ${i === 0 ? 'checked' : ''} class="peer sr-only" name="visit_type" type="radio" value="${o.value}" />
                 <div class="w-full text-center px-4 py-3 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:border-primary-container peer-checked:text-on-primary-container transition-all">
-                    <span class="material-symbols-outlined align-middle ml-2">${icon}</span>${o.name}
+                    <span class="material-symbols-outlined align-middle rtl:ml-2 ltr:mr-2">${icon}</span>${o.name}
                 </div>
             </label>`;
         }).join('');
@@ -296,7 +296,7 @@
         const saveBtn = document.getElementById('save-visit-btn');
         const saveLabel = document.getElementById('save-visit-label');
         saveBtn.disabled = true;
-        saveLabel.textContent = 'جاري الحفظ...';
+        saveLabel.textContent = UI_TEXT.common.saving;
 
         const visitTypeEl = document.querySelector('input[name="visit_type"]:checked');
         const massEl = document.querySelector('input[name="mass_freq"]:checked');
@@ -324,7 +324,7 @@
         const res = await Eftkad.api('/eftkads', { method: 'POST', body: payload });
 
         saveBtn.disabled = false;
-        saveLabel.textContent = 'حفظ الزيارة';
+        saveLabel.textContent = UI_TEXT.visit_form.save_button;
 
         if (res.ok) {
             window.location.href = '/visits';
@@ -333,12 +333,12 @@
 
         if (res.status === 422 && res.data && res.data.errors) {
             showFieldErrors(res.data.errors);
-            document.getElementById('form-error-text').textContent = 'برجاء مراجعة الحقول أدناه';
+            document.getElementById('form-error-text').textContent = UI_TEXT.common.review_fields;
             document.getElementById('form-error').classList.remove('hidden');
             return;
         }
 
-        document.getElementById('form-error-text').textContent = (res.data && res.data.message) || 'حدث خطأ أثناء حفظ الزيارة';
+        document.getElementById('form-error-text').textContent = (res.data && res.data.message) || UI_TEXT.visit_form.save_error;
         document.getElementById('form-error').classList.remove('hidden');
     }
 

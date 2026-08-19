@@ -11,9 +11,17 @@
             return localStorage.getItem(this.LOCALE_KEY) || 'ar';
         },
 
+        // Syncs the `lang` cookie so the server (SetLocale middleware) picks
+        // the same locale on the next full page load - localStorage alone
+        // is invisible to server-rendered Blade pages.
+        setLocaleCookie(locale) {
+            document.cookie = 'lang=' + locale + '; path=/; max-age=' + (60 * 60 * 24 * 365) + '; samesite=lax';
+        },
+
         toggleLocale() {
             const next = this.locale() === 'ar' ? 'en' : 'ar';
             localStorage.setItem(this.LOCALE_KEY, next);
+            this.setLocaleCookie(next);
             window.location.reload();
         },
 
@@ -116,6 +124,10 @@
             return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
         },
     };
+
+    // Keep the server-visible cookie in sync with localStorage even when the
+    // user didn't just click the toggle (e.g. first visit after an update).
+    Eftkad.setLocaleCookie(Eftkad.locale());
 
     window.addEventListener('beforeinstallprompt', function (e) {
         e.preventDefault();

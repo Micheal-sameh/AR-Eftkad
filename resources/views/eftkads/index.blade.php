@@ -2,60 +2,60 @@
 
 @php($activeNav = 'visits')
 
-@section('title', 'Eftkad - Visits List')
-@section('page-title', 'Visits List')
-@section('page-title-mobile', 'Visits List')
+@section('title', __('ui.visits.title') . ' - Eftkad')
+@section('page-title', __('ui.visits.title'))
+@section('page-title-mobile', __('ui.visits.title'))
 
 @section('content')
 <!-- Filter Bar -->
-<div class="bg-surface-container-lowest p-card-padding rounded-xl card-shadow border border-outline-variant grid grid-cols-1 md:grid-cols-4 gap-stack-gap relative z-20">
+<div class="bg-surface-container-lowest p-4 sm:p-card-padding rounded-xl card-shadow border border-outline-variant grid grid-cols-1 md:grid-cols-4 gap-stack-gap relative z-20">
     <!-- Father Dropdown -->
     <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Father</label>
-        <select id="filter-father" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none pr-8 cursor-pointer">
-            <option value="">All Fathers</option>
+        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_father') }}</label>
+        <select id="filter-father" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+            <option value="">{{ __('ui.visits.filter_father_all') }}</option>
         </select>
-        <span class="material-symbols-outlined absolute left-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
     </div>
     <!-- Servant Dropdown -->
     <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Servant</label>
-        <select id="filter-servant" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none pr-8 cursor-pointer">
-            <option value="">All Servants</option>
+        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_servant') }}</label>
+        <select id="filter-servant" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+            <option value="">{{ __('ui.visits.filter_servant_all') }}</option>
         </select>
-        <span class="material-symbols-outlined absolute left-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
     </div>
     <!-- Visit Type -->
     <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Visit Type</label>
-        <select id="filter-type" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none pr-8 cursor-pointer">
-            <option value="">All Types</option>
+        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_type') }}</label>
+        <select id="filter-type" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+            <option value="">{{ __('ui.visits.filter_type_all') }}</option>
         </select>
-        <span class="material-symbols-outlined absolute left-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
     </div>
     <!-- Date search -->
     <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Date</label>
+        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_date') }}</label>
         <div class="flex items-center bg-surface border border-outline-variant rounded-lg px-3 py-2 cursor-text">
-            <span class="material-symbols-outlined ml-2 text-on-surface-variant text-sm">calendar_today</span>
-            <input id="filter-date" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-on-surface" placeholder="e.g. 12-10-2023" type="text" />
+            <span class="material-symbols-outlined rtl:ml-2 ltr:mr-2 text-on-surface-variant text-sm">calendar_today</span>
+            <input id="filter-date" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-on-surface" placeholder="{{ __('ui.visits.filter_date_placeholder') }}" type="text" />
         </div>
     </div>
 </div>
 
 <p id="filter-note" class="hidden text-label-sm font-label-sm text-on-surface-variant -mt-2">
-    Note: Father/Servant filtering is applied client-side to the current page of results only.
+    {{ __('ui.visits.filter_note') }}
 </p>
 
 <!-- Cards List -->
-<div id="visits-loading" class="text-center py-12 text-on-surface-variant">Loading visits...</div>
-<div id="visits-empty" class="hidden text-center py-12 text-on-surface-variant">No visits found.</div>
-<div id="visits-error" class="hidden text-center py-12 text-error">Failed to load visits.</div>
+<div id="visits-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.visits.loading') }}</div>
+<div id="visits-empty" class="hidden text-center py-12 text-on-surface-variant">{{ __('ui.visits.empty') }}</div>
+<div id="visits-error" class="hidden text-center py-12 text-error">{{ __('ui.visits.error') }}</div>
 <div id="visits-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"></div>
 @endsection
 
 @section('fab')
-<a href="/visits/create" class="fixed bottom-24 md:bottom-8 left-6 md:left-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-surface-tint transition-all scale-95 active:opacity-80 z-40">
+<a href="/visits/create" class="fixed bottom-24 md:bottom-8 rtl:left-6 ltr:right-6 md:rtl:left-8 md:ltr:right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-surface-tint transition-all scale-95 active:opacity-80 z-40">
     <span class="material-symbols-outlined text-[28px]">add</span>
 </a>
 @endsection
@@ -96,7 +96,7 @@
     function needsChips(eftkad) {
         const needs = eftkad.needs || [];
         if (!needs.length) {
-            return '<span class="font-label-sm text-on-surface-variant italic">No special needs noted</span>';
+            return '<span class="font-label-sm text-on-surface-variant italic">' + UI_TEXT.visits.no_needs_noted + '</span>';
         }
         return needs.map(function (n) {
             const icon = NEED_ICONS[n.value] || 'info';
@@ -118,7 +118,7 @@
         const location = eftkad.location || eftkad.correspondence_address || '—';
         return `
         <a href="/visits/${eftkad.id}" class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant p-card-padding flex flex-col gap-3 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg">
-            <div class="absolute top-0 right-0 bottom-0 w-1 ${accent}"></div>
+            <div class="absolute top-0 rtl:right-0 ltr:left-0 bottom-0 w-1 ${accent}"></div>
             <div class="flex justify-between items-start">
                 <div>
                     <div class="flex items-center gap-2 mb-1">

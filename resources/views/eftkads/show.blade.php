@@ -2,30 +2,30 @@
 
 @php($activeNav = 'visits')
 
-@section('title', 'Visit Details - Eftkad')
-@section('page-title', 'تفاصيل الزيارة')
-@section('page-title-mobile', 'تفاصيل الزيارة')
+@section('title', __('ui.visit_detail.title') . ' - Eftkad')
+@section('page-title', __('ui.visit_detail.title'))
+@section('page-title-mobile', __('ui.visit_detail.title'))
 
 @section('content')
 <div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
     <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">arrow_forward</span>
-        <span>العودة</span>
+        <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
+        <span>{{ __('ui.common.back') }}</span>
     </button>
 </div>
 <div class="md:hidden flex items-center gap-2 -mt-4 mb-2">
     <button type="button" onclick="history.back()" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
-        <span class="material-symbols-outlined">arrow_forward</span>
+        <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
     </button>
 </div>
 
-<div id="detail-loading" class="text-center py-12 text-on-surface-variant">Loading...</div>
-<div id="detail-error" class="hidden text-center py-12 text-error">Failed to load visit details.</div>
+<div id="detail-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.visit_detail.loading') }}</div>
+<div id="detail-error" class="hidden text-center py-12 text-error">{{ __('ui.visit_detail.error') }}</div>
 
 <div id="detail-content" class="hidden space-y-6">
     <!-- Identity & Status Card -->
-    <section class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-2 h-full bg-primary-container"></div>
+    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
+        <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container"></div>
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-variant pb-4 mb-4">
             <div>
                 <h2 class="font-title-md text-title-md text-on-surface mb-1" id="d-membership_code">—</h2>
@@ -38,25 +38,25 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <h3 class="font-label-sm text-label-sm text-outline mb-2">الاحتياجات الرعوية</h3>
+                <h3 class="font-label-sm text-label-sm text-outline mb-2">{{ __('ui.visit_detail.needs_heading') }}</h3>
                 <div class="flex flex-wrap gap-2" id="d-needs">
-                    <span class="text-on-surface-variant italic font-body-md text-body-md">لا توجد احتياجات مسجلة</span>
+                    <span class="text-on-surface-variant italic font-body-md text-body-md">{{ __('ui.visit_detail.no_needs') }}</span>
                 </div>
             </div>
             <div>
-                <h3 class="font-label-sm text-label-sm text-outline mb-2">وسائل التواصل</h3>
+                <h3 class="font-label-sm text-label-sm text-outline mb-2">{{ __('ui.visit_detail.comm_heading') }}</h3>
                 <div class="flex flex-wrap gap-2" id="d-comm">
-                    <span class="text-on-surface-variant italic font-body-md text-body-md">لا توجد بيانات</span>
+                    <span class="text-on-surface-variant italic font-body-md text-body-md">{{ __('ui.visit_detail.no_comm') }}</span>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Address -->
-    <section class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
         <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">location_on</span>
-            الموقع والعنوان
+            {{ __('ui.visit_detail.location_heading') }}
         </h3>
         <div class="space-y-4">
             <div class="flex items-start gap-4">
@@ -70,10 +70,10 @@
     </section>
 
     <!-- Responsibility -->
-    <section class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
         <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">groups</span>
-            المسئولية الرعوية
+            {{ __('ui.visit_detail.responsibility_heading') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="flex items-center gap-3">
@@ -81,7 +81,7 @@
                     <span class="material-symbols-outlined">person</span>
                 </div>
                 <div>
-                    <p class="font-label-sm text-label-sm text-outline">الأب الكاهن</p>
+                    <p class="font-label-sm text-label-sm text-outline">{{ __('ui.visit_detail.father_label') }}</p>
                     <span class="font-body-md text-body-md text-on-surface" id="d-father">—</span>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                     <span class="material-symbols-outlined">person</span>
                 </div>
                 <div>
-                    <p class="font-label-sm text-label-sm text-outline">الخادم المسئول</p>
+                    <p class="font-label-sm text-label-sm text-outline">{{ __('ui.visit_detail.servant_label') }}</p>
                     <span class="font-body-md text-body-md text-on-surface" id="d-servant">—</span>
                 </div>
             </div>
@@ -98,30 +98,30 @@
     </section>
 
     <!-- Attendance & confession -->
-    <section class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
         <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">church</span>
-            الحضور والاعتراف
+            {{ __('ui.visit_detail.attendance_heading') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-body-md text-body-md text-on-surface">
-            <p>حضور القداسات: <span class="text-on-surface-variant" id="d-mass">—</span></p>
-            <p>حضور الاجتماعات: <span class="text-on-surface-variant" id="d-attend_meetings">—</span></p>
-            <p>اعتراف الأب: <span class="text-on-surface-variant" id="d-father_confession">—</span></p>
-            <p>اعتراف الأم: <span class="text-on-surface-variant" id="d-mother_confession">—</span></p>
-            <p>اعتراف الأبناء: <span class="text-on-surface-variant" id="d-children_confession">—</span></p>
-            <p>يحتاج افتقاد من الاجتماع: <span class="text-on-surface-variant" id="d-need_eftkad_from_meeting">—</span></p>
-            <p>يحتاج افتقاد من الأب الكاهن: <span class="text-on-surface-variant" id="d-need_eftkad_by_father">—</span></p>
+            <p>{{ __('ui.visit_detail.mass_attendance') }}: <span class="text-on-surface-variant" id="d-mass">—</span></p>
+            <p>{{ __('ui.visit_detail.attend_meetings') }}: <span class="text-on-surface-variant" id="d-attend_meetings">—</span></p>
+            <p>{{ __('ui.visit_detail.father_confession') }}: <span class="text-on-surface-variant" id="d-father_confession">—</span></p>
+            <p>{{ __('ui.visit_detail.mother_confession') }}: <span class="text-on-surface-variant" id="d-mother_confession">—</span></p>
+            <p>{{ __('ui.visit_detail.children_confession') }}: <span class="text-on-surface-variant" id="d-children_confession">—</span></p>
+            <p>{{ __('ui.visit_detail.need_from_meeting') }}: <span class="text-on-surface-variant" id="d-need_eftkad_from_meeting">—</span></p>
+            <p>{{ __('ui.visit_detail.need_by_father') }}: <span class="text-on-surface-variant" id="d-need_eftkad_by_father">—</span></p>
         </div>
     </section>
 
     <!-- Visit Notes -->
-    <section class="bg-surface-container-lowest rounded-xl p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
+    <section class="bg-surface-container-lowest rounded-xl p-4 sm:p-card-padding shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
         <h3 class="font-title-md text-title-md text-on-surface mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-primary">sticky_note_2</span>
-            ملاحظات الزيارة
+            {{ __('ui.visit_detail.notes_heading') }}
         </h3>
         <div class="bg-surface-container-low rounded-lg p-4 text-on-surface-variant font-body-md text-body-md leading-relaxed border border-outline-variant border-opacity-50" id="d-notes">
-            لا توجد ملاحظات
+            {{ __('ui.visit_detail.no_notes') }}
         </div>
     </section>
 </div>
@@ -140,12 +140,12 @@
     }
 
     function yesNo(boolResource) {
-        if (!boolResource) return '—';
-        return boolResource.value === 1 ? 'نعم' : 'لا';
+        if (!boolResource) return UI_TEXT.common.dash;
+        return boolResource.value === 1 ? UI_TEXT.common.yes : UI_TEXT.common.no;
     }
 
     function textYesNo(value) {
-        return value === '1' || value === 1 ? 'نعم' : 'لا';
+        return value === '1' || value === 1 ? UI_TEXT.common.yes : UI_TEXT.common.no;
     }
 
     async function loadDirectory() {
@@ -159,8 +159,8 @@
     }
 
     function renderDetail(e) {
-        document.getElementById('d-membership_code').textContent = e.membership_code || '—';
-        document.getElementById('d-date').textContent = e.date || '—';
+        document.getElementById('d-membership_code').textContent = e.membership_code || UI_TEXT.common.dash;
+        document.getElementById('d-date').textContent = e.date || UI_TEXT.common.dash;
 
         const badges = [];
         if (e.type) {
@@ -175,28 +175,28 @@
             ? needs.map(function (n) {
                 return `<span class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant font-body-md text-body-md">${escapeHtml(n.name)}</span>`;
             }).join('')
-            : '<span class="text-on-surface-variant italic font-body-md text-body-md">لا توجد احتياجات مسجلة</span>';
+            : '<span class="text-on-surface-variant italic font-body-md text-body-md">' + UI_TEXT.visit_detail.no_needs + '</span>';
 
         const comm = e.communication_means || [];
         document.getElementById('d-comm').innerHTML = comm.length
             ? comm.map(function (c) {
                 return `<span class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant font-body-md text-body-md">${escapeHtml(c.name)}</span>`;
             }).join('')
-            : '<span class="text-on-surface-variant italic font-body-md text-body-md">لا توجد بيانات</span>';
+            : '<span class="text-on-surface-variant italic font-body-md text-body-md">' + UI_TEXT.visit_detail.no_comm + '</span>';
 
-        document.getElementById('d-address').textContent = e.correspondence_address || '—';
+        document.getElementById('d-address').textContent = e.correspondence_address || UI_TEXT.common.dash;
         document.getElementById('d-location').textContent = e.location || '';
 
         const fatherCode = e.father_membership_code;
         const servantCode = e.servant_membership_code;
         document.getElementById('d-father').textContent = fatherCode
             ? (memberNames[fatherCode] ? memberNames[fatherCode] + ' (' + fatherCode + ')' : fatherCode)
-            : '—';
+            : UI_TEXT.common.dash;
         document.getElementById('d-servant').textContent = servantCode
             ? (memberNames[servantCode] ? memberNames[servantCode] + ' (' + servantCode + ')' : servantCode)
-            : '—';
+            : UI_TEXT.common.dash;
 
-        document.getElementById('d-mass').textContent = e.mass_attendence ? e.mass_attendence.name : '—';
+        document.getElementById('d-mass').textContent = e.mass_attendence ? e.mass_attendence.name : UI_TEXT.common.dash;
         document.getElementById('d-attend_meetings').textContent = yesNo(e.attend_meetings);
         document.getElementById('d-father_confession').textContent = textYesNo(e.father_confession);
         document.getElementById('d-mother_confession').textContent = textYesNo(e.mother_confession);
@@ -204,7 +204,7 @@
         document.getElementById('d-need_eftkad_from_meeting').textContent = textYesNo(e.need_eftkad_from_meeting);
         document.getElementById('d-need_eftkad_by_father').textContent = yesNo(e.need_eftkad_by_father);
 
-        document.getElementById('d-notes').textContent = e.general_notes || 'لا توجد ملاحظات';
+        document.getElementById('d-notes').textContent = e.general_notes || UI_TEXT.visit_detail.no_notes;
     }
 
     async function loadDetail() {

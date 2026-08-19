@@ -1,27 +1,27 @@
 @extends('layouts.guest')
 
-@section('title', 'جاري تسجيل الدخول - إفتقاد')
+@section('title', __('ui.callback.title'))
 
 @section('content')
-<div class="w-full max-w-md glass-card rounded-2xl p-8 md:p-10 relative overflow-hidden text-center">
-    <div class="absolute top-0 right-0 w-2 h-full bg-primary-container rounded-r-2xl"></div>
+<div class="w-full max-w-md glass-card rounded-2xl p-6 sm:p-8 md:p-10 relative overflow-hidden text-center">
+    <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container rtl:rounded-r-2xl ltr:rounded-l-2xl"></div>
 
     <div class="flex flex-col items-center mb-8">
         <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4 shadow-sm border border-outline-variant">
             <span class="material-symbols-outlined text-primary text-3xl">church</span>
         </div>
-        <h1 class="font-display-lg text-display-lg text-primary text-center">إفتقاد</h1>
+        <h1 class="font-display-lg text-display-lg text-primary text-center">{{ __('ui.app_name') }}</h1>
     </div>
 
     <div id="callback-pending">
         <span class="material-symbols-outlined text-primary text-4xl animate-spin" style="display: inline-block;">progress_activity</span>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-4">جاري إتمام تسجيل الدخول...</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-4">{{ __('ui.callback.pending') }}</p>
     </div>
 
     <div id="callback-error" class="hidden">
         <span class="material-symbols-outlined text-error text-4xl" style="display: inline-block;">error</span>
-        <p id="callback-error-text" class="font-body-md text-body-md text-on-surface-variant mt-4">تعذر تسجيل الدخول</p>
-        <a href="/login" class="inline-block mt-6 font-label-sm text-label-sm text-primary hover:underline underline-offset-4">العودة لصفحة تسجيل الدخول</a>
+        <p id="callback-error-text" class="font-body-md text-body-md text-on-surface-variant mt-4">{{ __('ui.callback.error_default') }}</p>
+        <a href="/login" class="inline-block mt-6 font-label-sm text-label-sm text-primary hover:underline underline-offset-4">{{ __('ui.callback.back_to_login') }}</a>
     </div>
 </div>
 @endsection
@@ -49,7 +49,7 @@
         }
 
         if (!code || !state) {
-            fail('رابط تسجيل الدخول غير مكتمل');
+            fail(UI_TEXT.callback.error_incomplete_link);
             return;
         }
 
@@ -65,7 +65,7 @@
             return;
         }
 
-        fail((res.data && res.data.message) || 'تعذر تسجيل الدخول عبر أفارويز');
+        fail((res.data && res.data.message) || UI_TEXT.callback.error_avarewase);
     });
 </script>
 @endsection

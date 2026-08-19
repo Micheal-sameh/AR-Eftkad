@@ -2,44 +2,44 @@
 
 @php($activeNav = 'directory')
 
-@section('title', 'Eftkad - Reference Directory')
-@section('page-title', 'دليل الخدمة')
-@section('page-title-mobile', 'دليل الخدمة')
+@section('title', __('ui.directory.title') . ' - Eftkad')
+@section('page-title', __('ui.directory.title'))
+@section('page-title-mobile', __('ui.directory.title'))
 
 @section('content')
 <div class="-mt-4 mb-2">
-    <p class="font-body-md text-body-md text-on-surface-variant">بحث سريع عن الأباء والخدام.</p>
+    <p class="font-body-md text-body-md text-on-surface-variant">{{ __('ui.directory.subtitle') }}</p>
 </div>
 
 <!-- Search Bar -->
 <div class="relative mb-2 max-w-md">
-    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+    <div class="absolute inset-y-0 rtl:right-0 ltr:left-0 rtl:pr-3 ltr:pl-3 flex items-center pointer-events-none">
         <span class="material-symbols-outlined text-outline">search</span>
     </div>
-    <input id="directory-search" class="block w-full pl-3 pr-10 py-3 border border-outline-variant rounded-lg leading-5 bg-surface-container-lowest placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-body-md sm:text-sm transition-colors" placeholder="ابحث بالاسم أو الكود..." type="text" />
+    <input id="directory-search" class="block w-full rtl:pl-3 ltr:pr-3 rtl:pr-10 ltr:pl-10 py-3 border border-outline-variant rounded-lg leading-5 bg-surface-container-lowest placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary font-body-md text-body-md sm:text-sm transition-colors" placeholder="{{ __('ui.directory.search_placeholder') }}" type="text" />
 </div>
 
-<div id="directory-loading" class="text-center py-8 text-on-surface-variant">Loading...</div>
-<div id="directory-error" class="hidden text-center py-8 text-error">Failed to load directory.</div>
+<div id="directory-loading" class="text-center py-8 text-on-surface-variant">{{ __('ui.directory.loading') }}</div>
+<div id="directory-error" class="hidden text-center py-8 text-error">{{ __('ui.directory.error') }}</div>
 
 <div id="directory-lists" class="hidden grid grid-cols-1 md:grid-cols-2 gap-container-margin">
     <!-- Fathers List -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-card-padding">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 sm:p-card-padding">
         <h3 class="font-title-md text-title-md text-primary mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined">person</span>
-            قائمة الآباء
+            {{ __('ui.directory.fathers_list') }}
         </h3>
         <ul class="divide-y divide-surface-container" id="fathers-list"></ul>
-        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="fathers-empty">لا توجد نتائج</p>
+        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="fathers-empty">{{ __('ui.directory.no_results') }}</p>
     </div>
     <!-- Servants List -->
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-card-padding">
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-container p-4 sm:p-card-padding">
         <h3 class="font-title-md text-title-md text-primary mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined">group</span>
-            قائمة الخدام
+            {{ __('ui.directory.servants_list') }}
         </h3>
         <ul class="divide-y divide-surface-container" id="servants-list"></ul>
-        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="servants-empty">لا توجد نتائج</p>
+        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="servants-empty">{{ __('ui.directory.no_results') }}</p>
     </div>
 </div>
 @endsection
@@ -66,9 +66,9 @@
         });
 
         list.innerHTML = filtered.map(function (p) {
-            return `<li class="py-3 flex justify-between items-center group cursor-pointer hover:bg-surface-container-low transition-colors px-2 rounded-md -mx-2">
-                <span class="font-body-md text-body-md text-on-background font-medium">${escapeHtml(p.name)}</span>
-                <span class="font-label-sm text-label-sm bg-surface-variant text-on-surface-variant px-2 py-1 rounded">${escapeHtml(p.membership_code)}</span>
+            return `<li class="py-3 flex justify-between items-center gap-2 group cursor-pointer hover:bg-surface-container-low transition-colors px-2 rounded-md -mx-2">
+                <span class="font-body-md text-body-md text-on-background font-medium truncate">${escapeHtml(p.name)}</span>
+                <span class="font-label-sm text-label-sm bg-surface-variant text-on-surface-variant px-2 py-1 rounded flex-shrink-0">${escapeHtml(p.membership_code)}</span>
             </li>`;
         }).join('');
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" lang="{{ app()->getLocale() }}">
 <head>
 @include('partials.head-assets')
 <title>@yield('title', 'Eftkad')</title>
@@ -9,22 +9,22 @@
 
 <!-- Install App Prompt (shown once, right after login) -->
 <div id="install-prompt" class="hidden fixed inset-0 z-[60] flex items-end md:items-center justify-center bg-black/40 p-4">
-    <div class="w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl p-card-padding relative">
-        <button type="button" id="install-dismiss" class="absolute top-3 left-3 p-1 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
+    <div class="w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl p-4 sm:p-card-padding relative">
+        <button type="button" id="install-dismiss" class="absolute top-3 rtl:left-3 ltr:right-3 p-1 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors">
             <span class="material-symbols-outlined">close</span>
         </button>
         <div class="flex flex-col items-center text-center gap-3">
-            <img src="/icons/icon-192.png" alt="إفتقاد" class="w-16 h-16 rounded-2xl shadow-md" />
-            <h3 class="font-title-md text-title-md text-on-surface">ثبّت تطبيق إفتقاد</h3>
+            <img src="/icons/icon-192.png" alt="{{ __('ui.app_name') }}" class="w-16 h-16 rounded-2xl shadow-md" />
+            <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.install_prompt.title') }}</h3>
             <p class="font-body-md text-body-md text-on-surface-variant" id="install-prompt-text">
-                أضف التطبيق إلى شاشتك الرئيسية للوصول السريع والعمل بدون اتصال.
+                {{ __('ui.install_prompt.text_default') }}
             </p>
             <div class="flex gap-3 w-full mt-2">
                 <button type="button" id="install-later" class="flex-1 px-4 py-3 rounded-lg border border-outline-variant text-on-surface-variant font-title-md text-title-md hover:bg-surface-container-low transition-colors">
-                    لاحقاً
+                    {{ __('ui.install_prompt.later') }}
                 </button>
                 <button type="button" id="install-confirm" class="flex-1 px-4 py-3 rounded-lg bg-primary text-on-primary font-title-md text-title-md hover:bg-surface-tint transition-colors">
-                    تثبيت
+                    {{ __('ui.install_prompt.install') }}
                 </button>
             </div>
         </div>
@@ -32,7 +32,7 @@
 </div>
 
 <!-- NavigationDrawer (Desktop) -->
-<nav class="hidden md:flex flex-col h-full p-gutter fixed right-0 top-0 bg-surface border-l border-outline-variant w-80 z-40 transition-all duration-200 ease-in-out">
+<nav class="hidden md:flex flex-col h-full p-gutter fixed rtl:right-0 ltr:left-0 top-0 bg-surface rtl:border-l ltr:border-r border-outline-variant w-80 z-40 transition-all duration-200 ease-in-out">
     <div class="mb-gutter">
         <h1 class="font-headline-lg text-primary">Eftkad</h1>
     </div>
@@ -49,25 +49,25 @@
         <li>
             <a href="/visits" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                 <span class="material-symbols-outlined">church</span>
-                <span class="font-title-md text-title-md">الزيارات الرعوية</span>
+                <span class="font-title-md text-title-md">{{ __('ui.nav.visits') }}</span>
             </a>
         </li>
         <li>
             <a href="/visits/create" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                 <span class="material-symbols-outlined">edit_calendar</span>
-                <span class="font-title-md text-title-md">تسجيل زيارة جديدة</span>
+                <span class="font-title-md text-title-md">{{ __('ui.nav.new_visit') }}</span>
             </a>
         </li>
         <li>
             <a href="/directory" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                 <span class="material-symbols-outlined">menu_book</span>
-                <span class="font-title-md text-title-md">دليل الخدمة</span>
+                <span class="font-title-md text-title-md">{{ __('ui.nav.directory') }}</span>
             </a>
         </li>
         <li>
             <a href="/users" class="flex items-center gap-stack-gap px-4 py-3 rounded-lg transition-all {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                 <span class="material-symbols-outlined">manage_accounts</span>
-                <span class="font-title-md text-title-md">إدارة المستخدمين</span>
+                <span class="font-title-md text-title-md">{{ __('ui.nav.users') }}</span>
             </a>
         </li>
     </ul>
@@ -78,13 +78,13 @@
         </button>
         <button type="button" id="nav-signout" class="w-full flex items-center gap-stack-gap text-on-surface-variant px-4 py-3 hover:bg-surface-container-low rounded-lg transition-all">
             <span class="material-symbols-outlined">door_open</span>
-            <span class="font-title-md text-title-md">تسجيل الخروج</span>
+            <span class="font-title-md text-title-md">{{ __('ui.nav.sign_out') }}</span>
         </button>
     </div>
 </nav>
 
 <!-- Main Content Area -->
-<div class="flex-grow flex flex-col md:mr-80 w-full relative">
+<div class="flex-grow flex flex-col md:rtl:mr-80 md:ltr:ml-80 w-full relative">
     <!-- TopAppBar (Mobile & Desktop Header Area) -->
     <header class="flex justify-between items-center w-full px-container-margin py-unit max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
         <div class="flex items-center gap-stack-gap md:hidden">
@@ -94,7 +94,7 @@
             <h1 class="font-title-md text-title-md font-semibold text-primary">Eftkad</h1>
         </div>
         <div class="hidden md:flex items-center gap-stack-gap flex-grow justify-between">
-            <h2 class="font-display-lg text-display-lg text-on-surface">@yield('page-title', 'إفتقاد')</h2>
+            <h2 class="font-display-lg text-display-lg text-on-surface">@yield('page-title', __('ui.app_name'))</h2>
         </div>
         <button type="button" id="topbar-locale-toggle" class="text-primary hover:bg-surface-container p-2 rounded-full transition-colors font-label-sm text-label-sm">
             AR/EN
@@ -102,7 +102,7 @@
     </header>
 
     <main class="flex-grow p-container-margin max-w-7xl mx-auto w-full flex flex-col gap-6">
-        <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden text-on-surface mb-2">@yield('page-title-mobile', 'إفتقاد')</h2>
+        <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden text-on-surface mb-2">@yield('page-title-mobile', __('ui.app_name'))</h2>
 
         @yield('content')
     </main>
@@ -113,26 +113,26 @@
 @endif
 
 <!-- BottomNavBar (Mobile Only) -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
-    <a href="/visits" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'visits' ? 'filled' : '' }}">home</span>
-        <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'visits' ? 'font-bold' : '' }}">الزيارات</span>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-1 sm:px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
+    <a href="/visits" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'visits' ? 'filled' : '' }}">home</span>
+        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'visits' ? 'font-bold' : '' }}">{{ __('ui.nav.visits_short') }}</span>
     </a>
-    <a href="/visits/create" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'create' ? 'filled' : '' }}">add_circle</span>
-        <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'create' ? 'font-bold' : '' }}">جديد</span>
+    <a href="/visits/create" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'create' ? 'filled' : '' }}">add_circle</span>
+        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'create' ? 'font-bold' : '' }}">{{ __('ui.nav.new_visit_short') }}</span>
     </a>
-    <a href="/directory" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'directory' ? 'filled' : '' }}">settings</span>
-        <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'directory' ? 'font-bold' : '' }}">أدوات</span>
+    <a href="/directory" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'directory' ? 'filled' : '' }}">settings</span>
+        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'directory' ? 'font-bold' : '' }}">{{ __('ui.nav.directory_short') }}</span>
     </a>
-    <a href="/users" class="flex flex-col items-center justify-center px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined {{ ($activeNav ?? '') === 'users' ? 'filled' : '' }}">manage_accounts</span>
-        <span class="font-label-sm text-label-sm mt-1 {{ ($activeNav ?? '') === 'users' ? 'font-bold' : '' }}">مستخدمين</span>
+    <a href="/users" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
+        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'users' ? 'filled' : '' }}">manage_accounts</span>
+        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'users' ? 'font-bold' : '' }}">{{ __('ui.nav.users_short') }}</span>
     </a>
-    <a href="#" id="bottomnav-signout" class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">logout</span>
-        <span class="font-label-sm text-label-sm mt-1">خروج</span>
+    <a href="#" id="bottomnav-signout" class="flex flex-col items-center justify-center text-on-surface-variant px-2 sm:px-3 py-1 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-[22px] sm:text-[24px]">logout</span>
+        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1">{{ __('ui.nav.sign_out_short') }}</span>
     </a>
 </nav>
 
@@ -201,9 +201,9 @@
         // moment before deciding what (if anything) to show.
         setTimeout(function () {
             if (Eftkad.deferredInstallPrompt) {
-                showInstallModal('أضف التطبيق إلى شاشتك الرئيسية للوصول السريع والعمل بدون اتصال.');
+                showInstallModal(UI_TEXT.install_prompt.text_default);
             } else if (Eftkad.isIos()) {
-                showInstallModal('لتثبيت التطبيق: اضغط على زر المشاركة ثم "إضافة إلى الشاشة الرئيسية".');
+                showInstallModal(UI_TEXT.install_prompt.text_ios);
             }
             // Otherwise the browser doesn't support installable PWAs (or already installed) - stay silent.
         }, 1200);
