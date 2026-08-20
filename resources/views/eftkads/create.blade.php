@@ -170,12 +170,16 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.father_code') }}</label>
-                    <input id="f-father_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.father_code_placeholder') }}" type="text" />
+                    <select id="f-father_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow">
+                        <option value="">{{ __('ui.visit_form.father_select_placeholder') }}</option>
+                    </select>
                     <p class="field-error" id="error-father_membership_code"></p>
                 </div>
                 <div>
                     <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.servant_code') }}</label>
-                    <input id="f-servant_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.servant_code_placeholder') }}" type="text" />
+                    <select id="f-servant_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow">
+                        <option value="">{{ __('ui.visit_form.servant_select_placeholder') }}</option>
+                    </select>
                     <p class="field-error" id="error-servant_membership_code"></p>
                 </div>
             </div>
@@ -292,6 +296,25 @@
         renderChipOptions(document.getElementById('communication-options'), data.user_status || [], COMM_ICONS, 'comm');
     }
 
+    async function loadAdminSelects() {
+        const res = await Eftkad.api('/settings/filters');
+        if (!res.ok || !res.data) return;
+        const data = res.data.data || {};
+
+        renderPersonOptions('f-father_membership_code', data.fathers || []);
+        renderPersonOptions('f-servant_membership_code', data.servants || []);
+    }
+
+    function renderPersonOptions(selectId, people) {
+        const select = document.getElementById(selectId);
+        people.forEach(function (person) {
+            const option = document.createElement('option');
+            option.value = person.membership_code;
+            option.textContent = person.name;
+            select.appendChild(option);
+        });
+    }
+
     async function submitForm() {
         clearErrors();
 
@@ -348,6 +371,7 @@
         if (!Eftkad.requireAuth()) return;
 
         loadEnums();
+        loadAdminSelects();
 
         document.getElementById('save-visit-btn').addEventListener('click', submitForm);
     });
