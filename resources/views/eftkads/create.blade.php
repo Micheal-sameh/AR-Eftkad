@@ -17,7 +17,7 @@
     <span id="form-error-text">{{ __('ui.visit_form.generic_error') }}</span>
 </div>
 
-<form id="visit-form" class="space-y-6 pb-24">
+<form id="visit-form" class="space-y-6">
     <!-- Section 1: Basic Info -->
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary overflow-hidden">
         <button class="w-full flex items-center justify-between p-4 md:p-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors" onclick="toggleSection('section-1')" type="button">
@@ -201,15 +201,15 @@
             </div>
         </div>
     </div>
-</form>
 
-<!-- Sticky Save Action -->
-<div class="safe-bottom fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-    <button type="button" id="save-visit-btn" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
-        <span class="material-symbols-outlined">save</span>
-        <span id="save-visit-label">{{ __('ui.visit_form.save_button') }}</span>
-    </button>
-</div>
+    <!-- Save Action -->
+    <div class="flex justify-center pt-2">
+        <button type="button" id="save-visit-btn" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined">save</span>
+            <span id="save-visit-label">{{ __('ui.visit_form.save_button') }}</span>
+        </button>
+    </div>
+</form>
 </div>
 @endsection
 
