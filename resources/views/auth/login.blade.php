@@ -9,10 +9,7 @@
 
     <!-- Logo / Brand -->
     <div class="flex flex-col items-center mb-10">
-        <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4 shadow-sm border border-outline-variant">
-            <span class="material-symbols-outlined text-primary text-3xl">church</span>
-        </div>
-        <h1 class="font-display-lg text-display-lg text-primary text-center">{{ __('ui.app_name') }}</h1>
+        <img src="/images/logo.png" alt="{{ __('ui.app_name') }}" class="w-28 h-auto mb-4" />
         <p class="font-body-md text-body-md text-on-surface-variant mt-2 text-center">{{ __('ui.login.subtitle') }}</p>
     </div>
 
