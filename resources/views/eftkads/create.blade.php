@@ -30,12 +30,12 @@
         <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-4" id="section-1">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.membership_code') }}</label>
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.membership_code') }} <span class="text-error">*</span></label>
                     <input id="f-membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.membership_code_placeholder') }}" type="text" />
                     <p class="field-error" id="error-membership_code"></p>
                 </div>
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.visit_date') }}</label>
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.visit_date') }} <span class="text-error">*</span></label>
                     <input id="f-date" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" type="date" />
                     <p class="field-error" id="error-date"></p>
                 </div>
@@ -62,7 +62,7 @@
                 <p class="field-error" id="error-location_url"></p>
             </div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">{{ __('ui.visit_form.visit_type') }}</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">{{ __('ui.visit_form.visit_type') }} <span class="text-error">*</span></label>
                 <div class="flex flex-wrap gap-4" id="visit-type-options"></div>
                 <p class="field-error" id="error-type"></p>
             </div>
@@ -81,7 +81,7 @@
         <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-6" id="section-2">
             <!-- Mass Attendance -->
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.mass_attendance') }}</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.mass_attendance') }} <span class="text-error">*</span></label>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="mass-attendance-options"></div>
                 <p class="field-error" id="error-mass_attendence"></p>
             </div>
@@ -155,13 +155,13 @@
         </button>
         <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-6" id="section-3">
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.needs_heading') }}</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.needs_heading') }} <span class="text-error">*</span></label>
                 <div class="flex flex-wrap gap-3" id="needs-options"></div>
                 <p class="field-error" id="error-needs"></p>
             </div>
             <div class="h-px bg-outline-variant w-full opacity-50"></div>
             <div>
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.comm_heading') }}</label>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-3">{{ __('ui.visit_form.comm_heading') }} <span class="text-error">*</span></label>
                 <div class="flex flex-wrap gap-3" id="communication-options"></div>
                 <p class="field-error" id="error-communication_means"></p>
             </div>
@@ -180,14 +180,14 @@
         <div class="section-content px-4 md:px-5 pb-4 md:pb-5 pt-0 space-y-4" id="section-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.father_code') }}</label>
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.father_code') }} <span class="text-error">*</span></label>
                     <select id="f-father_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow">
                         <option value="">{{ __('ui.visit_form.father_select_placeholder') }}</option>
                     </select>
                     <p class="field-error" id="error-father_membership_code"></p>
                 </div>
                 <div>
-                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.servant_code') }}</label>
+                    <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.servant_code') }} <span class="text-error">*</span></label>
                     <select id="f-servant_membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow">
                         <option value="">{{ __('ui.visit_form.servant_select_placeholder') }}</option>
                     </select>
