@@ -23,7 +23,7 @@
 <div id="edit-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.user_edit.loading') }}</div>
 <div id="edit-load-error" class="hidden text-center py-12 text-error">{{ __('ui.user_edit.error') }}</div>
 
-<form id="type-form" class="hidden space-y-6 pb-24">
+<form id="type-form" class="hidden space-y-6">
     <div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] rtl:border-r-4 ltr:border-l-4 border-primary p-4 md:p-5 space-y-4">
         <div>
             <p class="font-title-md text-base md:text-lg text-on-surface" id="f-name">—</p>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="safe-bottom fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
+    <div class="flex justify-center pt-2">
         <button type="button" id="save-type-btn" onclick="submitForm()" class="w-full max-w-sm bg-primary text-on-primary rounded-lg py-4 px-6 font-title-md text-title-md shadow-lg hover:shadow-xl hover:bg-surface-tint transition-all active:scale-95 flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">save</span>
             <span id="save-type-label">{{ __('ui.user_edit.save_button') }}</span>
