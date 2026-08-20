@@ -9,7 +9,7 @@
 
     <!-- Logo / Brand -->
     <div class="flex flex-col items-center mb-10">
-        <img src="/images/logo.png" alt="{{ __('ui.app_name') }}" class="w-28 h-auto mb-4" />
+        <img src="/images/logo.png?v=2" alt="{{ __('ui.app_name') }}" class="w-28 h-auto mb-4" />
         <p class="font-body-md text-body-md text-on-surface-variant mt-2 text-center">{{ __('ui.login.subtitle') }}</p>
     </div>
 

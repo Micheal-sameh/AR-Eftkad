@@ -14,7 +14,7 @@
             <span class="material-symbols-outlined">close</span>
         </button>
         <div class="flex flex-col items-center text-center gap-3">
-            <img src="/icons/icon-192.png" alt="{{ __('ui.app_name') }}" class="w-16 h-16 rounded-2xl shadow-md" />
+            <img src="/icons/icon-192.png?v=2" alt="{{ __('ui.app_name') }}" class="w-16 h-16 rounded-2xl shadow-md" />
             <h3 class="font-title-md text-title-md text-on-surface">{{ __('ui.install_prompt.title') }}</h3>
             <p class="font-body-md text-body-md text-on-surface-variant" id="install-prompt-text">
                 {{ __('ui.install_prompt.text_default') }}

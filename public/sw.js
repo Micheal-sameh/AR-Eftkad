@@ -1,9 +1,9 @@
-const CACHE_NAME = 'eftkad-shell-v2';
+const CACHE_NAME = 'eftkad-shell-v3';
 const APP_SHELL = [
     '/login',
     '/manifest.webmanifest',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png',
+    '/icons/icon-192.png?v=2',
+    '/icons/icon-512.png?v=2',
 ];
 
 self.addEventListener('install', function (event) {
