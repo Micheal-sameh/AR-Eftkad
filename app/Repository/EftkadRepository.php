@@ -57,6 +57,7 @@ class EftkadRepository
             'children_confession' => $input->children_confession,
             'need_eftkad_by_father' => $input->need_eftkad_by_father ?? BoolType::FALSE,
             'location' => $input->location,
+            'location_url' => $input->location_url,
             'general_notes' => $input->general_notes,
             'father_membership_code' => $input->father_membership_code,
             'servant_membership_code' => $input->servant_membership_code,
