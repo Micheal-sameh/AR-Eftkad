@@ -31,7 +31,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.membership_code') }} <span class="text-error">*</span></label>
-                    <input id="f-membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.membership_code_placeholder') }}" type="text" />
+                    <input id="f-membership_code" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow uppercase" placeholder="{{ __('ui.visit_form.membership_code_placeholder') }}" type="text" />
                     <p class="field-error" id="error-membership_code"></p>
                 </div>
                 <div>

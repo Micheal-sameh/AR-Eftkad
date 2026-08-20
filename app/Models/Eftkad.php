@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -34,4 +35,25 @@ class Eftkad extends Model
         'needs' => 'array',
         'communication_means' => 'array',
     ];
+
+    protected function membershipCode(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value === null ? null : strtoupper($value),
+        );
+    }
+
+    protected function fatherMembershipCode(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value === null ? null : strtoupper($value),
+        );
+    }
+
+    protected function servantMembershipCode(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value === null ? null : strtoupper($value),
+        );
+    }
 }
