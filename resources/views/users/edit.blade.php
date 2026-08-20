@@ -34,6 +34,11 @@
             <div class="flex flex-wrap gap-4" id="type-options"></div>
             <p class="field-error" id="error-type"></p>
         </div>
+        <div id="role-section" class="hidden">
+            <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">{{ __('ui.user_edit.role_label') }}</label>
+            <div class="flex flex-wrap gap-4" id="role-options"></div>
+            <p class="field-error" id="error-role"></p>
+        </div>
     </div>
 
     <div class="safe-bottom fixed bottom-16 md:bottom-0 left-0 w-full md:rtl:w-[calc(100%-16rem)] md:ltr:w-[calc(100%-16rem)] bg-surface/90 backdrop-blur-sm border-t border-outline-variant p-4 z-40 flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)] md:shadow-none">
@@ -70,6 +75,19 @@
         }).join('');
     }
 
+    function renderRoleOptions(options, currentValue) {
+        const container = document.getElementById('role-options');
+        container.innerHTML = options.map(function (o) {
+            const checked = String(o.value) === String(currentValue) ? 'checked' : '';
+            return `<label class="flex-1 min-w-[45%] sm:min-w-0 cursor-pointer">
+                <input ${checked} class="peer sr-only" name="user_role" type="radio" value="${o.value}" />
+                <div class="w-full text-center px-4 py-3 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:border-primary-container peer-checked:text-on-primary-container transition-all">
+                    ${escapeHtml(o.name)}
+                </div>
+            </label>`;
+        }).join('');
+    }
+
     function clearErrors() {
         document.getElementById('form-error').classList.add('hidden');
         document.querySelectorAll('.field-error').forEach(function (el) {
@@ -77,10 +95,17 @@
         });
     }
 
-    async function loadTypeOptions(currentValue) {
+    async function loadTypeOptions(currentValue, currentRole) {
         const res = await Eftkad.api('/settings/enums');
         if (!res.ok || !res.data) return;
         renderTypeOptions((res.data.data && res.data.data.user_type) || [], currentValue);
+
+        const currentUser = Eftkad.user();
+        const isSuperadmin = currentUser && currentUser.role && currentUser.role.value === 'superadmin';
+        if (isSuperadmin) {
+            document.getElementById('role-section').classList.remove('hidden');
+            renderRoleOptions((res.data.data && res.data.data.user_role) || [], currentRole);
+        }
     }
 
     async function loadUser() {
@@ -101,7 +126,7 @@
         document.getElementById('f-name').textContent = user.name || UI_TEXT.common.dash;
         document.getElementById('f-membership_code').textContent = user.membership_code || UI_TEXT.common.dash;
 
-        await loadTypeOptions(user.type ? user.type.value : null);
+        await loadTypeOptions(user.type ? user.type.value : null, user.role ? user.role.value : null);
         form.classList.remove('hidden');
     }
 
@@ -118,25 +143,54 @@
 
         const res = await Eftkad.api('/users/' + USER_ID + '/type', { method: 'PATCH', body: payload });
 
-        saveBtn.disabled = false;
-        saveLabel.textContent = UI_TEXT.user_edit.save_button;
+        if (!res.ok) {
+            saveBtn.disabled = false;
+            saveLabel.textContent = UI_TEXT.user_edit.save_button;
 
-        if (res.ok) {
-            window.location.href = '/users/' + USER_ID;
-            return;
-        }
+            if (res.status === 422 && res.data && res.data.errors) {
+                const errors = res.data.errors;
+                const el = document.getElementById('error-type');
+                if (el && errors.type) el.textContent = errors.type[0];
+                document.getElementById('form-error-text').textContent = UI_TEXT.common.review_fields;
+                document.getElementById('form-error').classList.remove('hidden');
+                return;
+            }
 
-        if (res.status === 422 && res.data && res.data.errors) {
-            const errors = res.data.errors;
-            const el = document.getElementById('error-type');
-            if (el && errors.type) el.textContent = errors.type[0];
-            document.getElementById('form-error-text').textContent = UI_TEXT.common.review_fields;
+            document.getElementById('form-error-text').textContent = (res.data && res.data.message) || UI_TEXT.user_edit.save_error;
             document.getElementById('form-error').classList.remove('hidden');
             return;
         }
 
-        document.getElementById('form-error-text').textContent = (res.data && res.data.message) || UI_TEXT.user_edit.save_error;
-        document.getElementById('form-error').classList.remove('hidden');
+        const roleSection = document.getElementById('role-section');
+        const roleEl = document.querySelector('input[name="user_role"]:checked');
+        if (!roleSection.classList.contains('hidden') && roleEl) {
+            const roleRes = await Eftkad.api('/users/' + USER_ID + '/role', { method: 'PATCH', body: { role: roleEl.value } });
+
+            saveBtn.disabled = false;
+            saveLabel.textContent = UI_TEXT.user_edit.save_button;
+
+            if (!roleRes.ok) {
+                if (roleRes.status === 422 && roleRes.data && roleRes.data.errors) {
+                    const errors = roleRes.data.errors;
+                    const el = document.getElementById('error-role');
+                    if (el && errors.role) el.textContent = errors.role[0];
+                    document.getElementById('form-error-text').textContent = UI_TEXT.common.review_fields;
+                    document.getElementById('form-error').classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('form-error-text').textContent = (roleRes.data && roleRes.data.message) || UI_TEXT.user_edit.save_error;
+                document.getElementById('form-error').classList.remove('hidden');
+                return;
+            }
+
+            window.location.href = '/users/' + USER_ID;
+            return;
+        }
+
+        saveBtn.disabled = false;
+        saveLabel.textContent = UI_TEXT.user_edit.save_button;
+        window.location.href = '/users/' + USER_ID;
     }
 
     document.addEventListener('DOMContentLoaded', function () {

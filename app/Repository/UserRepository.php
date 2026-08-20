@@ -31,4 +31,11 @@ class UserRepository
 
         return $user;
     }
+
+    public function updateRole(User $user, string $role): User
+    {
+        $user->syncRoles([$role]);
+
+        return $user;
+    }
 }

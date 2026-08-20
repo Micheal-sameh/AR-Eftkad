@@ -178,6 +178,7 @@ return [
         'loading' => 'Loading...',
         'error' => 'Failed to load user.',
         'type_label' => 'User Type',
+        'role_label' => 'Role',
         'save_button' => 'Save',
         'save_error' => 'An error occurred while saving',
     ],

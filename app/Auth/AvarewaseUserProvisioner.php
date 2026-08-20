@@ -2,6 +2,7 @@
 
 namespace App\Auth;
 
+use App\Enums\UserRole;
 use App\Exceptions\AvarewaseAccountNotFoundException;
 use App\Models\User;
 use Avarewase\SsoClient\Contracts\ProvisionsAvarewaseUsers;
@@ -19,7 +20,8 @@ use Illuminate\Support\Str;
  * membership_code).
  *
  * `type` (Father/Servant) has no SSO equivalent, so newly-created users
- * are left with type = null until an admin assigns it.
+ * are left with type = null until an admin assigns it. New users default
+ * to the "user" authorization role; an admin/superadmin can promote them.
  *
  * @throws AvarewaseAccountNotFoundException if no user matches and the
  *         SSO identity carries no membership_code to create one with.
@@ -62,6 +64,10 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
 
         if ($userInfo->emailVerified && ! $user->email_verified_at) {
             $user->forceFill(['email_verified_at' => now()])->save();
+        }
+
+        if ($user->roles->isEmpty()) {
+            $user->assignRole(UserRole::USER);
         }
 
         return $user;

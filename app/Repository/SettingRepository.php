@@ -7,6 +7,7 @@ use App\Enums\CommunicationType;
 use App\Enums\EftkadType;
 use App\Enums\MassAttendanceType;
 use App\Enums\NeedType;
+use App\Enums\UserRole;
 use App\Enums\UserType;
 use App\Models\User;
 
@@ -20,6 +21,7 @@ class SettingRepository
         $enums['visits_status'] = NeedType::all();
         $enums['user_type'] = UserType::all();
         $enums['eftkad_type'] = EftkadType::all();
+        $enums['user_role'] = UserRole::all();
 
         return $enums;
     }

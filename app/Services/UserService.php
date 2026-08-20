@@ -33,4 +33,15 @@ class UserService
 
         return $this->userRepository->updateType($user, $type);
     }
+
+    public function updateRole($id, string $role)
+    {
+        $user = $this->userRepository->find($id);
+
+        if (! $user) {
+            return null;
+        }
+
+        return $this->userRepository->updateRole($user, $role);
+    }
 }

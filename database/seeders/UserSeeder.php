@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             'membership_code' => 'E1C1F1NR1',
             'phone' => '1227343176',
             'type' => 1,
-        ]);
+        ])->assignRole('user');
 
         User::create([
             'name' => 'ميشيل',
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             'membership_code' => 'E1C1F1NR3',
             'phone' => '01278783887',
             'type' => 2,
-        ]);
+        ])->assignRole('superadmin');
 
         User::create([
             'name' => 'مارك',
@@ -39,6 +39,6 @@ class UserSeeder extends Seeder
             'membership_code' => 'E1C1F1NR3',
             'phone' => '01208486948',
             'type' => 2,
-        ]);
+        ])->assignRole('admin');
     }
 }

@@ -43,10 +43,11 @@ Route::group(['middleware' => 'setlocale'], function () {
             Route::post('', [EftkadController::class, 'create']);
         });
 
-        Route::group(['prefix' => 'users'], function () {
+        Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin'], function () {
             Route::get('', [UserController::class, 'index']);
             Route::get('{id}', [UserController::class, 'show']);
             Route::patch('{id}/type', [UserController::class, 'updateType']);
+            Route::patch('{id}/role', [UserController::class, 'updateRole'])->middleware('role:superadmin');
         });
 
         Route::group(['as' => 'api.', 'prefix' => 'settings'], function () {
