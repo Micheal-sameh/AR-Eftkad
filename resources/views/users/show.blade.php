@@ -39,13 +39,13 @@
             <div id="d-type-badge"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-body-md text-body-md text-on-surface">
-            <p class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-outline">mail</span>
-                <span id="d-email" class="text-on-surface-variant">—</span>
+            <p class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-outline shrink-0">mail</span>
+                <span id="d-email" class="text-on-surface-variant break-words min-w-0">—</span>
             </p>
-            <p class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-outline">call</span>
-                <span id="d-phone" class="text-on-surface-variant">—</span>
+            <p class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-outline shrink-0">call</span>
+                <span id="d-phone" class="text-on-surface-variant break-words min-w-0">—</span>
             </p>
         </div>
     </section>

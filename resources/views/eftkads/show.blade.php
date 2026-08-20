@@ -60,11 +60,11 @@
             {{ __('ui.visit_detail.location_heading') }}
         </h3>
         <div class="space-y-4">
-            <div class="flex items-start gap-4">
-                <span class="material-symbols-outlined text-outline mt-1">map</span>
-                <div>
-                    <p class="font-body-md text-body-md text-on-surface" id="d-address">—</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant" id="d-location">—</p>
+            <div class="flex items-start gap-4 min-w-0">
+                <span class="material-symbols-outlined text-outline mt-1 shrink-0">map</span>
+                <div class="min-w-0">
+                    <p class="font-body-md text-body-md text-on-surface break-words" id="d-address">—</p>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant break-words" id="d-location">—</p>
                     <a href="#" target="_blank" rel="noopener" class="hidden items-center gap-1 mt-1 font-label-sm text-label-sm text-primary hover:underline" id="d-location-url">
                         <span class="material-symbols-outlined text-[16px]">open_in_new</span>
                         {{ __('ui.visit_detail.open_in_maps') }}
@@ -125,7 +125,7 @@
             <span class="material-symbols-outlined text-primary">sticky_note_2</span>
             {{ __('ui.visit_detail.notes_heading') }}
         </h3>
-        <div class="bg-surface-container-low rounded-lg p-4 text-on-surface-variant font-body-md text-body-md leading-relaxed border border-outline-variant border-opacity-50" id="d-notes">
+        <div class="bg-surface-container-low rounded-lg p-4 text-on-surface-variant font-body-md text-body-md leading-relaxed border border-outline-variant border-opacity-50 break-words" id="d-notes">
             {{ __('ui.visit_detail.no_notes') }}
         </div>
     </section>
