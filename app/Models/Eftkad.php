@@ -23,6 +23,7 @@ class Eftkad extends Model
         'children_confession',
         'need_eftkad_by_father',
         'location',
+        'location_url',
         'general_notes',
         'father_membership_code',
         'servant_membership_code',

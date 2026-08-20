@@ -29,6 +29,7 @@ class EftkadCreateRequest extends FormRequest
             'children_confession' => 'string',
             'need_eftkad_by_father' => 'integer|in:'.implode(',', array_column(BoolType::all(), 'value')),
             'location' => 'string',
+            'location_url' => 'nullable|string|url',
             'general_notes' => 'string',
             'father_membership_code' => 'required|string|exists:users,membership_code',
             'servant_membership_code' => 'required|string|exists:users,membership_code',

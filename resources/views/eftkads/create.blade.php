@@ -51,6 +51,17 @@
                 <p class="field-error" id="error-location"></p>
             </div>
             <div>
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visit_form.location_url') }}</label>
+                <div class="flex items-center gap-2">
+                    <input id="f-location_url" class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="{{ __('ui.visit_form.location_url_placeholder') }}" type="url" readonly />
+                    <button id="set-location-btn" class="shrink-0 flex items-center gap-1.5 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 hover:opacity-90 transition-opacity whitespace-nowrap" type="button">
+                        <span class="material-symbols-outlined text-[20px]" id="set-location-icon">my_location</span>
+                        <span id="set-location-label">{{ __('ui.visit_form.set_current_location') }}</span>
+                    </button>
+                </div>
+                <p class="field-error" id="error-location_url"></p>
+            </div>
+            <div>
                 <label class="block font-label-sm text-label-sm text-on-surface-variant mb-2">{{ __('ui.visit_form.visit_type') }}</label>
                 <div class="flex flex-wrap gap-4" id="visit-type-options"></div>
                 <p class="field-error" id="error-type"></p>
@@ -305,6 +316,49 @@
         renderPersonOptions('f-servant_membership_code', data.servants || []);
     }
 
+    function setCurrentLocation() {
+        const btn = document.getElementById('set-location-btn');
+        const icon = document.getElementById('set-location-icon');
+        const label = document.getElementById('set-location-label');
+        const input = document.getElementById('f-location_url');
+
+        if (!navigator.geolocation) {
+            alert(UI_TEXT.visit_form.location_not_supported);
+            return;
+        }
+
+        btn.disabled = true;
+        icon.textContent = 'progress_activity';
+        icon.classList.add('animate-spin');
+        label.textContent = UI_TEXT.visit_form.locating;
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                input.value = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+
+                btn.disabled = false;
+                icon.textContent = 'my_location';
+                icon.classList.remove('animate-spin');
+                label.textContent = UI_TEXT.visit_form.set_current_location;
+            },
+            function (error) {
+                btn.disabled = false;
+                icon.textContent = 'my_location';
+                icon.classList.remove('animate-spin');
+                label.textContent = UI_TEXT.visit_form.set_current_location;
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    alert(UI_TEXT.visit_form.location_permission_denied);
+                } else {
+                    alert(UI_TEXT.visit_form.location_error);
+                }
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
     function renderPersonOptions(selectId, people) {
         const select = document.getElementById(selectId);
         people.forEach(function (person) {
@@ -331,6 +385,7 @@
             date: toDMY(document.getElementById('f-date').value),
             correspondence_address: document.getElementById('f-correspondence_address').value.trim(),
             location: document.getElementById('f-location').value.trim(),
+            location_url: document.getElementById('f-location_url').value.trim(),
             type: visitTypeEl ? parseInt(visitTypeEl.value, 10) : null,
             mass_attendence: massEl ? parseInt(massEl.value, 10) : null,
             needs: checkedValues('need'),
@@ -374,6 +429,7 @@
         loadAdminSelects();
 
         document.getElementById('save-visit-btn').addEventListener('click', submitForm);
+        document.getElementById('set-location-btn').addEventListener('click', setCurrentLocation);
     });
 </script>
 @endsection

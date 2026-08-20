@@ -35,6 +35,7 @@ class EftkadResource extends JsonResource
             'children_confession' => $this->children_confession,
             'need_eftkad_by_father' => new EnumResource($this->need_eftkad_by_father, BoolType::class),
             'location' => $this->location,
+            'location_url' => $this->location_url,
             'general_notes' => $this->general_notes,
             'father_membership_code' => $this->father_membership_code,
             'servant_membership_code' => $this->servant_membership_code,

@@ -65,6 +65,10 @@
                 <div>
                     <p class="font-body-md text-body-md text-on-surface" id="d-address">—</p>
                     <p class="font-label-sm text-label-sm text-on-surface-variant" id="d-location">—</p>
+                    <a href="#" target="_blank" rel="noopener" class="hidden items-center gap-1 mt-1 font-label-sm text-label-sm text-primary hover:underline" id="d-location-url">
+                        <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                        {{ __('ui.visit_detail.open_in_maps') }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -188,6 +192,13 @@
 
         document.getElementById('d-address').textContent = e.correspondence_address || UI_TEXT.common.dash;
         document.getElementById('d-location').textContent = e.location || '';
+
+        const locationUrlLink = document.getElementById('d-location-url');
+        if (e.location_url) {
+            locationUrlLink.href = e.location_url;
+            locationUrlLink.classList.remove('hidden');
+            locationUrlLink.classList.add('inline-flex');
+        }
 
         const fatherCode = e.father_membership_code;
         const servantCode = e.servant_membership_code;

@@ -20,6 +20,7 @@ class EftkadCreateDTO extends DTO
     public ?string $children_confession;
     public ?int $need_eftkad_by_father;
     public ?string $location;
+    public ?string $location_url;
     public ?string $general_notes;
     public string $father_membership_code;
     public string $servant_membership_code;
@@ -40,6 +41,7 @@ class EftkadCreateDTO extends DTO
         string $children_confession = parent::STRING,
         int $need_eftkad_by_father = parent::INT,
         string $location = parent::STRING,
+        string $location_url = parent::STRING,
         string $general_notes = parent::STRING,
         string $father_membership_code = parent::STRING,
         string $servant_membership_code = parent::STRING,
