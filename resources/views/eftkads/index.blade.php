@@ -8,37 +8,48 @@
 
 @section('content')
 <!-- Filter Bar -->
-<div class="bg-surface-container-lowest p-4 md:p-5 rounded-xl card-shadow border border-outline-variant grid grid-cols-1 md:grid-cols-4 gap-stack-gap relative z-20">
-    <!-- Father Dropdown -->
-    <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_father') }}</label>
-        <select id="filter-father" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-            <option value="">{{ __('ui.visits.filter_father_all') }}</option>
-        </select>
-        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
-    </div>
-    <!-- Servant Dropdown -->
-    <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_servant') }}</label>
-        <select id="filter-servant" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-            <option value="">{{ __('ui.visits.filter_servant_all') }}</option>
-        </select>
-        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
-    </div>
-    <!-- Visit Type -->
-    <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_type') }}</label>
-        <select id="filter-type" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-            <option value="">{{ __('ui.visits.filter_type_all') }}</option>
-        </select>
-        <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
-    </div>
-    <!-- Date search -->
-    <div class="relative">
-        <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_date') }}</label>
-        <div class="flex items-center bg-surface border border-outline-variant rounded-lg px-3 py-2 cursor-text">
-            <span class="material-symbols-outlined rtl:ml-2 ltr:mr-2 text-on-surface-variant text-sm">calendar_today</span>
-            <input id="filter-date" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-on-surface" placeholder="{{ __('ui.visits.filter_date_placeholder') }}" type="text" />
+<div class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant relative z-20 overflow-hidden">
+    <button type="button" id="filter-toggle-btn" class="w-full flex items-center justify-between p-4 md:hidden" onclick="toggleFilterPanel()">
+        <span class="flex items-center gap-2 font-title-md text-title-md text-on-surface">
+            <span class="material-symbols-outlined text-primary">filter_list</span>
+            {{ __('ui.visits.filters_button') }}
+        </span>
+        <span class="material-symbols-outlined text-outline-variant chevron" id="filter-chevron">expand_more</span>
+    </button>
+    <div class="section-content collapsed md:!max-h-none md:!opacity-100 md:overflow-visible" id="filter-panel">
+        <div class="p-4 pt-0 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-stack-gap">
+            <!-- Father Dropdown -->
+            <div class="relative">
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_father') }}</label>
+                <select id="filter-father" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+                    <option value="">{{ __('ui.visits.filter_father_all') }}</option>
+                </select>
+                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+            </div>
+            <!-- Servant Dropdown -->
+            <div class="relative">
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_servant') }}</label>
+                <select id="filter-servant" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+                    <option value="">{{ __('ui.visits.filter_servant_all') }}</option>
+                </select>
+                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+            </div>
+            <!-- Visit Type -->
+            <div class="relative">
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_type') }}</label>
+                <select id="filter-type" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
+                    <option value="">{{ __('ui.visits.filter_type_all') }}</option>
+                </select>
+                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+            </div>
+            <!-- Date search -->
+            <div class="relative">
+                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_date') }}</label>
+                <div class="flex items-center bg-surface border border-outline-variant rounded-lg px-3 py-2 cursor-text">
+                    <span class="material-symbols-outlined rtl:ml-2 ltr:mr-2 text-on-surface-variant text-sm">calendar_today</span>
+                    <input id="filter-date" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-on-surface" placeholder="{{ __('ui.visits.filter_date_placeholder') }}" type="text" />
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -72,6 +83,11 @@
     const TYPE_ICON = { 1: 'call', 2: 'home' }; // 1=Call, 2=Home
 
     let allVisits = [];
+
+    function toggleFilterPanel() {
+        document.getElementById('filter-panel').classList.toggle('collapsed');
+        document.getElementById('filter-chevron').classList.toggle('rotate-180');
+    }
 
     function typeBadge(eftkad) {
         const t = eftkad.type;

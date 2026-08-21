@@ -64,6 +64,7 @@ return [
 
     'visits' => [
         'title' => 'قائمة الزيارات',
+        'filters_button' => 'الفلاتر',
         'filter_father' => 'الأب الكاهن',
         'filter_father_all' => 'كل الآباء',
         'filter_servant' => 'الخادم',

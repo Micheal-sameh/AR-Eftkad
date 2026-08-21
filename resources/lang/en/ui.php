@@ -64,6 +64,7 @@ return [
 
     'visits' => [
         'title' => 'Visits List',
+        'filters_button' => 'Filters',
         'filter_father' => 'Father',
         'filter_father_all' => 'All Fathers',
         'filter_servant' => 'Servant',
