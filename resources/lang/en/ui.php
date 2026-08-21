@@ -135,7 +135,7 @@ return [
         'section_admin' => 'Administrative Details',
         'location_url' => 'Location URL',
         'location_url_placeholder' => 'e.g. https://maps.google.com/...',
-        'set_current_location' => 'Set My Current Location',
+        'set_current_location' => 'Location',
         'locating' => 'Locating...',
         'location_error' => 'Could not detect your location, please try again',
         'location_permission_denied' => 'Location access was denied. Please enable it in your browser settings and try again',

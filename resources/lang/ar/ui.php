@@ -135,7 +135,7 @@ return [
         'section_admin' => 'بيانات إدارية',
         'location_url' => 'رابط الموقع',
         'location_url_placeholder' => 'مثال: https://maps.google.com/...',
-        'set_current_location' => 'حدد موقعي الحالي',
+        'set_current_location' => 'موقعي',
         'locating' => 'جارٍ تحديد الموقع...',
         'location_error' => 'تعذر تحديد موقعك، يرجى المحاولة مرة أخرى',
         'location_permission_denied' => 'تم رفض إذن الوصول للموقع. يرجى تفعيله من إعدادات المتصفح والمحاولة مرة أخرى',
