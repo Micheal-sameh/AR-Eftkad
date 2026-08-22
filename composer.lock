@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8eeb3b7af59485c14e2062cc18db5994",
+    "content-hash": "a337765201d50f266e4755fbc25e044a",
     "packages": [
         {
             "name": "avarewase/sso-client",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:Micheal-sameh/ar-sso-handler.git",
-                "reference": "e7f772967130e57549f872d8ec196c185cce2818"
+                "reference": "d081e6319f886058c6222e87825b1410950219a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Micheal-sameh/ar-sso-handler/zipball/e7f772967130e57549f872d8ec196c185cce2818",
-                "reference": "e7f772967130e57549f872d8ec196c185cce2818",
+                "url": "https://api.github.com/repos/Micheal-sameh/ar-sso-handler/zipball/d081e6319f886058c6222e87825b1410950219a5",
+                "reference": "d081e6319f886058c6222e87825b1410950219a5",
                 "shasum": ""
             },
             "require": {
@@ -64,10 +64,10 @@
                 "sso"
             ],
             "support": {
-                "source": "https://github.com/Micheal-sameh/ar-sso-handler/tree/v1.3.0",
+                "source": "https://github.com/Micheal-sameh/ar-sso-handler/tree/v1.4.0",
                 "issues": "https://github.com/Micheal-sameh/ar-sso-handler/issues"
             },
-            "time": "2026-08-19T12:49:24+00:00"
+            "time": "2026-08-22T18:34:30+00:00"
         },
         {
             "name": "brick/math",
