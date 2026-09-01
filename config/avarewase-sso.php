@@ -56,12 +56,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Resource-server middleware (auth.sso_or_sanctum)
+    |--------------------------------------------------------------------------
+    | How long (seconds) a validated Bearer token's userinfo response is
+    | cached, keyed by a hash of the token. Used by
+    | App\Http\Middleware\AuthenticateWithSsoOrSanctum when a request carries
+    | a raw avarewase-sso access token (the mobile app) rather than an
+    | eftkad-issued Sanctum token (the web SPA).
+    */
+    'cache_ttl' => (int) env('AVAREWASE_SSO_USERINFO_CACHE_TTL', 60),
+
+    /*
+    |--------------------------------------------------------------------------
     | User provisioning
     |--------------------------------------------------------------------------
-    | Class responsible for turning a userinfo payload into a local
-    | Authenticatable. Bind your own implementation of
-    | Avarewase\SsoClient\Contracts\ProvisionsAvarewaseUsers in your
-    | AppServiceProvider to override the default find-or-create behaviour.
+    | eftkad matches/creates users by avarewase_sub, then membership_code,
+    | then email — see App\Auth\AvarewaseUserProvisioner, bound over this
+    | default in App\Providers\AppServiceProvider.
     */
     'provisioner' => \Avarewase\SsoClient\Auth\DefaultAvarewaseUserProvisioner::class,
 
@@ -69,6 +80,8 @@ return [
     |--------------------------------------------------------------------------
     | Routes
     |--------------------------------------------------------------------------
+    | Disabled: eftkad wires its own /api/auth/avarewase/redirect+callback
+    | (App\Http\Controllers\Api\AuthController) instead of the package's.
     */
     'routes' => [
         'enabled' => env('AVAREWASE_SSO_ROUTES_ENABLED', true),
@@ -77,6 +90,24 @@ return [
         'login_name' => 'avarewase.login',
         'callback_name' => 'avarewase.callback',
         'redirect_after_login' => '/home',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Back-channel logout webhook
+    |--------------------------------------------------------------------------
+    | avarewase-sso's App\Jobs\NotifyClientLogoutJob POSTs a signed
+    | `user.access_revoked` event here when an admin revokes this user's
+    | access — set this client's "Logout Webhook URL" (on avarewase-sso) to
+    | ${APP_URL}/login/avarewase/logout-webhook, and AVAREWASE_SSO_LOGOUT_SECRET
+    | here to the logout_secret it issued for this client.
+    */
+    'logout_webhook' => [
+        'enabled' => env('AVAREWASE_SSO_LOGOUT_WEBHOOK_ENABLED', true),
+        'path' => env('AVAREWASE_SSO_LOGOUT_WEBHOOK_PATH', 'login/avarewase/logout-webhook'),
+        'name' => 'avarewase.logout-webhook',
+        'middleware' => ['throttle:30,1'],
+        'secret' => env('AVAREWASE_SSO_LOGOUT_SECRET'),
     ],
 
 ];

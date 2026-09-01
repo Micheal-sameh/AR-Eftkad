@@ -15,10 +15,14 @@ use Illuminate\Support\Facades\Cache;
 class AuthController extends BaseController
 {
     /**
-     * Start "Login with Avarewase": returns the authorize URL for the
-     * client (mobile app / webview) to open. PKCE verifier is cached
-     * server-side, keyed by a one-time state value, so this stays
+     * Start "Login with Avarewase" for the web SPA (resources/views/auth/login.blade.php):
+     * returns the authorize URL for the browser to open. PKCE verifier is
+     * cached server-side, keyed by a one-time state value, so this stays
      * stateless from the client's point of view (no session cookie needed).
+     *
+     * The mobile app does not use this endpoint — it does PKCE directly
+     * against avarewase-sso and sends the resulting SSO access token straight
+     * to the API, validated by App\Http\Middleware\AuthenticateWithSsoOrSanctum.
      */
     public function avarewaseRedirect(AvarewaseClient $client)
     {
@@ -34,14 +38,15 @@ class AuthController extends BaseController
     }
 
     /**
-     * Complete "Login with Avarewase". Accepts the `code`/`state` pair
-     * either as the raw browser redirect from the SSO (GET) or as a
-     * direct call from a client that intercepted the redirect itself
+     * Complete "Login with Avarewase" for the web SPA. Accepts the `code`/
+     * `state` pair either as the raw browser redirect from the SSO (GET) or
+     * as a direct call from a client that intercepted the redirect itself
      * (POST) — same response shape as the normal login() either way.
      *
      * Creates the local user on first login (or updates the matching one)
      * via AvarewaseUserProvisioner; see its docblock for the matching and
-     * creation rules.
+     * creation rules. Issues eftkad's own Sanctum token, which the SPA
+     * stores and sends as the bearer for subsequent API calls.
      */
     public function avarewaseCallback(Request $request, AvarewaseClient $client, ProvisionsAvarewaseUsers $provisioner)
     {

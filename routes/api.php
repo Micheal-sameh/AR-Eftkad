@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth.sso_or_sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -36,7 +36,7 @@ Route::group(['middleware' => 'setlocale'], function () {
         Route::get('avarewase/redirect', [AuthController::class, 'avarewaseRedirect']);
         Route::match(['get', 'post'], 'avarewase/callback', [AuthController::class, 'avarewaseCallback']);
     });
-    Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
         Route::group(['prefix' => 'eftkads'], function () {
             Route::get('detail/{id}', [EftkadController::class, 'show']);
             Route::get('{all?}', [EftkadController::class, 'index']);

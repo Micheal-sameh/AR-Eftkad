@@ -74,5 +74,6 @@ class Kernel extends HttpKernel
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
+        'auth.sso_or_sanctum' => \App\Http\Middleware\AuthenticateWithSsoOrSanctum::class,
     ];
 }
