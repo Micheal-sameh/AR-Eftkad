@@ -34,7 +34,7 @@ COPY . .
 RUN composer dump-autoload --optimize --no-dev
 
 # ---- Runtime image: php-fpm + nginx in one container, via supervisord ----
-FROM php:8.2-fpm-alpine AS app
+FROM php:8.2.35-fpm-alpine AS app
 
 RUN apk add --no-cache \
         nginx \
