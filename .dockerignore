@@ -19,3 +19,9 @@ docker-compose.yml
 .fleet
 resources/views/refrence
 *.md
+android
+www
+capacitor.config.json
+tests
+scripts
+stitch-prompt.md

@@ -4,7 +4,7 @@
 FROM node:22.23.4-alpine AS frontend
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
 COPY resources ./resources
 COPY vite.config.js tailwind.config.js postcss.config.js ./
 RUN npm run build
@@ -14,6 +14,7 @@ FROM composer:2 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN --mount=type=secret,id=github_token \
+    --mount=type=cache,target=/tmp/cache \
     if [ -s /run/secrets/github_token ]; then \
         composer config --global github-oauth.github.com "$(cat /run/secrets/github_token)"; \
     fi \
@@ -36,34 +37,18 @@ RUN composer dump-autoload --optimize --no-dev
 # ---- Runtime image: php-fpm + nginx in one container, via supervisord ----
 FROM php:8.2.35-fpm-alpine AS app
 
-RUN apk add --no-cache \
-        nginx \
-        supervisor \
-        libzip-dev \
-        libpng-dev \
-        libjpeg-turbo-dev \
-        freetype-dev \
-        oniguruma-dev \
-        icu-dev \
-    && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install -j"$(nproc)" \
-        pdo_mysql \
-        mbstring \
-        exif \
-        pcntl \
-        bcmath \
-        gd \
-        zip \
-        intl \
-        opcache
+# Only what the app actually needs. Nothing in composer.lock requires gd, zip, intl,
+# exif, pcntl or bcmath, and compiling gd/intl alone cost many minutes per build.
+# (mbstring, ctype, tokenizer, openssl, etc. are already built into the base image.)
+RUN apk add --no-cache nginx supervisor \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql opcache
 
 WORKDIR /var/www/html
 
-COPY --from=vendor /app ./
-COPY --from=frontend /app/public/build ./public/build
+COPY --from=vendor --chown=www-data:www-data /app ./
+COPY --from=frontend --chown=www-data:www-data /app/public/build ./public/build
 
-RUN chown -R www-data:www-data /var/www/html \
-    && mkdir -p /run/nginx
+RUN mkdir -p /run/nginx
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
