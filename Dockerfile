@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Frontend assets ----
-FROM node:20-alpine AS frontend
+FROM node:22.23.4-alpine AS frontend
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
