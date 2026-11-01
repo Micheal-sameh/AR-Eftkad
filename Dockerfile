@@ -32,7 +32,7 @@ RUN --mount=type=secret,id=github_token \
         --no-autoloader \
         --ignore-platform-reqs
 COPY . .
-RUN composer dump-autoload --optimize --no-dev
+RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
 # ---- Runtime image: php-fpm + nginx in one container, via supervisord ----
 FROM php:8.2.35-fpm-alpine AS app
@@ -48,7 +48,8 @@ WORKDIR /var/www/html
 COPY --from=vendor --chown=www-data:www-data /app ./
 COPY --from=frontend --chown=www-data:www-data /app/public/build ./public/build
 
-RUN mkdir -p /run/nginx
+RUN mkdir -p /run/nginx /var/cache/nginx/pages \
+    && chown -R nginx:nginx /var/cache/nginx
 
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
 COPY docker/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
