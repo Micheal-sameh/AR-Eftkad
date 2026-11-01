@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Eftkad</string>
+    <string name="title_activity_main">Eftkad</string>
+    <string name="package_name">com.eftkad.app</string>
+    <string name="custom_url_scheme">com.eftkad.app</string>
+</resources>

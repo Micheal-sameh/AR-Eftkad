@@ -73,7 +73,7 @@ return [
         'filter_type_all' => 'All Types',
         'filter_date' => 'Date',
         'filter_date_placeholder' => 'e.g. 12-10-2023',
-        'filter_note' => 'Note: Father/Servant filtering only applies to the current page of results.',
+        'load_more' => 'Load more',
         'loading' => 'Loading visits...',
         'empty' => 'No visits found.',
         'error' => 'Failed to load visits.',

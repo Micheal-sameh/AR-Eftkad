@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = ['common', 'user_detail'])
+
 @php($activeNav = 'users')
 
 @section('title', __('ui.user_detail.title') . ' - Eftkad')

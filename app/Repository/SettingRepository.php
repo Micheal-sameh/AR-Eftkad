@@ -10,6 +10,7 @@ use App\Enums\NeedType;
 use App\Enums\UserRole;
 use App\Enums\UserType;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class SettingRepository
 {
@@ -28,9 +29,17 @@ class SettingRepository
 
     public function filters()
     {
-        $filters['fathers'] = User::where('type', UserType::FATHER)->get()->map->only(['name', 'membership_code']);
-        $filters['servants'] = User::where('type', UserType::SERVANT)->get()->map->only(['name', 'membership_code']);
+        return Cache::remember(User::FILTERS_CACHE_KEY, 600, function () {
+            $byType = fn (int $type) => User::where('type', $type)
+                ->get(['name', 'membership_code'])
+                ->map->only(['name', 'membership_code'])
+                ->values()
+                ->all();
 
-        return $filters;
+            return [
+                'fathers' => $byType(UserType::FATHER),
+                'servants' => $byType(UserType::SERVANT),
+            ];
+        });
     }
 }

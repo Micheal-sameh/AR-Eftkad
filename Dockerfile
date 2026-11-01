@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY resources ./resources
-COPY vite.config.js ./
+COPY vite.config.js tailwind.config.js postcss.config.js ./
 RUN npm run build
 
 # ---- PHP dependencies ----
@@ -54,7 +54,8 @@ RUN apk add --no-cache \
         bcmath \
         gd \
         zip \
-        intl
+        intl \
+        opcache
 
 WORKDIR /var/www/html
 
@@ -64,6 +65,8 @@ COPY --from=frontend /app/public/build ./public/build
 RUN chown -R www-data:www-data /var/www/html \
     && mkdir -p /run/nginx
 
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/zz-opcache.ini
+COPY docker/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
 COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh

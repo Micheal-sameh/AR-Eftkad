@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eftkad-shell-v3';
+const CACHE_NAME = 'eftkad-shell-v4';
 const APP_SHELL = [
     '/login',
     '/manifest.webmanifest',

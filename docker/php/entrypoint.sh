@@ -16,4 +16,10 @@ done
 
 php artisan migrate --force
 
+# Cache config/routes/views/events once per container start (env is final here).
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
 exec "$@"

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = ['common', 'visit_form'])
+
 @php($activeNav = 'create')
 
 @section('title', __('ui.visit_form.title'))
@@ -297,7 +299,7 @@
     }
 
     async function loadEnums() {
-        const res = await Eftkad.api('/settings/enums');
+        const res = await Eftkad.cachedApi('/settings/enums');
         if (!res.ok || !res.data) return;
         const data = res.data.data || {};
 
@@ -308,7 +310,7 @@
     }
 
     async function loadAdminSelects() {
-        const res = await Eftkad.api('/settings/filters');
+        const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const data = res.data.data || {};
 

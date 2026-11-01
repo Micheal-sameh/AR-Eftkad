@@ -35,9 +35,9 @@ return [
     | Avarewase\SsoClient\Exceptions\AvarewaseConnectionException is thrown.
     */
     'http' => [
-        'timeout' => (int) env('AVAREWASE_SSO_HTTP_TIMEOUT', 5),
-        'connect_timeout' => (int) env('AVAREWASE_SSO_HTTP_CONNECT_TIMEOUT', 3),
-        'retry_times' => (int) env('AVAREWASE_SSO_HTTP_RETRY_TIMES', 2),
+        'timeout' => (int) env('AVAREWASE_SSO_HTTP_TIMEOUT', 3),
+        'connect_timeout' => (int) env('AVAREWASE_SSO_HTTP_CONNECT_TIMEOUT', 2),
+        'retry_times' => (int) env('AVAREWASE_SSO_HTTP_RETRY_TIMES', 1),
         'retry_sleep_ms' => (int) env('AVAREWASE_SSO_HTTP_RETRY_SLEEP_MS', 200),
     ],
 
@@ -64,7 +64,7 @@ return [
     | a raw avarewase-sso access token (the mobile app) rather than an
     | eftkad-issued Sanctum token (the web SPA).
     */
-    'cache_ttl' => (int) env('AVAREWASE_SSO_USERINFO_CACHE_TTL', 60),
+    'cache_ttl' => (int) env('AVAREWASE_SSO_USERINFO_CACHE_TTL', 300),
 
     /*
     |--------------------------------------------------------------------------

@@ -6,7 +6,9 @@ use App\DTOs\EftkadCreateDTO;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\EftkadCreateRequest;
 use App\Http\Resources\EftkadResource;
+use App\Repository\EftkadRepository;
 use App\Services\EftkadService;
+use Illuminate\Http\Request;
 
 class EftkadController extends BaseController
 {
@@ -26,9 +28,12 @@ class EftkadController extends BaseController
         return $this->apiResponse(new EftkadResource($eftkad));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->eftkadService->index();
+        $data = $this->eftkadService->index(
+            $request->only('father', 'servant', 'type', 'date'),
+            (int) $request->query('per_page', EftkadRepository::DEFAULT_PER_PAGE),
+        );
 
         return $this->respondResource(EftkadResource::collection($data['eftkads']),
             additional_data: [

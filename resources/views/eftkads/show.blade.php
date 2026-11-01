@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = ['common', 'visit_detail'])
+
 @php($activeNav = 'visits')
 
 @section('title', __('ui.visit_detail.title') . ' - Eftkad')
@@ -155,7 +157,7 @@
     }
 
     async function loadDirectory() {
-        const res = await Eftkad.api('/settings/filters');
+        const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const fathers = (res.data.data && res.data.data.fathers) || [];
         const servants = (res.data.data && res.data.data.servants) || [];

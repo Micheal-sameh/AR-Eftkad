@@ -22,7 +22,6 @@ class SetLocale
         $languageCode = in_array(substr($lang, 0, 2), ['ar', 'en']) ? substr($lang, 0, 2) : 'ar';
 
         App::setLocale($languageCode);
-        session(['lang' => $languageCode]);
 
         return $next($request);
     }

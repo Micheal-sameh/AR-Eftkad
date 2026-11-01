@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = ['common', 'user_edit'])
+
 @php($activeNav = 'users')
 
 @section('title', __('ui.user_edit.title'))
@@ -96,7 +98,7 @@
     }
 
     async function loadTypeOptions(currentValue, currentRole) {
-        const res = await Eftkad.api('/settings/enums');
+        const res = await Eftkad.cachedApi('/settings/enums');
         if (!res.ok || !res.data) return;
         renderTypeOptions((res.data.data && res.data.data.user_type) || [], currentValue);
 

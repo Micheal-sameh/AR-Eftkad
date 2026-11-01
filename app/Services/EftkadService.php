@@ -9,19 +9,13 @@ class EftkadService
 {
     public function __construct(
         protected EftkadRepository $eftkadRepository,
+    ) {}
 
-    ) {
-        if (request()->route()->parameter('all') == 'all') {
-            $this->eftkadRepository->pagination = false;
-        }
-    }
-
-    public function index()
+    public function index(array $filters = [], int $perPage = EftkadRepository::DEFAULT_PER_PAGE)
     {
-        $eftkads = $this->eftkadRepository->index();
-        $eftkads_count = method_exists('total', $eftkads) ? $eftkads->total() : $eftkads->count();
+        $eftkads = $this->eftkadRepository->index($filters, $perPage);
 
-        return compact('eftkads', 'eftkads_count');
+        return ['eftkads' => $eftkads, 'eftkads_count' => $eftkads->total()];
     }
 
     public function show($id)

@@ -1,0 +1,116 @@
+@import '@fontsource/be-vietnam-pro/latin-400.css';
+@import '@fontsource/be-vietnam-pro/latin-500.css';
+@import '@fontsource/be-vietnam-pro/latin-600.css';
+@import '@fontsource/be-vietnam-pro/latin-700.css';
+@import '@fontsource/noto-serif/latin-400.css';
+@import '@fontsource/noto-serif/latin-600.css';
+@import '@fontsource/noto-serif/latin-700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Icon font subset (only the icons the views use, FILL axis 0..1, ~10 KB).
+   Re-generate from Google Fonts with an updated icon_names list when adding icons.
+   block (not swap) so ligature names never flash as text. */
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    font-display: block;
+    font-weight: 400;
+    src: url('../fonts/material-symbols-subset.woff2') format('woff2');
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+    overflow-x: hidden;
+}
+body {
+    background-color: theme('colors.background');
+    color: theme('colors.on-background');
+    min-height: 100dvh;
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-size: 24px;
+}
+.material-symbols-outlined.filled {
+    font-variation-settings: 'FILL' 1;
+}
+.bg-pattern {
+    background-image: radial-gradient(theme('colors.outline-variant') 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.3;
+}
+.card-shadow {
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+}
+.chip-checkbox:checked + label {
+    background-color: theme('colors.primary-container');
+    color: theme('colors.on-primary-container');
+    border-color: theme('colors.primary-container');
+}
+.chip-checkbox:checked + label .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+}
+.section-content {
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    max-height: 2000px;
+    opacity: 1;
+    overflow: hidden;
+}
+.section-content.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+.chevron {
+    transition: transform 0.3s ease;
+}
+.collapsed .chevron {
+    transform: rotate(-180deg);
+}
+.field-error {
+    color: theme('colors.error');
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+.field-error.show {
+    display: block;
+}
+[x-cloak] { display: none !important; }
+
+/* Standalone PWA: avoid the notch/status bar and the home-indicator
+   area (iOS "black-translucent" status bar lets content draw under it).
+   !important because these must win over whatever Tailwind padding
+   utility is also on the element, regardless of stylesheet order. */
+.safe-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px)) !important;
+}
+.safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+}
+.pb-nav-safe {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+}

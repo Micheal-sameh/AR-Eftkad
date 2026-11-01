@@ -12,12 +12,13 @@ class UserRepository
 
     public function index()
     {
-        return $this->model->query()->orderBy('name')->paginate($this->perPage);
+        // UserResource reads ->roles for every row; eager-load to avoid one query per user.
+        return $this->model->query()->with('roles')->orderBy('name')->paginate($this->perPage);
     }
 
     public function find($id)
     {
-        return $this->model->find($id);
+        return $this->model->with('roles')->find($id);
     }
 
     public function show($id)

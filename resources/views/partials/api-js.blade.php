@@ -46,6 +46,30 @@
             localStorage.removeItem(this.TOKEN_KEY);
             localStorage.removeItem(this.USER_KEY);
             sessionStorage.removeItem('eftkad_last_list');
+            Object.keys(localStorage)
+                .filter(function (k) { return k.indexOf(Eftkad.CACHE_PREFIX) === 0; })
+                .forEach(function (k) { localStorage.removeItem(k); });
+        },
+
+        // GET with a short-lived localStorage cache, for rarely-changing
+        // reference data (enums, father/servant filters) that every page
+        // otherwise refetches on each navigation.
+        CACHE_PREFIX: 'eftkad_cache:',
+
+        async cachedApi(path, ttlMs = 10 * 60 * 1000) {
+            const key = this.CACHE_PREFIX + this.locale() + ':' + path;
+            try {
+                const hit = JSON.parse(localStorage.getItem(key) || 'null');
+                if (hit && Date.now() - hit.t < ttlMs) return hit.res;
+            } catch (e) {}
+
+            const res = await this.api(path);
+            if (res.ok && res.data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify({ t: Date.now(), res: res }));
+                } catch (e) {}
+            }
+            return res;
         },
 
         // Redirects to /login when there's no token. Call at the top of any

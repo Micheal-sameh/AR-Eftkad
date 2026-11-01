@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@php($uiSections = ['login'])
+
 @section('title', __('ui.login.title'))
 
 @section('content')

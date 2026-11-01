@@ -6,27 +6,60 @@ use App\Enums\BoolType;
 use App\Models\Eftkad;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EftkadRepository
 {
     public function __construct(protected Eftkad $model) {}
 
-    public bool $pagination = true;
+    public const DEFAULT_PER_PAGE = 10;
 
-    public int $perPage = 10;
+    public const MAX_PER_PAGE = 50;
 
-    protected function execute(Builder $query): Collection|LengthAwarePaginator
+    /**
+     * @param  array{father?: ?string, servant?: ?string, type?: ?string, date?: ?string}  $filters
+     */
+    public function index(array $filters = [], int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->pagination ? $query->paginate($this->perPage) : $query->get();
+        $perPage = max(1, min($perPage, self::MAX_PER_PAGE));
+
+        return $this->model->query()
+            ->when($filters['father'] ?? null, fn (Builder $q, $v) => $q->where('father_membership_code', $v))
+            ->when($filters['servant'] ?? null, fn (Builder $q, $v) => $q->where('servant_membership_code', $v))
+            ->when($filters['type'] ?? null, fn (Builder $q, $v) => $q->where('type', (int) $v))
+            ->when($filters['date'] ?? null, fn (Builder $q, $v) => $this->applyDateFilter($q, trim($v)))
+            ->orderByDesc('date')
+            ->orderByDesc('id')
+            ->paginate($perPage);
     }
 
-    public function index()
+    /**
+     * Complete day (12-10-2023), month (10-2023) or year (2023) become index-friendly
+     * range scans; anything else falls back to a substring match on the d-m-Y text.
+     */
+    protected function applyDateFilter(Builder $query, string $value): void
     {
-        $query = $this->model->query();
+        $range = null;
 
-        return $this->execute($query);
+        if (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $value, $m) && checkdate((int) $m[2], (int) $m[1], (int) $m[3])) {
+            $start = Carbon::create((int) $m[3], (int) $m[2], (int) $m[1])->startOfDay();
+            $range = [$start, $start->copy()->endOfDay()];
+        } elseif (preg_match('/^(\d{1,2})-(\d{4})$/', $value, $m) && (int) $m[1] >= 1 && (int) $m[1] <= 12) {
+            $start = Carbon::create((int) $m[2], (int) $m[1], 1)->startOfDay();
+            $range = [$start, $start->copy()->endOfMonth()];
+        } elseif (preg_match('/^\d{4}$/', $value)) {
+            $start = Carbon::create((int) $value, 1, 1)->startOfDay();
+            $range = [$start, $start->copy()->endOfYear()];
+        }
+
+        if ($range) {
+            $query->whereBetween('date', $range);
+
+            return;
+        }
+
+        $like = '%'.addcslashes($value, '\%_').'%';
+        $query->whereRaw("DATE_FORMAT(date, '%d-%m-%Y') LIKE ?", [$like]);
     }
 
     public function find($id)

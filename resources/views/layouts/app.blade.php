@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" lang="{{ app()->getLocale() }}">
 <head>
+@php($uiSections = array_merge($uiSections ?? [], ['install_prompt']))
 @include('partials.head-assets')
 <title>@yield('title', 'Eftkad')</title>
 </head>

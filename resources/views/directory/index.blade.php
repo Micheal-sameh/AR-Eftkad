@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = [])
+
 @php($activeNav = 'directory')
 
 @section('title', __('ui.directory.title') . ' - Eftkad')
@@ -86,7 +88,7 @@
         const errorBox = document.getElementById('directory-error');
         const lists = document.getElementById('directory-lists');
 
-        const res = await Eftkad.api('/settings/filters');
+        const res = await Eftkad.cachedApi('/settings/filters');
 
         loading.classList.add('hidden');
 

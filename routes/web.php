@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,42 +21,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return redirect('/visits');
+// These routes only return static Blade shells (auth is client-side), so skip the
+// session/CSRF middleware: otherwise every page view reads and writes a session file.
+Route::withoutMiddleware([
+    StartSession::class,
+    ShareErrorsFromSession::class,
+    VerifyCsrfToken::class,
+])->group(function () {
+    Route::redirect('/', '/visits');
+
+    Route::view('/login', 'auth.login')->name('login');
+    Route::view('/login/avarewase/callback', 'auth.avarewase-callback')->name('login.avarewase.callback');
+
+    Route::view('/visits', 'eftkads.index')->name('visits.index');
+    Route::view('/visits/create', 'eftkads.create')->name('visits.create');
+    Route::view('/visits/{id}', 'eftkads.show')->name('visits.show');
+
+    Route::view('/directory', 'directory.index')->name('directory.index');
+
+    Route::view('/users', 'users.index')->name('users.index');
+    Route::view('/users/{id}', 'users.show')->name('users.show');
+    Route::view('/users/{id}/edit', 'users.edit')->name('users.edit');
 });
-
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
-Route::get('/login/avarewase/callback', function () {
-    return view('auth.avarewase-callback');
-})->name('login.avarewase.callback');
-
-Route::get('/visits', function () {
-    return view('eftkads.index');
-})->name('visits.index');
-
-Route::get('/visits/create', function () {
-    return view('eftkads.create');
-})->name('visits.create');
-
-Route::get('/visits/{id}', function ($id) {
-    return view('eftkads.show', ['id' => $id]);
-})->name('visits.show');
-
-Route::get('/directory', function () {
-    return view('directory.index');
-})->name('directory.index');
-
-Route::get('/users', function () {
-    return view('users.index');
-})->name('users.index');
-
-Route::get('/users/{id}', function ($id) {
-    return view('users.show', ['id' => $id]);
-})->name('users.show');
-
-Route::get('/users/{id}/edit', function ($id) {
-    return view('users.edit', ['id' => $id]);
-})->name('users.edit');

@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@php($uiSections = ['callback'])
+
 @section('title', __('ui.callback.title'))
 
 @section('content')

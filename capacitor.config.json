@@ -1,0 +1,22 @@
+{
+  "appId": "com.eftkad.app",
+  "appName": "Eftkad",
+  "webDir": "www",
+  "server": {
+    "url": "https://eftkad.avarewase.com/visits",
+    "cleartext": false,
+    "errorPath": "offline.html",
+    "allowNavigation": ["*.avarewase.com"]
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 10000,
+      "launchAutoHide": false,
+      "backgroundColor": "#FFFFFF",
+      "androidScaleType": "CENTER_INSIDE",
+      "showSpinner": false
+    }
+  }
+}
+
+

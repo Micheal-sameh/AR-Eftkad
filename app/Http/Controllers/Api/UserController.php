@@ -7,10 +7,16 @@ use App\Http\Requests\UpdateUserRoleRequest;
 use App\Http\Requests\UpdateUserTypeRequest;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 
 class UserController extends BaseController
 {
     public function __construct(protected UserService $userService) {}
+
+    public function me(Request $request)
+    {
+        return $request->user();
+    }
 
     public function index()
     {

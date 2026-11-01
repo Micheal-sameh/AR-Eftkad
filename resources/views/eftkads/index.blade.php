@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@php($uiSections = ['visits'])
+
 @php($activeNav = 'visits')
 
 @section('title', __('ui.visits.title') . ' - Eftkad')
@@ -54,15 +56,12 @@
     </div>
 </div>
 
-<p id="filter-note" class="hidden text-label-sm font-label-sm text-on-surface-variant -mt-2">
-    {{ __('ui.visits.filter_note') }}
-</p>
-
 <!-- Cards List -->
 <div id="visits-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.visits.loading') }}</div>
 <div id="visits-empty" class="hidden text-center py-12 text-on-surface-variant">{{ __('ui.visits.empty') }}</div>
 <div id="visits-error" class="hidden text-center py-12 text-error">{{ __('ui.visits.error') }}</div>
 <div id="visits-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"></div>
+<button type="button" id="visits-more" class="hidden mx-auto px-6 py-3 rounded-lg border border-outline-variant text-primary font-title-md text-title-md hover:bg-surface-container-low transition-colors disabled:opacity-50">{{ __('ui.visits.load_more') }}</button>
 @endsection
 
 @section('fab')
@@ -82,7 +81,11 @@
     const ACCENT_STYLES = { 1: 'bg-outline-variant', 2: 'bg-primary', 3: 'bg-secondary' };
     const TYPE_ICON = { 1: 'call', 2: 'home' }; // 1=Call, 2=Home
 
+    const PER_PAGE = 12;
     let allVisits = [];
+    let currentPage = 1;
+    let lastPage = 1;
+    let loadSeq = 0;
 
     function toggleFilterPanel() {
         document.getElementById('filter-panel').classList.toggle('collapsed');
@@ -159,28 +162,14 @@
         </a>`;
     }
 
-    function applyFilters() {
-        const father = document.getElementById('filter-father').value;
-        const servant = document.getElementById('filter-servant').value;
-        const type = document.getElementById('filter-type').value;
-        const date = document.getElementById('filter-date').value.trim();
-
-        const filtered = allVisits.filter(function (v) {
-            if (father && v.father_membership_code !== father) return false;
-            if (servant && v.servant_membership_code !== servant) return false;
-            if (type && String((v.type || {}).value) !== type) return false;
-            if (date && !(v.date || '').includes(date)) return false;
-            return true;
-        });
-
-        const grid = document.getElementById('visits-grid');
-        const empty = document.getElementById('visits-empty');
-        grid.innerHTML = filtered.map(renderCard).join('');
-        empty.classList.toggle('hidden', filtered.length > 0);
+    function renderVisits() {
+        document.getElementById('visits-grid').innerHTML = allVisits.map(renderCard).join('');
+        document.getElementById('visits-empty').classList.toggle('hidden', allVisits.length > 0);
+        document.getElementById('visits-more').classList.toggle('hidden', currentPage >= lastPage);
     }
 
     async function loadFilters() {
-        const res = await Eftkad.api('/settings/filters');
+        const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const fathers = (res.data.data && res.data.data.fathers) || [];
         const servants = (res.data.data && res.data.data.servants) || [];
@@ -200,14 +189,10 @@
             opt.textContent = s.name + ' (' + s.membership_code + ')';
             servantSelect.appendChild(opt);
         });
-
-        if (fathers.length || servants.length) {
-            document.getElementById('filter-note').classList.remove('hidden');
-        }
     }
 
     async function loadEnums() {
-        const res = await Eftkad.api('/settings/enums');
+        const res = await Eftkad.cachedApi('/settings/enums');
         if (!res.ok || !res.data) return;
         const types = (res.data.data && res.data.data.eftkad_type) || [];
         const typeSelect = document.getElementById('filter-type');
@@ -219,24 +204,73 @@
         });
     }
 
-    async function loadVisits() {
+    function currentFilters() {
+        return {
+            father: document.getElementById('filter-father').value,
+            servant: document.getElementById('filter-servant').value,
+            type: document.getElementById('filter-type').value,
+            date: document.getElementById('filter-date').value.trim(),
+        };
+    }
+
+    function hasFilters(f) {
+        return !!(f.father || f.servant || f.type || f.date);
+    }
+
+    // Loads one server-side page. reset=true starts over at page 1 (filters changed);
+    // otherwise appends the next page. Stale responses from an older filter state are dropped.
+    async function loadVisits(reset) {
         const loading = document.getElementById('visits-loading');
         const errorBox = document.getElementById('visits-error');
-        loading.classList.remove('hidden');
+        const moreBtn = document.getElementById('visits-more');
+        const filters = currentFilters();
+        const seq = ++loadSeq;
+        const page = reset ? 1 : currentPage + 1;
+
         errorBox.classList.add('hidden');
 
-        const res = await Eftkad.api('/eftkads');
+        // Paint the last-seen first page right away (unfiltered view only), refresh behind it.
+        let painted = false;
+        if (reset && !hasFilters(filters) && !allVisits.length) {
+            try {
+                const cached = JSON.parse(sessionStorage.getItem('eftkad_last_list') || 'null');
+                if (Array.isArray(cached) && cached.length) {
+                    allVisits = cached;
+                    renderVisits();
+                    painted = true;
+                }
+            } catch (e) {}
+        }
+        if (!painted && reset) {
+            allVisits = [];
+            renderVisits();
+            document.getElementById('visits-empty').classList.add('hidden');
+            loading.classList.remove('hidden');
+        }
+        moreBtn.disabled = true;
 
+        const params = new URLSearchParams({ page: page, per_page: PER_PAGE });
+        Object.keys(filters).forEach(function (k) { if (filters[k]) params.set(k, filters[k]); });
+        const res = await Eftkad.api('/eftkads?' + params.toString());
+
+        if (seq !== loadSeq) return;
         loading.classList.add('hidden');
+        moreBtn.disabled = false;
 
         if (!res.ok || !res.data) {
-            errorBox.classList.remove('hidden');
+            if (!painted) errorBox.classList.remove('hidden');
             return;
         }
 
-        allVisits = (res.data.data) || [];
-        sessionStorage.setItem('eftkad_last_list', JSON.stringify(allVisits));
-        applyFilters();
+        const items = res.data.data || [];
+        const meta = res.data.meta || {};
+        currentPage = meta.current_page || page;
+        lastPage = meta.last_page || currentPage;
+        allVisits = reset ? items : allVisits.concat(items);
+        if (reset && !hasFilters(filters)) {
+            try { sessionStorage.setItem('eftkad_last_list', JSON.stringify(items)); } catch (e) {}
+        }
+        renderVisits();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -244,12 +278,18 @@
 
         loadFilters();
         loadEnums();
-        loadVisits();
+        loadVisits(true);
 
+        const reload = function () { loadVisits(true); };
         ['filter-father', 'filter-servant', 'filter-type'].forEach(function (id) {
-            document.getElementById(id).addEventListener('change', applyFilters);
+            document.getElementById(id).addEventListener('change', reload);
         });
-        document.getElementById('filter-date').addEventListener('input', applyFilters);
+        let dateTimer;
+        document.getElementById('filter-date').addEventListener('input', function () {
+            clearTimeout(dateTimer);
+            dateTimer = setTimeout(reload, 300);
+        });
+        document.getElementById('visits-more').addEventListener('click', function () { loadVisits(false); });
     });
 </script>
 @endsection
