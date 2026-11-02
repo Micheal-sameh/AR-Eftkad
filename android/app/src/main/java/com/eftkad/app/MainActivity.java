@@ -35,6 +35,21 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AlertDialog;
+
+import android.content.Intent;
+import android.provider.Settings;
+
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
 
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
@@ -141,6 +156,7 @@ public class MainActivity extends BridgeActivity {
                 String loadedPath = Uri.parse(url).getPath();
                 if (loadedPath != null && loadedPath.startsWith("/visits") && !prompting && lockOverlay == null) {
                     handler.postDelayed(MainActivity.this::askForLocationOnce, 1500);
+                    handler.postDelayed(MainActivity.this::checkForUpdate, 5000);
                 }
                 if (lockOverlay != null && !prompting && pendingUnlock == null && target != null && onTargetPage(view)) {
                     handler.postDelayed(MainActivity.this::removeLockOverlay, 350);
@@ -436,6 +452,134 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    // ---- in-app updates (OTA) ----
+    // The site serves /app/version.json ({versionCode, versionName, url, sha256, notes, force}) and the
+    // APK it points to (see scripts/publish-apk.mjs). When versionCode is newer than this build, the app
+    // offers to download and install it, so the APK never has to be sent around again.
+
+    private static final String UPDATE_INFO_URL = BASE_URL + "/app/version.json";
+    private boolean updateChecked = false;
+    private JSONObject pendingUpdate = null; // waiting for the "install unknown apps" permission
+    private AlertDialog updateDialog;
+
+    @SuppressWarnings("deprecation")
+    private int installedVersionCode() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            return Integer.MAX_VALUE; // unknown: never offer an update
+        }
+    }
+
+    private void checkForUpdate() {
+        if (updateChecked || lockOverlay != null || pendingUnlock != null || !isOnline()) return;
+        updateChecked = true;
+        new Thread(() -> {
+            try {
+                // cache-buster: neither Cloudflare nor the site's service worker may answer with an old file
+                HttpURLConnection c = (HttpURLConnection) new URL(UPDATE_INFO_URL + "?t=" + System.currentTimeMillis()).openConnection();
+                c.setConnectTimeout(8000);
+                c.setReadTimeout(8000);
+                if (c.getResponseCode() != 200) return;
+                StringBuilder sb = new StringBuilder();
+                try (InputStream in = c.getInputStream()) {
+                    byte[] buf = new byte[4096];
+                    int n;
+                    while ((n = in.read(buf)) > 0) sb.append(new String(buf, 0, n, "UTF-8"));
+                }
+                JSONObject info = new JSONObject(sb.toString());
+                String apkUrl = info.optString("url", "");
+                // only ever download from our own site
+                if (info.getInt("versionCode") <= installedVersionCode() || !apkUrl.startsWith(BASE_URL + "/")) return;
+                runOnUiThread(() -> showUpdateDialog(info));
+            } catch (Exception ignored) {
+                // no update info reachable: carry on silently
+            }
+        }).start();
+    }
+
+    private void showUpdateDialog(JSONObject info) {
+        if (isFinishing() || updateDialog != null) return;
+        boolean force = info.optBoolean("force", false);
+        String notes = info.optString("notes", "");
+        AlertDialog.Builder b = new AlertDialog.Builder(this)
+            .setTitle("تحديث جديد / Update available")
+            .setMessage("الإصدار " + info.optString("versionName") + (notes.isEmpty() ? "" : "\n" + notes)
+                + "\n\nلأفضل تجربة، حدّث التطبيق الآن.\nUpdate Eftkad now for the best experience.")
+            .setCancelable(!force)
+            .setPositiveButton("تحديث / Update", (d, w) -> { updateDialog = null; startUpdate(info); });
+        if (!force) b.setNegativeButton("لاحقاً / Later", (d, w) -> updateDialog = null);
+        updateDialog = b.create();
+        updateDialog.setOnDismissListener(d -> updateDialog = null);
+        updateDialog.show();
+    }
+
+    private void startUpdate(JSONObject info) {
+        // Android asks the user to allow installs from this app once.
+        if (!getPackageManager().canRequestPackageInstalls()) {
+            pendingUpdate = info;
+            Toast.makeText(this, "اسمح بالتثبيت من هذا التطبيق ثم ارجع / Allow installs from this app, then come back", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())));
+            return;
+        }
+        pendingUpdate = null;
+
+        AlertDialog progress = new AlertDialog.Builder(this)
+            .setTitle("جاري التحميل / Downloading")
+            .setMessage("0%")
+            .setCancelable(false)
+            .create();
+        progress.show();
+
+        new Thread(() -> {
+            try {
+                File dir = new File(getCacheDir(), "updates");
+                if (!dir.exists() && !dir.mkdirs()) throw new Exception("no cache dir");
+                File apk = new File(dir, "eftkad.apk");
+                HttpURLConnection c = (HttpURLConnection) new URL(info.getString("url")).openConnection();
+                c.setConnectTimeout(15000);
+                c.setReadTimeout(30000);
+                long total = c.getContentLengthLong();
+                MessageDigest sha = MessageDigest.getInstance("SHA-256");
+                try (InputStream in = c.getInputStream(); OutputStream out = new FileOutputStream(apk)) {
+                    byte[] buf = new byte[16384];
+                    long done = 0;
+                    int last = -1, n;
+                    while ((n = in.read(buf)) > 0) {
+                        out.write(buf, 0, n);
+                        sha.update(buf, 0, n);
+                        done += n;
+                        int pct = total > 0 ? (int) (done * 100 / total) : -1;
+                        if (pct != last) {
+                            last = pct;
+                            final String text = pct >= 0 ? pct + "%" : "…";
+                            runOnUiThread(() -> progress.setMessage(text));
+                        }
+                    }
+                }
+                // refuse a corrupted or swapped file
+                StringBuilder hex = new StringBuilder();
+                for (byte x : sha.digest()) hex.append(String.format("%02x", x));
+                String expected = info.optString("sha256", "");
+                if (!expected.isEmpty() && !expected.equalsIgnoreCase(hex.toString())) throw new Exception("checksum mismatch");
+
+                runOnUiThread(() -> {
+                    progress.dismiss();
+                    Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", apk);
+                    Intent install = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(uri, "application/vnd.android.package-archive")
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(install);
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    progress.dismiss();
+                    Toast.makeText(this, "تعذر التحديث، حاول لاحقاً / Update failed, try again later", Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+
     // ---- location permission ----
 
     private static final int LOCATION_REQUEST_CODE = 4321;
@@ -483,6 +627,8 @@ public class MainActivity extends BridgeActivity {
         final boolean relock = stoppedAt > 0 && "visits".equals(target) && splashHidden && !prompting && lockOverlay == null
             && System.currentTimeMillis() - stoppedAt > RELOCK_AFTER_MS && biometricAvailable();
         stoppedAt = 0;
+        // back from the "install unknown apps" settings screen with the permission granted
+        if (pendingUpdate != null && getPackageManager().canRequestPackageInstalls()) startUpdate(pendingUpdate);
         if (!relock && lockOverlay != null && pendingUnlock != null && !prompting && fingerprintEnrolled()) {
             authenticate(pendingUnlock);
         }
