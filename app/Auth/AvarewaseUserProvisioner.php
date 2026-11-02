@@ -42,6 +42,14 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
             $user = User::query()->where('email', $userInfo->email)->first();
         }
 
+        // A user already linked to a different SSO identity must never be re-linked by a
+        // membership_code/email match, or whoever claims that code would inherit the account.
+        if ($user && $user->avarewase_sub && $user->avarewase_sub !== $userInfo->sub) {
+            throw new AvarewaseAccountNotFoundException(
+                "Local user {$user->getKey()} is already linked to a different Avarewase identity than {$userInfo->sub}.",
+            );
+        }
+
         if (! $user) {
             if (! $userInfo->membershipCode) {
                 throw new AvarewaseAccountNotFoundException(

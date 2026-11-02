@@ -32,7 +32,16 @@ class AuthenticateWithSsoOrSanctum
         $accessToken = $token ? PersonalAccessToken::findToken($token) : null;
 
         if ($accessToken) {
-            $user = $accessToken->tokenable;
+            // findToken() doesn't enforce expiry, so check it here like Sanctum's own guard does.
+            $expiration = config('sanctum.expiration');
+            $expired = ($expiration && $accessToken->created_at->lte(now()->subMinutes($expiration)))
+                || ($accessToken->expires_at && $accessToken->expires_at->isPast());
+
+            $user = $expired ? null : $accessToken->tokenable;
+
+            if (! $user) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
 
             Auth::setUser($user);
             $request->setUserResolver(fn () => $user);
