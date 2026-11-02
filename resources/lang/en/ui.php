@@ -212,6 +212,9 @@ return [
         'developer' => 'Developer sign-in',
         'secure_sign_in' => 'Secure sign in',
         'privacy' => 'Protected and secure pastoral data',
+        'signout_title' => 'Sign out?',
+        'signout_text' => 'Are you sure you want to sign out of Eftkad?',
+        'cancel' => 'Cancel',
         'nav' => [
             'visits' => 'Visits',
             'new_visit' => 'New visit',

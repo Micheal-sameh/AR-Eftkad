@@ -103,6 +103,22 @@
 
 <div id="toast-root"></div>
 
+<div class="modal-wrap hidden" id="signout-modal" role="dialog" aria-modal="true" aria-labelledby="signout-title">
+    <div class="modal-backdrop" id="signout-backdrop"></div>
+    <div class="modal signout-modal">
+        <div class="signout-icon"><x-icon name="logout" :size="24" /></div>
+        <div class="section-title" id="signout-title">{{ __('ui.fg.signout_title') }}</div>
+        <p class="signout-text">{{ __('ui.fg.signout_text') }}</p>
+        <div class="modal-actions">
+            <button type="button" class="button button-ghost" id="signout-cancel"><span>{{ __('ui.fg.cancel') }}</span></button>
+            <button type="button" class="button button-danger" id="signout-confirm">
+                <x-icon name="logout" :size="18" />
+                <span>{{ __('ui.fg.nav.sign_out') }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
@@ -121,18 +137,107 @@
             document.getElementById('profile-type').textContent = (user.type && user.type.name) ? user.type.name : '';
         }
 
+        // Signing out always asks first (sidebar, bottom bar and profile button all land here).
+        var signoutModal = document.getElementById('signout-modal');
+        function setSignoutModal(open) {
+            signoutModal.classList.toggle('hidden', !open);
+            if (open) document.getElementById('signout-cancel').focus();
+        }
+        document.getElementById('signout-backdrop').addEventListener('click', function () { setSignoutModal(false); });
+        document.getElementById('signout-cancel').addEventListener('click', function () { setSignoutModal(false); });
+        document.getElementById('signout-confirm').addEventListener('click', function () {
+            this.disabled = true;
+            Eftkad.logout();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setSignoutModal(false); });
+
         document.querySelectorAll('[data-signout]').forEach(function (b) {
-            b.addEventListener('click', function (e) { e.preventDefault(); Eftkad.logout(); });
+            b.addEventListener('click', function (e) { e.preventDefault(); setSignoutModal(true); });
         });
 
         setupInstallBanner();
         Eftkad.enhanceSelects();
+        Eftkad.initPullToRefresh();
 
         try {
             var msg = sessionStorage.getItem('eftkad_toast');
             if (msg) { sessionStorage.removeItem('eftkad_toast'); Eftkad.toast(msg); }
         } catch (e) {}
     });
+
+    // Pull-to-refresh: drag down while the page is at the very top, release past the threshold to
+    // reload. The browser's own gesture is disabled (overscroll-behavior), so this replaces it.
+    // A page can supply its own refresh by setting window.EftkadRefresh = function () { ... }.
+    Eftkad.initPullToRefresh = function () {
+        // Native app only: the Android shell's web view has the Capacitor bridge; a phone's
+        // browser (which has its own refresh) and the installed PWA do not.
+        var native = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
+        if (!native) return;
+
+        var THRESHOLD = 70, MAX = 120;
+        var ring = document.createElement('div');
+        ring.className = 'ptr';
+        ring.innerHTML = '<span class="ptr-ring"></span>';
+        document.body.appendChild(ring);
+        var spinner = ring.firstChild;
+
+        var startY = 0, startX = 0, pull = 0, tracking = false, busy = false, armed = false;
+
+        function blocked(target) {
+            return target.closest('.select-menu, .sheet-wrap.open, .modal-wrap:not(.hidden), textarea, input');
+        }
+        function render(p) {
+            ring.style.transform = 'translateY(' + (p - 52) + 'px)';
+            ring.style.opacity = Math.min(1, p / 40);
+            spinner.style.transform = 'rotate(' + (p * 4) + 'deg)';
+        }
+        function reset() {
+            ring.classList.remove('is-loading');
+            ring.classList.add('is-settling');
+            render(0);
+            setTimeout(function () { ring.classList.remove('is-settling'); ring.style.opacity = 0; }, 250);
+        }
+
+        document.addEventListener('touchstart', function (e) {
+            if (busy || e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)) { tracking = false; return; }
+            tracking = true; armed = false; pull = 0;
+            startY = e.touches[0].clientY; startX = e.touches[0].clientX;
+            ring.classList.remove('is-settling');
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+            if (!tracking || busy) return;
+            var dy = e.touches[0].clientY - startY;
+            var dx = e.touches[0].clientX - startX;
+            if (dy <= 0 || Math.abs(dx) > dy || window.scrollY > 0) { if (pull) { pull = 0; render(0); } if (dy <= 0) tracking = false; return; }
+            if (e.cancelable) e.preventDefault();
+            pull = Math.min(MAX, dy * 0.5);
+            render(pull);
+            var nowArmed = pull >= THRESHOLD;
+            if (nowArmed && !armed && navigator.vibrate) navigator.vibrate(8);
+            armed = nowArmed;
+        }, { passive: false });
+
+        function end() {
+            if (!tracking) return;
+            tracking = false;
+            if (pull >= THRESHOLD && !busy) {
+                busy = true;
+                ring.classList.add('is-loading', 'is-settling');
+                render(THRESHOLD * 0.8);
+                if (typeof window.EftkadRefresh === 'function') {
+                    Promise.resolve(window.EftkadRefresh()).catch(function () {}).then(function () { busy = false; reset(); });
+                } else {
+                    setTimeout(function () { window.location.reload(); }, 250);
+                }
+            } else if (pull > 0) {
+                reset();
+            }
+            pull = 0;
+        }
+        document.addEventListener('touchend', end, { passive: true });
+        document.addEventListener('touchcancel', end, { passive: true });
+    };
 
     // Custom dropdowns. The browser's own <select> list can't be themed (white popup on the
     // dark theme, huge font on phones), so every `.input-shell select` gets a themed trigger
