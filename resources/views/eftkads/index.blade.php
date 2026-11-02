@@ -97,10 +97,16 @@
                     <span class="field-label">{{ __('ui.fg.visits.type') }}</span>
                     <span class="input-shell"><select id="filter-type"><option value="">{{ __('ui.visits.filter_type_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
                 </label>
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.visits.date') }}</span>
-                    <span class="input-shell"><input id="filter-date" type="date" /></span>
-                </label>
+                <div class="form-grid">
+                    <label class="field">
+                        <span class="field-label">{{ __('ui.fg.visits.date_from') }}</span>
+                        <span class="input-shell"><input id="filter-date-from" type="date" /></span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">{{ __('ui.fg.visits.date_to') }}</span>
+                        <span class="input-shell"><input id="filter-date-to" type="date" /></span>
+                    </label>
+                </div>
             </div>
             <div class="sheet-actions">
                 <button type="button" class="button button-ghost" id="clear-filters"><span>{{ __('ui.fg.visits.clear') }}</span></button>
@@ -120,7 +126,7 @@
     let lastPage = 1;
     let totalVisits = null;
     let loadSeq = 0;
-    let applied = { father: '', servant: '', type: '', date: '' };
+    let applied = { father: '', servant: '', type: '', date_from: '', date_to: '' };
     const memberNames = {};
     const $ = function (id) { return document.getElementById(id); };
 
@@ -287,19 +293,23 @@
         $('filter-backdrop').addEventListener('click', function () { setSheet(false); });
 
         $('apply-filters').addEventListener('click', function () {
+            let from = $('filter-date-from').value;
+            let to = $('filter-date-to').value;
+            if (from && to && from > to) { const t = from; from = to; to = t; $('filter-date-from').value = from; $('filter-date-to').value = to; }
             applied = {
                 father: $('filter-father').value,
                 servant: $('filter-servant').value,
                 type: $('filter-type').value,
-                date: toDMY($('filter-date').value),
+                date_from: toDMY(from),
+                date_to: toDMY(to),
             };
             updateFilterBadge();
             setSheet(false);
             loadVisits(true);
         });
         $('clear-filters').addEventListener('click', function () {
-            ['filter-father', 'filter-servant', 'filter-type', 'filter-date'].forEach(function (id) { $(id).value = ''; });
-            applied = { father: '', servant: '', type: '', date: '' };
+            ['filter-father', 'filter-servant', 'filter-type', 'filter-date-from', 'filter-date-to'].forEach(function (id) { $(id).value = ''; });
+            applied = { father: '', servant: '', type: '', date_from: '', date_to: '' };
             updateFilterBadge();
             setSheet(false);
             loadVisits(true);

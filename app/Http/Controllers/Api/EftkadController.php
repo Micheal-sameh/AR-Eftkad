@@ -31,7 +31,7 @@ class EftkadController extends BaseController
     public function index(Request $request)
     {
         $data = $this->eftkadService->index(
-            $request->only('father', 'servant', 'type', 'date'),
+            $request->only('father', 'servant', 'type', 'date', 'date_from', 'date_to'),
             (int) $request->query('per_page', EftkadRepository::DEFAULT_PER_PAGE),
         );
 

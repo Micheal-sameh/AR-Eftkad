@@ -247,6 +247,8 @@ return [
             'servant' => 'Servant',
             'type' => 'Visit type',
             'date' => 'Date',
+            'date_from' => 'From date',
+            'date_to' => 'To date',
             'new_visit' => 'New visit',
             'load_more' => 'Load more',
         ],

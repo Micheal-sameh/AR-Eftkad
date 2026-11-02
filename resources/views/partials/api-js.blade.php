@@ -181,6 +181,9 @@
     Eftkad.toggleTheme = function () {
         var dark = document.documentElement.classList.toggle('dark');
         try { localStorage.setItem('eftkad_theme', dark ? 'dark' : 'light'); } catch (e) {}
+        // Keep the phone's status bar / browser chrome in step with the theme.
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', dark ? '#1c2428' : '#faf9f6');
         document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
             el.innerHTML = Eftkad.icon(dark ? 'sun' : 'moon');
         });

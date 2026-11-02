@@ -17,7 +17,7 @@ class EftkadRepository
     public const MAX_PER_PAGE = 50;
 
     /**
-     * @param  array{father?: ?string, servant?: ?string, type?: ?string, date?: ?string}  $filters
+     * @param  array{father?: ?string, servant?: ?string, type?: ?string, date?: ?string, date_from?: ?string, date_to?: ?string}  $filters
      */
     public function index(array $filters = [], int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
@@ -28,9 +28,28 @@ class EftkadRepository
             ->when($filters['servant'] ?? null, fn (Builder $q, $v) => $q->where('servant_membership_code', $v))
             ->when($filters['type'] ?? null, fn (Builder $q, $v) => $q->where('type', (int) $v))
             ->when($filters['date'] ?? null, fn (Builder $q, $v) => $this->applyDateFilter($q, trim($v)))
+            ->when($this->parseDay($filters['date_from'] ?? null), fn (Builder $q, Carbon $d) => $q->where('date', '>=', $d->startOfDay()))
+            ->when($this->parseDay($filters['date_to'] ?? null), fn (Builder $q, Carbon $d) => $q->where('date', '<=', $d->endOfDay()))
             ->orderByDesc('date')
             ->orderByDesc('id')
             ->paginate($perPage);
+    }
+
+    /** d-m-Y (the format the API speaks) to a Carbon day, or null when empty/invalid. */
+    protected function parseDay(?string $value): ?Carbon
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            $day = Carbon::createFromFormat('!d-m-Y', $value);
+        } catch (\Carbon\Exceptions\InvalidFormatException) {
+            return null;
+        }
+
+        return $day && $day->format('d-m-Y') === $value ? $day : null;
     }
 
     /**

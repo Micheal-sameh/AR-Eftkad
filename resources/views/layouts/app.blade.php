@@ -16,7 +16,6 @@
 ])
 
 <div class="app-shell">
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand compact">
@@ -25,7 +24,6 @@
                     <div class="brand-name">Eftkad <span>افتقاد</span></div>
                 </div>
             </div>
-            <button type="button" class="icon-button mobile-only" id="sidebar-close" aria-label="Close"><x-icon name="close" /></button>
         </div>
         <nav class="sidebar-nav">
             @foreach ($nav as $item)
@@ -52,9 +50,7 @@
 
     <div class="main-shell">
         <header class="topbar">
-            <div class="mobile-only">
-                <button type="button" class="icon-button" id="menu-open" aria-label="{{ __('ui.fg.menu') }}"><x-icon name="menu" /></button>
-            </div>
+            <div class="topbar-brand" aria-hidden="true"><img class="brand-logo" src="/icons/icon-192.png?v=2" alt="" width="40" height="40" />{{ app()->getLocale() === 'ar' ? 'افتقاد' : 'Eftkad' }}</div>
             <div class="topbar-title">
                 <span class="topbar-kicker" id="topbar-greeting">{{ __('ui.fg.greeting_anon') }}</span>
                 <strong>{{ __('ui.fg.welcome') }}</strong>
@@ -129,23 +125,150 @@
             b.addEventListener('click', function (e) { e.preventDefault(); Eftkad.logout(); });
         });
 
-        var sidebar = document.getElementById('sidebar');
-        var overlay = document.getElementById('sidebar-overlay');
-        function setMenu(open) {
-            sidebar.classList.toggle('show', open);
-            overlay.classList.toggle('show', open);
-        }
-        document.getElementById('menu-open').addEventListener('click', function () { setMenu(true); });
-        document.getElementById('sidebar-close').addEventListener('click', function () { setMenu(false); });
-        overlay.addEventListener('click', function () { setMenu(false); });
-
         setupInstallBanner();
+        Eftkad.enhanceSelects();
 
         try {
             var msg = sessionStorage.getItem('eftkad_toast');
             if (msg) { sessionStorage.removeItem('eftkad_toast'); Eftkad.toast(msg); }
         } catch (e) {}
     });
+
+    // Custom dropdowns. The browser's own <select> list can't be themed (white popup on the
+    // dark theme, huge font on phones), so every `.input-shell select` gets a themed trigger
+    // and menu. The real <select> stays in the DOM and stays the source of truth: reading or
+    // setting .value, `change` listeners and form code all keep working untouched.
+    Eftkad.enhanceSelects = function () {
+        var menu = null;
+        var openFor = null;
+
+        function closeMenu() {
+            if (!menu) return;
+            menu.remove();
+            menu = null;
+            if (openFor) { openFor.shell.classList.remove('is-open'); openFor.trigger.setAttribute('aria-expanded', 'false'); }
+            openFor = null;
+        }
+
+        function labelOf(select) {
+            var opt = select.options[select.selectedIndex];
+            return opt ? opt.textContent : '';
+        }
+
+        function sync(c) {
+            var opt = c.select.options[c.select.selectedIndex];
+            var empty = !opt || opt.value === '';
+            c.trigger.textContent = labelOf(c.select);
+            c.trigger.classList.toggle('is-placeholder', empty);
+        }
+
+        // Sits under the field (or above it when there is no room); re-run on scroll/resize so it follows the field.
+        function place() {
+            if (!menu || !openFor) return;
+            var r = openFor.shell.getBoundingClientRect();
+            var below = window.innerHeight - r.bottom - 12;
+            var h = Math.min(menu.scrollHeight, 256);
+            var up = below < h && r.top > below;
+            menu.style.minWidth = r.width + 'px';
+            menu.style.maxWidth = Math.max(r.width, 280) + 'px';
+            menu.style.maxHeight = Math.max(120, Math.min(256, up ? r.top - 12 : below)) + 'px';
+            var left = document.documentElement.dir === 'rtl' ? r.right - menu.offsetWidth : r.left;
+            menu.style.left = Math.max(8, Math.min(left, window.innerWidth - menu.offsetWidth - 8)) + 'px';
+            menu.style.top = up ? (r.top - menu.offsetHeight - 6) + 'px' : (r.bottom + 6) + 'px';
+        }
+
+        function openMenu(c) {
+            closeMenu();
+            if (c.select.disabled) return;
+            menu = document.createElement('div');
+            menu.className = 'select-menu';
+            menu.setAttribute('role', 'listbox');
+            Array.prototype.forEach.call(c.select.options, function (o, i) {
+                var item = document.createElement('div');
+                var chosen = i === c.select.selectedIndex;
+                item.className = 'select-option' + (chosen ? ' selected' : '') + (o.disabled ? ' disabled' : '') + (o.value === '' ? ' is-placeholder' : '');
+                item.setAttribute('role', 'option');
+                item.dataset.index = i;
+                item.innerHTML = '<span></span>' + (chosen ? Eftkad.icon('check', 16) : '');
+                item.firstChild.textContent = o.textContent;
+                menu.appendChild(item);
+            });
+            document.body.appendChild(menu);
+
+            openFor = c;
+            place();
+
+            var sel = menu.querySelector('.selected');
+            // Scroll inside the menu only; scrollIntoView would scroll the page and trip the close-on-scroll rule below.
+            if (sel) menu.scrollTop = Math.max(0, sel.offsetTop - menu.clientHeight / 2 + sel.offsetHeight / 2);
+
+            menu.addEventListener('mousedown', function (e) { e.preventDefault(); });
+            menu.addEventListener('click', function (e) {
+                var item = e.target.closest('.select-option');
+                if (!item || item.classList.contains('disabled')) return;
+                c.select.selectedIndex = parseInt(item.dataset.index, 10);
+                c.select.dispatchEvent(new Event('change', { bubbles: true }));
+                sync(c);
+                closeMenu();
+                c.trigger.focus();
+            });
+
+            c.shell.classList.add('is-open');
+            c.trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function move(c, dir) {
+            var s = c.select, i = s.selectedIndex;
+            do { i += dir; } while (i >= 0 && i < s.options.length && s.options[i].disabled);
+            if (i < 0 || i >= s.options.length) return;
+            s.selectedIndex = i;
+            s.dispatchEvent(new Event('change', { bubbles: true }));
+            sync(c);
+        }
+
+        function enhance(select) {
+            if (select.dataset.enhanced) return;
+            var shell = select.closest('.input-shell');
+            if (!shell) return;
+            select.dataset.enhanced = '1';
+            shell.classList.add('is-enhanced');
+
+            var trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'select-trigger';
+            trigger.setAttribute('aria-haspopup', 'listbox');
+            trigger.setAttribute('aria-expanded', 'false');
+            select.tabIndex = -1;
+            select.setAttribute('aria-hidden', 'true');
+            shell.insertBefore(trigger, select);
+
+            var c = { select: select, shell: shell, trigger: trigger };
+            sync(c);
+
+            trigger.addEventListener('click', function () { openFor === c ? closeMenu() : openMenu(c); });
+            trigger.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); move(c, e.key === 'ArrowDown' ? 1 : -1); }
+                else if (e.key === 'Escape') closeMenu();
+            });
+
+            // Keep the trigger in step with the real select: options added later (API data),
+            // and .value set from code (which does not fire any event).
+            new MutationObserver(function () { sync(c); }).observe(select, { childList: true, subtree: true, attributes: true });
+            var desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+            Object.defineProperty(select, 'value', {
+                get: function () { return desc.get.call(this); },
+                set: function (v) { desc.set.call(this, v); sync(c); },
+            });
+            select.addEventListener('change', function () { sync(c); });
+        }
+
+        document.querySelectorAll('.input-shell select').forEach(enhance);
+        document.addEventListener('mousedown', function (e) {
+            if (menu && !menu.contains(e.target) && !(openFor && openFor.shell.contains(e.target))) closeMenu();
+        });
+        window.addEventListener('resize', place);
+        window.addEventListener('scroll', function (e) { if (menu && !menu.contains(e.target)) place(); }, true);
+    };
 
     // Toast: Eftkad.toast('message') shows the green confirmation pill for a moment.
     Eftkad.toast = function (message) {
@@ -157,6 +280,10 @@
     // Install banner: shown when the browser can install the PWA (or on iOS, with
     // manual steps) and the app is not already running standalone.
     function setupInstallBanner() {
+        // Temporarily off: set to true to show the banner again.
+        var INSTALL_BANNER_ENABLED = false;
+        if (!INSTALL_BANNER_ENABLED) return;
+
         var DISMISS_KEY = 'eftkad_install_dismissed';
         try { if (localStorage.getItem(DISMISS_KEY)) return; } catch (e) {}
         if (Eftkad.isStandalone()) return;
