@@ -58,6 +58,10 @@ class EftkadViewController: CAPBridgeViewController {
 
     private var lockOverlay: UIView?
     private var authenticating = false
+    // The lock screen's own icon + status line, so it matches the Android lock screen.
+    private var lockIcon: UIImageView?
+    private var lockStatus: UILabel?
+    private var lockRetryButton: UIButton?
     private var sessionUnlocked = false   // past the lock (or signed in fresh) during this launch
     private var hasToken = false
     private var backgroundedAt: Date?
@@ -154,17 +158,51 @@ class EftkadViewController: CAPBridgeViewController {
         guard !authenticating else { return }
         authenticating = true
 
+        setLockState(biometryPrompt(), color: Self.lockIdleColor, retry: false)
+
         let context = LAContext()
         context.localizedCancelTitle = "تسجيل الدخول بحساب / Use login"
         context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics,
-                               localizedReason: "افتح التطبيق بالبصمة / Unlock Eftkad") { [weak self] success, _ in
+                               localizedReason: "افتح إفتقاد / Unlock Eftkad") { [weak self] success, _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.authenticating = false
-                if success { self.unlock() }
-                // on cancel / failure the overlay stays, with its Unlock and Use login buttons
+                if success {
+                    self.setLockState("تم / Unlocked", color: Self.lockOkColor, retry: false)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in self?.unlock() }
+                } else {
+                    // on cancel / failure the overlay stays, with its Try again and Use login buttons
+                    self.setLockState("حاول مرة أخرى / Try again", color: Self.lockErrorColor, retry: true)
+                }
             }
         }
+    }
+
+    private static let lockIdleColor = UIColor(red: 0.247, green: 0.365, blue: 0.427, alpha: 1)   // #3f5d6d
+    private static let lockErrorColor = UIColor(red: 0.753, green: 0.224, blue: 0.169, alpha: 1)  // #c0392b
+    private static let lockOkColor = UIColor(red: 0.18, green: 0.49, blue: 0.2, alpha: 1)         // #2e7d32
+
+    private func biometryPrompt() -> String {
+        let context = LAContext()
+        var error: NSError?
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        return context.biometryType == .faceID
+            ? "انظر إلى الشاشة / Look at your iPhone"
+            : "المس مستشعر البصمة / Touch the fingerprint sensor"
+    }
+
+    private func biometryIconName() -> String {
+        let context = LAContext()
+        var error: NSError?
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
+        return context.biometryType == .faceID ? "faceid" : "touchid"
+    }
+
+    private func setLockState(_ text: String, color: UIColor, retry: Bool) {
+        lockStatus?.text = text
+        lockStatus?.textColor = color
+        lockIcon?.tintColor = color
+        lockRetryButton?.isHidden = !retry
     }
 
     private func unlock() {
@@ -196,7 +234,7 @@ class EftkadViewController: CAPBridgeViewController {
         overlay.addSubview(logo)
 
         var unlockConfig = UIButton.Configuration.filled()
-        unlockConfig.title = "فتح / Unlock"
+        unlockConfig.title = "حاول مرة أخرى / Try again"
         unlockConfig.cornerStyle = .large
         unlockConfig.baseBackgroundColor = UIColor(red: 0.247, green: 0.365, blue: 0.427, alpha: 1)   // #3f5d6d
         let unlockButton = UIButton(configuration: unlockConfig, primaryAction: UIAction { [weak self] _ in self?.authenticate() })
@@ -206,9 +244,25 @@ class EftkadViewController: CAPBridgeViewController {
         loginConfig.baseForegroundColor = UIColor(red: 0.392, green: 0.439, blue: 0.502, alpha: 1)  // #647080
         let loginButton = UIButton(configuration: loginConfig, primaryAction: UIAction { [weak self] _ in self?.signOutToLogin() })
 
-        let stack = UIStackView(arrangedSubviews: [unlockButton, loginButton])
+        // Face ID / Touch ID icon and status line above the buttons; the Try again button only
+        // shows after a failed or cancelled attempt.
+        unlockButton.isHidden = true
+        let icon = UIImageView(image: UIImage(systemName: biometryIconName()))
+        icon.tintColor = Self.lockIdleColor
+        icon.contentMode = .scaleAspectFit
+        icon.heightAnchor.constraint(equalToConstant: 64).isActive = true
+        let status = UILabel()
+        status.font = .systemFont(ofSize: 15)
+        status.textColor = Self.lockIdleColor
+        status.textAlignment = .center
+        status.numberOfLines = 0
+
+        let stack = UIStackView(arrangedSubviews: [icon, status, unlockButton, loginButton])
         stack.axis = .vertical
-        stack.spacing = 8
+        stack.spacing = 12
+        lockIcon = icon
+        lockStatus = status
+        lockRetryButton = unlockButton
         stack.translatesAutoresizingMaskIntoConstraints = false
         overlay.addSubview(stack)
 
@@ -234,6 +288,9 @@ class EftkadViewController: CAPBridgeViewController {
     private func removeLockOverlay() {
         lockOverlay?.removeFromSuperview()
         lockOverlay = nil
+        lockIcon = nil
+        lockStatus = nil
+        lockRetryButton = nil
     }
 
     // MARK: - App lifecycle: lock again after a while in the background

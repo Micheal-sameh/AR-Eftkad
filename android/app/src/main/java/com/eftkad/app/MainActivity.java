@@ -4,12 +4,19 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.hardware.fingerprint.FingerprintManager;
+import android.os.CancellationSignal;
+import android.widget.TextView;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
@@ -17,7 +24,10 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -71,6 +81,17 @@ public class MainActivity extends BridgeActivity {
     private long stoppedAt = 0;
     private boolean prompting = false;
     private View lockOverlay;
+    // Set while the app is locked: what to run once the user passes the biometric check.
+    private Runnable pendingUnlock = null;
+    // The lock screen's own fingerprint UI (icon + status), driven by FingerprintManager.
+    private ImageView fpIcon;
+    private TextView fpStatus;
+    private Button unlockButton;
+    private CancellationSignal fpCancel;
+
+    private static final int COLOR_IDLE = Color.parseColor("#3F5D6D");
+    private static final int COLOR_ERROR = Color.parseColor("#C0392B");
+    private static final int COLOR_OK = Color.parseColor("#2E7D32");
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,7 +142,7 @@ public class MainActivity extends BridgeActivity {
                 if (loadedPath != null && loadedPath.startsWith("/visits") && !prompting && lockOverlay == null) {
                     handler.postDelayed(MainActivity.this::askForLocationOnce, 1500);
                 }
-                if (lockOverlay != null && !prompting && target != null && onTargetPage(view)) {
+                if (lockOverlay != null && !prompting && pendingUnlock == null && target != null && onTargetPage(view)) {
                     handler.postDelayed(MainActivity.this::removeLockOverlay, 350);
                 }
                 if (splashHidden) return;
@@ -160,12 +181,20 @@ public class MainActivity extends BridgeActivity {
 
     /** Asks for fingerprint/face. onUnlocked runs on success; any cancel/failure signs out to the login page. */
     private void authenticate(Runnable onUnlocked) {
+        if (prompting) return;
+        pendingUnlock = onUnlocked;
+        // Fingerprint: read straight from our own lock screen. Face-only phones use the system prompt.
+        if (lockOverlay != null && fingerprintEnrolled()) {
+            listenForFingerprint(onUnlocked);
+            return;
+        }
         prompting = true;
         BiometricPrompt prompt = new BiometricPrompt(this, ContextCompat.getMainExecutor(this),
             new BiometricPrompt.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                     prompting = false;
+                    pendingUnlock = null;
                     onUnlocked.run();
                 }
 
@@ -176,18 +205,17 @@ public class MainActivity extends BridgeActivity {
                         || errorCode == BiometricPrompt.ERROR_LOCKOUT
                         || errorCode == BiometricPrompt.ERROR_LOCKOUT_PERMANENT) {
                         // "Use login", or too many wrong attempts: fall back to a full sign-in
+                        pendingUnlock = null;
                         signOut();
-                    } else {
-                        // dismissed (back button, switching apps, system cancel): stay signed in,
-                        // close the app so the next launch asks for the fingerprint again
-                        finish();
                     }
+                    // otherwise (dismissed, system cancel): the lock screen stays up with its
+                    // Unlock and Use login buttons, so the user can try again or sign in instead
                 }
             });
 
         BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder()
-            .setTitle("افتح التطبيق بالبصمة / Unlock Eftkad")
-            .setSubtitle("استخدم بصمتك أو وجهك للدخول / Use your fingerprint or face")
+            .setTitle("افتح إفتقاد / Unlock Eftkad")
+            .setSubtitle("بصمتك أو وجهك / Fingerprint or face")
             .setNegativeButtonText("تسجيل الدخول بحساب / Use login")
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
             .setConfirmationRequired(false)
@@ -195,7 +223,79 @@ public class MainActivity extends BridgeActivity {
         prompt.authenticate(info);
     }
 
+    @SuppressWarnings("deprecation")
+    private boolean fingerprintEnrolled() {
+        try {
+            FingerprintManager fm = getSystemService(FingerprintManager.class);
+            return fm != null && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void setFpState(String text, int color, boolean showRetry) {
+        if (fpStatus == null) return;
+        fpStatus.setText(text);
+        fpStatus.setTextColor(color);
+        fpIcon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        unlockButton.setVisibility(showRetry ? View.VISIBLE : View.GONE);
+    }
+
+    private void stopListening() {
+        if (fpCancel != null) {
+            fpCancel.cancel();
+            fpCancel = null;
+        }
+        prompting = false;
+    }
+
+    /** Listens for the fingerprint from the lock screen itself, so it shows our UI instead of the system popup. */
+    @SuppressWarnings("deprecation")
+    private void listenForFingerprint(Runnable onUnlocked) {
+        FingerprintManager fm = getSystemService(FingerprintManager.class);
+        stopListening();
+        prompting = true;
+        fpCancel = new CancellationSignal();
+        setFpState("المس مستشعر البصمة / Touch the fingerprint sensor", COLOR_IDLE, false);
+        fm.authenticate(null, fpCancel, 0, new FingerprintManager.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                prompting = false;
+                fpCancel = null;
+                setFpState("تم / Unlocked", COLOR_OK, false);
+                handler.postDelayed(() -> { pendingUnlock = null; onUnlocked.run(); }, 250);
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                // a finger was read but not recognised: the sensor keeps listening
+                setFpState("لم يتم التعرف على البصمة، حاول مرة أخرى / Not recognised, try again", COLOR_ERROR, false);
+            }
+
+            @Override
+            public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                if (helpString != null) setFpState(helpString.toString(), COLOR_ERROR, false);
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                prompting = false;
+                fpCancel = null;
+                if (errorCode == FingerprintManager.FINGERPRINT_ERROR_CANCELED) return; // we stopped it ourselves
+                if (errorCode == FingerprintManager.FINGERPRINT_ERROR_LOCKOUT
+                    || errorCode == FingerprintManager.FINGERPRINT_ERROR_LOCKOUT_PERMANENT) {
+                    // too many wrong attempts: fall back to a full sign-in
+                    pendingUnlock = null;
+                    signOut();
+                    return;
+                }
+                setFpState("حاول مرة أخرى / Try again", COLOR_ERROR, true);
+            }
+        }, null);
+    }
+
     private void signOut() {
+        stopListening();
         WebView view = getBridge().getWebView();
         view.evaluateJavascript(CLEAR_AUTH_JS, null);
         target = "login";
@@ -206,20 +306,81 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    private int dp(int v) {
+        return Math.round(v * getResources().getDisplayMetrics().density);
+    }
+
     private void showLockOverlay() {
         if (lockOverlay != null) return;
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.WHITE);
+        root.setClickable(true);
+
         // the logo on white (same image as the splash), shown behind the fingerprint prompt
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.drawable.splash);
         logo.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        logo.setBackgroundColor(Color.WHITE);
-        logo.setClickable(true);
-        lockOverlay = logo;
+        root.addView(logo, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        // Unlock / Use login: what's left on screen when the fingerprint prompt is dismissed
+        Button unlock = new Button(this);
+        unlock.setText("فتح / Unlock");
+        unlock.setAllCaps(false);
+        unlock.setTextColor(Color.WHITE);
+        unlock.setTextSize(16);
+        unlock.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor("#3F5D6D"));
+        bg.setCornerRadius(dp(14));
+        unlock.setBackground(bg);
+        unlock.setOnClickListener(v -> { if (pendingUnlock != null) authenticate(pendingUnlock); });
+        unlockButton = unlock;
+        unlock.setText("حاول مرة أخرى / Try again");
+        unlock.setVisibility(View.GONE);
+
+        fpIcon = new ImageView(this);
+        fpIcon.setImageResource(R.drawable.ic_fingerprint);
+        fpIcon.setColorFilter(COLOR_IDLE, PorterDuff.Mode.SRC_IN);
+        fpStatus = new TextView(this);
+        fpStatus.setTextSize(15);
+        fpStatus.setGravity(Gravity.CENTER);
+        fpStatus.setTextColor(COLOR_IDLE);
+
+        Button login = new Button(this);
+        login.setText("تسجيل الدخول بحساب / Use login");
+        login.setAllCaps(false);
+        login.setTextColor(Color.parseColor("#647080"));
+        login.setTextSize(14);
+        login.setBackgroundColor(Color.TRANSPARENT);
+        login.setOnClickListener(v -> { pendingUnlock = null; signOut(); });
+
+        LinearLayout actions = new LinearLayout(this);
+        actions.setOrientation(LinearLayout.VERTICAL);
+        actions.setGravity(Gravity.CENTER_HORIZONTAL);
+        actions.addView(fpIcon, new LinearLayout.LayoutParams(dp(72), dp(72)));
+        LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        statusParams.topMargin = dp(12);
+        statusParams.bottomMargin = dp(16);
+        actions.addView(fpStatus, statusParams);
+        actions.addView(unlock, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52)));
+        LinearLayout.LayoutParams loginParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
+        loginParams.topMargin = dp(8);
+        actions.addView(login, loginParams);
+
+        FrameLayout.LayoutParams actionsParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        actionsParams.setMargins(dp(32), 0, dp(32), dp(40));
+        root.addView(actions, actionsParams);
+
+        lockOverlay = root;
         ((ViewGroup) findViewById(android.R.id.content)).addView(lockOverlay,
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     private void removeLockOverlay() {
+        stopListening();
+        fpIcon = null;
+        fpStatus = null;
+        unlockButton = null;
         if (lockOverlay == null) return;
         ((ViewGroup) lockOverlay.getParent()).removeView(lockOverlay);
         lockOverlay = null;
@@ -308,6 +469,8 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onStop() {
         super.onStop();
+        // the sensor must not stay claimed in the background; onResume listens again
+        if (fpCancel != null) stopListening();
         stoppedAt = System.currentTimeMillis();
     }
 
@@ -317,9 +480,12 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
-        final boolean relock = stoppedAt > 0 && "visits".equals(target) && splashHidden && !prompting
+        final boolean relock = stoppedAt > 0 && "visits".equals(target) && splashHidden && !prompting && lockOverlay == null
             && System.currentTimeMillis() - stoppedAt > RELOCK_AFTER_MS && biometricAvailable();
         stoppedAt = 0;
+        if (!relock && lockOverlay != null && pendingUnlock != null && !prompting && fingerprintEnrolled()) {
+            authenticate(pendingUnlock);
+        }
         if (relock) {
             showLockOverlay();
             authenticate(this::removeLockOverlay);
