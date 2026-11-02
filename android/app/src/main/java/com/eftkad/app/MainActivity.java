@@ -13,6 +13,9 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -32,6 +35,8 @@ public class MainActivity extends BridgeActivity {
     private static final String VISITS_URL = BASE_URL + "/visits";
     private static final String LOGIN_URL = BASE_URL + "/login";
     private static final String OFFLINE_URL = "file:///android_asset/public/offline.html";
+    // Same page, in "server problem" mode: says the service is unavailable and retries by itself.
+    private static final String SERVER_ERROR_URL = OFFLINE_URL + "#server";
     private static final long SPLASH_TIMEOUT_MS = 10000;
     private static final long RELOCK_AFTER_MS = 60000;
 
@@ -67,6 +72,25 @@ public class MainActivity extends BridgeActivity {
         // token is valid (after biometric unlock), /login otherwise. The splash is
         // hidden only once that page has loaded.
         getBridge().setWebViewClient(new BridgeWebViewClient(getBridge()) {
+            // The site answered with a server error (e.g. Cloudflare's 502 while the app container
+            // restarts): show our own retrying page instead of leaving the user on a dead error page.
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                super.onReceivedHttpError(view, request, errorResponse);
+                if (request.isForMainFrame() && errorResponse.getStatusCode() >= 500) {
+                    view.loadUrl(SERVER_ERROR_URL);
+                }
+            }
+
+            // Page could not be loaded at all (connection refused/reset, TLS or DNS failure).
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (request.isForMainFrame() && !String.valueOf(request.getUrl()).startsWith("file:")) {
+                    view.loadUrl(isOnline() ? SERVER_ERROR_URL : OFFLINE_URL);
+                }
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
