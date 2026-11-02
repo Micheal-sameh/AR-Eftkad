@@ -1,8 +1,18 @@
 services:
+  # Prebuilt php-fpm + nginx + pdo_mysql base image. Built once, then served from cache.
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile.base
+    image: eftkad-php-base
+    scale: 0  # build-only: `up` must never start a container from this service
+
   app:
     build:
       context: .
       target: app
+      additional_contexts:
+        eftkad-php-base: service:base
     env_file:
       - .env
     ports:
