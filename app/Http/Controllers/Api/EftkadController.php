@@ -46,7 +46,7 @@ class EftkadController extends BaseController
         $eftkad = $this->eftkadService->show($id);
 
         if (! $eftkad) {
-            return $this->apiErrorResponse(message: 'Eftkad not found', status_code: 404);
+            return $this->apiErrorResponse(message: trans('messages.eftkad not found'), status_code: 404);
         }
 
         return $this->apiResponse(new EftkadResource($eftkad));

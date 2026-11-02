@@ -112,14 +112,14 @@ class AuthController extends BaseController
         return "avarewase_sso:verifier:{$state}";
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = auth()->user();
-        $token = $user->currentAccessToken();
-        $token->delete();
+        // Null-safe: if the request has no resolvable token (already revoked, or the user was set
+        // by another guard), signing out must still succeed instead of crashing with a 500.
+        $request->user()?->currentAccessToken()?->delete();
         auth()->guard('web')->logout();
 
-        return $this->apiResponse(message: 'logout successfuly');
+        return $this->apiResponse(message: trans('messages.logout successfuly'));
     }
 
     /**

@@ -33,7 +33,7 @@ class UserController extends BaseController
         $user = $this->userService->show($id);
 
         if (! $user) {
-            return $this->apiErrorResponse(message: 'User not found', status_code: 404);
+            return $this->apiErrorResponse(message: trans('messages.user not found'), status_code: 404);
         }
 
         return $this->apiResponse(new UserResource($user));
@@ -44,7 +44,7 @@ class UserController extends BaseController
         $user = $this->userService->updateType($id, (int) $request->input('type'));
 
         if (! $user) {
-            return $this->apiErrorResponse(message: 'User not found', status_code: 404);
+            return $this->apiErrorResponse(message: trans('messages.user not found'), status_code: 404);
         }
 
         return $this->apiResponse(new UserResource($user));
@@ -55,7 +55,7 @@ class UserController extends BaseController
         $user = $this->userService->updateRole($id, $request->string('role')->toString());
 
         if (! $user) {
-            return $this->apiErrorResponse(message: 'User not found', status_code: 404);
+            return $this->apiErrorResponse(message: trans('messages.user not found'), status_code: 404);
         }
 
         return $this->apiResponse(new UserResource($user));
