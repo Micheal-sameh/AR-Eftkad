@@ -40,6 +40,17 @@
         setAuth(token, user) {
             localStorage.setItem(this.TOKEN_KEY, token);
             localStorage.setItem(this.USER_KEY, JSON.stringify(user || null));
+            // The text size is saved on the account, so signing in on a new device restores it.
+            this.applyFontSize(user && user.font_size);
+        },
+
+        // Text size for readability (older users): 0 = normal, 1 = large, 2 = extra large. Also kept in
+        // localStorage so partials/head-assets can apply it before first paint (html[data-font]).
+        applyFontSize(level) {
+            level = parseInt(level, 10) || 0;
+            if (level === 1 || level === 2) document.documentElement.setAttribute('data-font', level);
+            else document.documentElement.removeAttribute('data-font');
+            try { localStorage.setItem('eftkad_font', String(level)); } catch (e) {}
         },
 
         clearAuth() {
@@ -191,6 +202,20 @@
         });
     };
 
+    // Text size for readability (older users): 0 = normal, 1 = large, 2 = extra large. The saved level
+    // is applied before first paint by partials/head-assets as html[data-font]; CSS scales the root size.
+    Eftkad.cycleFontSize = function () {
+        var cur = parseInt(document.documentElement.getAttribute('data-font') || '0', 10) || 0;
+        var next = (cur + 1) % 3;
+        Eftkad.applyFontSize(next);
+        // Save to the account (so other devices pick it up) and keep the cached user in step.
+        var u = Eftkad.user();
+        if (u) { u.font_size = next; try { localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); } catch (e) {} }
+        Eftkad.api('/user/font-size', { method: 'PATCH', body: { font_size: next } }).catch(function () {});
+        var levels = UI_TEXT.fg.font_levels || [];
+        if (Eftkad.toast) Eftkad.toast(UI_TEXT.fg.font_size + ': ' + (levels[next] || ''));
+    };
+
     // Wires the AR/EN pill and the theme button (used on every page that renders them).
     Eftkad.initChrome = function () {
         document.querySelectorAll('.language-toggle button').forEach(function (b) {
@@ -200,6 +225,9 @@
         var dark = document.documentElement.classList.contains('dark');
         document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
             el.innerHTML = Eftkad.icon(dark ? 'sun' : 'moon');
+        });
+        document.querySelectorAll('[data-font-toggle]').forEach(function (b) {
+            b.addEventListener('click', Eftkad.cycleFontSize);
         });
         document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
             b.addEventListener('click', Eftkad.toggleTheme);

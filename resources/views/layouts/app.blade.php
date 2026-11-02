@@ -60,6 +60,7 @@
                     <button type="button" data-lang="ar">ع</button>
                     <button type="button" data-lang="en">EN</button>
                 </div>
+                <button type="button" class="icon-button font-size-button" data-font-toggle aria-label="{{ __('ui.fg.font_size') }}" title="{{ __('ui.fg.font_size') }}">Aa</button>
                 <button type="button" class="icon-button" data-theme-toggle aria-label="{{ __('ui.fg.theme') }}"><span data-theme-icon style="display:contents"></span></button>
                 <div class="profile-button">
                     <span id="profile-initials">··</span>
@@ -124,6 +125,21 @@
         if (!Eftkad.requireAuth()) return;
 
         Eftkad.initChrome();
+
+        // Pick up a text size changed on another device: refresh it from the account once per tab session.
+        try {
+            if (!sessionStorage.getItem('eftkad_font_synced')) {
+                sessionStorage.setItem('eftkad_font_synced', '1');
+                Eftkad.api('/user').then(function (res) {
+                    var me = res && res.ok !== false && res.data && (res.data.data || res.data);
+                    if (me && typeof me.font_size === 'number') {
+                        Eftkad.applyFontSize(me.font_size);
+                        var u = Eftkad.user();
+                        if (u) { u.font_size = me.font_size; localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); }
+                    }
+                }).catch(function () {});
+            }
+        } catch (e) {}
 
         var user = Eftkad.user();
         if (user) {

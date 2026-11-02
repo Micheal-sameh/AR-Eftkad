@@ -27,6 +27,7 @@ class User extends Authenticatable
         'phone',
         'type',
         'password',
+        'font_size',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'font_size' => 'integer',
     ];
 
     public const FILTERS_CACHE_KEY = 'settings.filters';

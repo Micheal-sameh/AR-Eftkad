@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth.sso_or_sanctum')->get('/user', [UserController::class, 'me']);
 
+Route::middleware('auth.sso_or_sanctum')->patch('/user/font-size', [UserController::class, 'updateFontSize']);
+
 Route::view('/documentation', 'vendor.l5-swagger.index', [
     'documentation' => 'default',
     'useAbsolutePath' => true,

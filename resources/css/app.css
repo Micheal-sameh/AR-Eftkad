@@ -98,6 +98,9 @@
 .language-toggle button { min-width: 2.15rem; height: 1.8rem; border-radius: .55rem; color: var(--ink-soft); font-size: .72rem; font-weight: 700; }
 .language-toggle button.active { background: var(--surface-raised); color: var(--primary); box-shadow: var(--shadow-sm); }
 .icon-button { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; border: 1px solid transparent; border-radius: .8rem; color: var(--ink-soft); transition: .18s ease; }
+.font-size-button { font-size: .85rem; font-weight: 700; }
+html[data-font="1"] { font-size: 118%; }
+html[data-font="2"] { font-size: 135%; }
 .icon-button:hover { color: var(--ink); background: var(--surface-soft); border-color: var(--border); }
 .sidebar { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 50; width: var(--sidebar); display: flex; flex-direction: column; padding: 1.2rem; border-inline-end: 1px solid var(--border); background: var(--surface-raised); }
 .sidebar-brand { height: 3.3rem; display: flex; align-items: center; justify-content: space-between; }

@@ -10,5 +10,6 @@
 <link rel="icon" href="/icons/icon-192.png?v=2" />
 {{-- Only ship the UI_TEXT sections a page's JS reads; pages declare them with @php($uiSections = [...]). --}}
 <script>try{if(localStorage.getItem("eftkad_theme")==="dark"){document.documentElement.classList.add("dark");document.querySelector('meta[name="theme-color"]').setAttribute("content","#1c2428")}}catch(e){}</script>
+<script>try{var f=localStorage.getItem("eftkad_font");if(f==="1"||f==="2")document.documentElement.setAttribute("data-font",f)}catch(e){}</script>
 <script>window.UI_TEXT = @json(isset($uiSections) ? \Illuminate\Support\Arr::only(__('ui'), $uiSections) : __('ui'));</script>
 @vite(['resources/css/app.css'])

@@ -20,6 +20,16 @@ class UserController extends BaseController
         return new UserResource($request->user()->loadMissing('roles'));
     }
 
+    public function updateFontSize(Request $request)
+    {
+        $data = $request->validate(['font_size' => 'required|integer|between:0,2']);
+
+        $user = $request->user();
+        $user->update(['font_size' => $data['font_size']]);
+
+        return new UserResource($user->loadMissing('roles'));
+    }
+
     public function index()
     {
         $data = $this->userService->index();

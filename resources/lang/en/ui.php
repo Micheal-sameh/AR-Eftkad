@@ -206,6 +206,8 @@ return [
         'subtitle' => 'Care with one heart',
         'menu' => 'Menu',
         'theme' => 'Theme',
+        'font_size' => 'Text size',
+        'font_levels' => ['Normal', 'Large', 'Extra large'],
         'portal' => 'Ministers Portal',
         'sign_in_hint' => 'Welcome back. Sign in to continue your ministry.',
         'or' => 'or',
