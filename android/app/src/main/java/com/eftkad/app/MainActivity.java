@@ -1,6 +1,8 @@
 package com.eftkad.app;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.BridgeActivity;
@@ -72,6 +75,11 @@ public class MainActivity extends BridgeActivity {
                     removeLockOverlay();
                     hideSplash(view);
                     return;
+                }
+                // First visits page after a fresh sign-in: ask for location (not while the biometric lock is up)
+                String loadedPath = Uri.parse(url).getPath();
+                if (loadedPath != null && loadedPath.startsWith("/visits") && !prompting && lockOverlay == null) {
+                    handler.postDelayed(MainActivity.this::askForLocationOnce, 1500);
                 }
                 if (lockOverlay != null && !prompting && target != null && onTargetPage(view)) {
                     handler.postDelayed(MainActivity.this::removeLockOverlay, 350);
@@ -227,7 +235,29 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    // ---- location permission ----
+
+    private static final int LOCATION_REQUEST_CODE = 4321;
+    private boolean askedForLocation = false;
+
+    /**
+     * Asks for location once per launch, after the user has signed in / unlocked, so the system
+     * dialog never lands on top of the fingerprint prompt. The visit form's "Use current location"
+     * button (navigator.geolocation) is then granted by Capacitor's web chrome client without
+     * asking again; if the user declined, that button still re-asks when it is tapped.
+     */
+    private void askForLocationOnce() {
+        if (askedForLocation) return;
+        askedForLocation = true;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) return;
+        ActivityCompat.requestPermissions(this,
+            new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
+            LOCATION_REQUEST_CODE);
+    }
+
     private void openVisits(WebView view) {
+        // give the page a moment to paint before the system dialog appears
+        handler.postDelayed(this::askForLocationOnce, 1500);
         if (onTargetPage(view)) {
             handler.postDelayed(() -> { hideSplash(view); removeLockOverlay(); }, 350);
         } else {

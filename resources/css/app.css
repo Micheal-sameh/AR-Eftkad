@@ -486,7 +486,9 @@ main { min-height: calc(100vh - 5rem); }
   .icon-button:active, .bottom-nav a:active, .bottom-nav button:active { opacity: .6; }
 
   /* Screens slide up a touch when they open, like a navigation push. */
-  .page-content { animation: screen-in .22s ease-out both; }
+  /* `backwards`, not `both`: a finished animation must not keep the page in its own stacking
+     layer, or the filter sheet / modals inside it end up underneath the fixed bottom bar. */
+  .page-content { animation: screen-in .22s ease-out backwards; }
   @keyframes screen-in { from { opacity: 0; transform: translateY(8px); } }
 }
 
