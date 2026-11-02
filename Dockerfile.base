@@ -2,41 +2,35 @@
 
 # Base image for the app: php-fpm + nginx + supervisor + pdo_mysql.
 #
-# This is split out of the main Dockerfile because compiling pdo_mysql needs a ~150 MB
-# toolchain that took 10-25 minutes to download on our server. It only has to be built
-# ONCE (compose does it automatically through the `base` service, and the result stays in
-# the local image store), so the day-to-day app build never touches the toolchain.
-# Rebuild it only when the PHP version below changes.
-
-# ---- PHP extension: pdo_mysql ----
-# Own stage so the toolchain never reaches the final image; only the compiled .so and its
-# ini are copied across.
+# Split out of the main Dockerfile so the app build stays fast. It is built once by the
+# `base` service in docker-compose.yml and then served from the local image store / cache;
+# rebuild it only when the PHP version below changes.
 #
-# Alpine's default CDN (dl-cdn.alpinelinux.org) only gives ~65 KB/s to our server, so apk
-# uses a nearer mirror; override with --build-arg APK_MIRROR=dl-cdn.alpinelinux.org.
-# apk still verifies package signatures, so the mirror is not trusted blindly.
-FROM php:8.2.35-fpm-alpine AS ext
-ARG APK_MIRROR=mirrors.aliyun.com
-RUN --mount=type=cache,target=/var/cache/apk \
-    sed -i "s#dl-cdn.alpinelinux.org#${APK_MIRROR}#g" /etc/apk/repositories \
-    && ln -sf /var/cache/apk /etc/apk/cache \
-    && apk add $PHPIZE_DEPS \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql
-
-# ---- Runtime base ----
+# pdo_mysql is the one extension that is not in the php image. Compiling it needs a ~150 MB
+# toolchain that takes 10+ minutes to download on our server, so the module is committed
+# prebuilt in docker/php/ext/pdo_mysql.so (about 34 KB). It must come from the SAME php
+# version as the FROM line below - the `php -m` check fails the build if it does not load.
+#
+# To regenerate it (e.g. after changing the PHP version):
+#   docker run --rm -v "$PWD/docker/php/ext:/out" php:8.2.35-fpm-alpine sh -c \
+#     'apk add --no-cache $PHPIZE_DEPS && docker-php-ext-install pdo_mysql \
+#      && cp "$(php-config --extension-dir)/pdo_mysql.so" /out/'
 FROM php:8.2.35-fpm-alpine
 
 # Only what the app actually needs. Nothing in composer.lock requires gd, zip, intl,
 # exif, pcntl or bcmath. (mbstring, ctype, tokenizer, openssl, etc. are already built
 # into the php image, and so is opcache.so - it only has to be enabled.)
+#
+# Alpine's default CDN (dl-cdn.alpinelinux.org) is slow from our server, so nginx and
+# supervisor come from a nearer mirror; override with --build-arg APK_MIRROR=dl-cdn.alpinelinux.org.
+# apk still verifies package signatures, so the mirror is not trusted blindly.
 ARG APK_MIRROR=mirrors.aliyun.com
+COPY docker/php/ext/pdo_mysql.so /tmp/pdo_mysql.so
 RUN --mount=type=cache,target=/var/cache/apk \
     sed -i "s#dl-cdn.alpinelinux.org#${APK_MIRROR}#g" /etc/apk/repositories \
     && ln -sf /var/cache/apk /etc/apk/cache \
-    && apk add nginx supervisor
-
-COPY --from=ext /usr/local/lib/php/extensions /usr/local/lib/php/extensions
-COPY --from=ext /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini
-RUN docker-php-ext-enable opcache \
+    && apk add nginx supervisor \
+    && mv /tmp/pdo_mysql.so "$(php-config --extension-dir)/pdo_mysql.so" \
+    && docker-php-ext-enable pdo_mysql opcache \
     && php -m | grep -qx pdo_mysql \
     && php -m | grep -qx 'Zend OPcache'
