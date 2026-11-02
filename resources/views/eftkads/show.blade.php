@@ -5,133 +5,78 @@
 @php($activeNav = 'visits')
 
 @section('title', __('ui.visit_detail.title') . ' - Eftkad')
-@section('page-title', __('ui.visit_detail.title'))
-@section('page-title-mobile', __('ui.visit_detail.title'))
 
 @section('content')
-<div class="md:max-w-3xl">
-<div class="hidden md:flex justify-between items-center mb-2 -mt-4 border-b border-outline-variant pb-4">
-    <button type="button" onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
-        <span>{{ __('ui.common.back') }}</span>
-    </button>
-</div>
-<div class="md:hidden flex items-center gap-2 -mt-4 mb-2">
-    <button type="button" onclick="history.back()" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
-        <span class="material-symbols-outlined">{{ app()->getLocale() === 'ar' ? 'arrow_forward' : 'arrow_back' }}</span>
-    </button>
-</div>
+<div class="page-content detail-page">
+    <a href="/visits" class="back-link" onclick="if (history.length > 1) { history.back(); return false; }">
+        <x-icon name="arrow" :size="18" />
+        {{ __('ui.fg.nav.visits') }}
+    </a>
 
-<div id="detail-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.visit_detail.loading') }}</div>
-<div id="detail-error" class="hidden text-center py-12 text-error">{{ __('ui.visit_detail.error') }}</div>
+    <div id="detail-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="detail-error" class="state-note is-error hidden">{{ __('ui.visit_detail.error') }}</div>
 
-<div id="detail-content" class="hidden space-y-6">
-    <!-- Identity & Status Card -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant relative overflow-hidden">
-        <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container"></div>
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-variant pb-4 mb-4">
+    <div id="detail-content" class="hidden">
+        <div class="detail-hero">
+            <div class="member-avatar large" id="d-avatar">··</div>
             <div>
-                <h2 class="font-title-md text-lg md:text-xl text-on-surface mb-1" id="d-membership_code">—</h2>
-                <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+                <div class="detail-hero-line">
+                    <div class="page-title" id="d-membership_code">—</div>
+                    <span id="d-badges"></span>
+                </div>
+                <div class="detail-subtitle">
+                    <x-icon name="calendar" :size="16" />
                     <span id="d-date">—</span>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2" id="d-badges"></div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <h3 class="font-label-sm text-label-sm text-outline mb-2">{{ __('ui.visit_detail.needs_heading') }}</h3>
-                <div class="flex flex-wrap gap-2" id="d-needs">
-                    <span class="text-on-surface-variant italic font-body-md text-body-md">{{ __('ui.visit_detail.no_needs') }}</span>
-                </div>
-            </div>
-            <div>
-                <h3 class="font-label-sm text-label-sm text-outline mb-2">{{ __('ui.visit_detail.comm_heading') }}</h3>
-                <div class="flex flex-wrap gap-2" id="d-comm">
-                    <span class="text-on-surface-variant italic font-body-md text-body-md">{{ __('ui.visit_detail.no_comm') }}</span>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Address -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">location_on</span>
-            {{ __('ui.visit_detail.location_heading') }}
-        </h3>
-        <div class="space-y-4">
-            <div class="flex items-start gap-4 min-w-0">
-                <span class="material-symbols-outlined text-outline mt-1 shrink-0">map</span>
-                <div class="min-w-0">
-                    <p class="font-body-md text-body-md text-on-surface break-words" id="d-address">—</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant break-words" id="d-location">—</p>
-                    <a href="#" target="_blank" rel="noopener" class="hidden items-center gap-1 mt-1 font-label-sm text-label-sm text-primary hover:underline" id="d-location-url">
-                        <span class="material-symbols-outlined text-[16px]">open_in_new</span>
-                        {{ __('ui.visit_detail.open_in_maps') }}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+        <div class="details-grid">
+            <section class="detail-section">
+                <div class="detail-section-title"><span><x-icon name="cross" :size="19" /></span><strong>{{ __('ui.fg.detail.needs') }}</strong></div>
+                <div class="chips" id="d-needs"></div>
+            </section>
 
-    <!-- Responsibility -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">groups</span>
-            {{ __('ui.visit_detail.responsibility_heading') }}
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
-                    <span class="material-symbols-outlined">person</span>
-                </div>
-                <div>
-                    <p class="font-label-sm text-label-sm text-outline">{{ __('ui.visit_detail.father_label') }}</p>
-                    <span class="font-body-md text-body-md text-on-surface" id="d-father">—</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
-                    <span class="material-symbols-outlined">person</span>
-                </div>
-                <div>
-                    <p class="font-label-sm text-label-sm text-outline">{{ __('ui.visit_detail.servant_label') }}</p>
-                    <span class="font-body-md text-body-md text-on-surface" id="d-servant">—</span>
-                </div>
-            </div>
-        </div>
-    </section>
+            <section class="detail-section">
+                <div class="detail-section-title"><span><x-icon name="phone" :size="19" /></span><strong>{{ __('ui.fg.detail.comm') }}</strong></div>
+                <div class="chips" id="d-comm"></div>
+            </section>
 
-    <!-- Attendance & confession -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">church</span>
-            {{ __('ui.visit_detail.attendance_heading') }}
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-body-md text-body-md text-on-surface">
-            <p>{{ __('ui.visit_detail.mass_attendance') }}: <span class="text-on-surface-variant" id="d-mass">—</span></p>
-            <p>{{ __('ui.visit_detail.attend_meetings') }}: <span class="text-on-surface-variant" id="d-attend_meetings">—</span></p>
-            <p>{{ __('ui.visit_detail.father_confession') }}: <span class="text-on-surface-variant" id="d-father_confession">—</span></p>
-            <p>{{ __('ui.visit_detail.mother_confession') }}: <span class="text-on-surface-variant" id="d-mother_confession">—</span></p>
-            <p>{{ __('ui.visit_detail.children_confession') }}: <span class="text-on-surface-variant" id="d-children_confession">—</span></p>
-            <p>{{ __('ui.visit_detail.need_from_meeting') }}: <span class="text-on-surface-variant" id="d-need_eftkad_from_meeting">—</span></p>
-            <p>{{ __('ui.visit_detail.need_by_father') }}: <span class="text-on-surface-variant" id="d-need_eftkad_by_father">—</span></p>
-        </div>
-    </section>
+            <section class="detail-section">
+                <div class="detail-section-title"><span><x-icon name="location" :size="19" /></span><strong>{{ __('ui.fg.detail.location') }}</strong></div>
+                <p class="section-copy" id="d-address">—</p>
+                <p class="section-copy" id="d-location" style="margin-top:-.4rem"></p>
+                <a href="#" target="_blank" rel="noopener" class="button button-secondary hidden" id="d-location-url">
+                    <x-icon name="map" :size="18" />
+                    <span>{{ __('ui.fg.detail.maps') }}</span>
+                </a>
+            </section>
 
-    <!-- Visit Notes -->
-    <section class="bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-surface-variant">
-        <h3 class="font-title-md text-base md:text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">sticky_note_2</span>
-            {{ __('ui.visit_detail.notes_heading') }}
-        </h3>
-        <div class="bg-surface-container-low rounded-lg p-4 text-on-surface-variant font-body-md text-body-md leading-relaxed border border-outline-variant border-opacity-50 break-words" id="d-notes">
-            {{ __('ui.visit_detail.no_notes') }}
+            <section class="detail-section">
+                <div class="detail-section-title"><span><x-icon name="users" :size="19" /></span><strong>{{ __('ui.fg.detail.resp') }}</strong></div>
+                <div class="stacked-info">
+                    <div class="info-row">
+                        <div class="info-icon"><x-icon name="cross" :size="18" /></div>
+                        <div><span>{{ __('ui.fg.visits.father') }}</span><strong id="d-father">—</strong></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-icon"><x-icon name="user" :size="18" /></div>
+                        <div><span>{{ __('ui.fg.visits.servant') }}</span><strong id="d-servant">—</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="detail-section wide">
+                <div class="detail-section-title"><span><x-icon name="check" :size="19" /></span><strong>{{ __('ui.fg.detail.attendance') }}</strong></div>
+                <div class="status-grid" id="d-status"></div>
+            </section>
+
+            <section class="detail-section wide">
+                <div class="detail-section-title"><span><x-icon name="book" :size="19" /></span><strong>{{ __('ui.fg.detail.notes') }}</strong></div>
+                <p class="notes-copy" id="d-notes">{{ __('ui.visit_detail.no_notes') }}</p>
+            </section>
         </div>
-    </section>
-</div>
+    </div>
 </div>
 @endsection
 
@@ -139,107 +84,80 @@
 <script>
     const VISIT_ID = {{ (int) $id }};
     const memberNames = {};
+    const TYPE_TONE = { 1: 'gold', 2: 'blue' };
+    const $ = function (id) { return document.getElementById(id); };
 
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
+    function chips(items, emptyText) {
+        if (!items.length) return '<span class="section-copy" style="margin:0">' + Eftkad.esc(emptyText) + '</span>';
+        return items.map(function (n) { return '<span class="chip selected">' + Eftkad.esc(n.name) + '</span>'; }).join('');
     }
 
-    function yesNo(boolResource) {
-        if (!boolResource) return UI_TEXT.common.dash;
-        return boolResource.value === 1 ? UI_TEXT.common.yes : UI_TEXT.common.no;
+    function statusItem(label, yes, text) {
+        const shown = text || (yes ? UI_TEXT.common.yes : UI_TEXT.common.no);
+        return `<div class="status-item"><span>${Eftkad.esc(label)}</span>
+            <span class="badge ${yes ? 'badge-green' : 'badge-neutral'}">${Eftkad.icon(yes ? 'check' : 'close', 13)}${Eftkad.esc(shown)}</span></div>`;
     }
 
-    function textYesNo(value) {
-        return value === '1' || value === 1 ? UI_TEXT.common.yes : UI_TEXT.common.no;
-    }
+    const isYes = function (v) { return v === '1' || v === 1 || v === true; };
+    const enumYes = function (r) { return !!r && r.value === 1; };
 
     async function loadDirectory() {
         const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
-        const fathers = (res.data.data && res.data.data.fathers) || [];
-        const servants = (res.data.data && res.data.data.servants) || [];
-        fathers.concat(servants).forEach(function (p) {
-            memberNames[p.membership_code] = p.name;
-        });
+        const d = res.data.data || {};
+        (d.fathers || []).concat(d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
+    }
+
+    function person(code) {
+        if (!code) return UI_TEXT.common.dash;
+        return memberNames[code] ? memberNames[code] + ' (' + code + ')' : code;
     }
 
     function renderDetail(e) {
-        document.getElementById('d-membership_code').textContent = e.membership_code || UI_TEXT.common.dash;
-        document.getElementById('d-date').textContent = e.date || UI_TEXT.common.dash;
+        const t = UI_TEXT.fg.detail;
+        $('d-avatar').textContent = (e.membership_code || '?').replace(/[^A-Za-z0-9؀-ۿ]/g, '').slice(0, 2).toUpperCase();
+        $('d-membership_code').textContent = e.membership_code || UI_TEXT.common.dash;
+        $('d-date').textContent = e.date || UI_TEXT.common.dash;
+        $('d-badges').innerHTML = e.type
+            ? '<span class="badge badge-' + (TYPE_TONE[e.type.value] || 'blue') + '">' + Eftkad.esc(e.type.name) + '</span>' : '';
 
-        const badges = [];
-        if (e.type) {
-            badges.push(`<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
-                <span class="material-symbols-outlined" style="font-size: 14px;">${e.type.value === 2 ? 'home' : 'call'}</span> ${escapeHtml(e.type.name)}
-            </span>`);
-        }
-        document.getElementById('d-badges').innerHTML = badges.join('');
+        $('d-needs').innerHTML = chips(e.needs || [], UI_TEXT.visit_detail.no_needs);
+        $('d-comm').innerHTML = chips(e.communication_means || [], UI_TEXT.visit_detail.no_comm);
 
-        const needs = e.needs || [];
-        document.getElementById('d-needs').innerHTML = needs.length
-            ? needs.map(function (n) {
-                return `<span class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant font-body-md text-body-md">${escapeHtml(n.name)}</span>`;
-            }).join('')
-            : '<span class="text-on-surface-variant italic font-body-md text-body-md">' + UI_TEXT.visit_detail.no_needs + '</span>';
-
-        const comm = e.communication_means || [];
-        document.getElementById('d-comm').innerHTML = comm.length
-            ? comm.map(function (c) {
-                return `<span class="px-3 py-1.5 border border-outline-variant rounded-lg text-on-surface-variant font-body-md text-body-md">${escapeHtml(c.name)}</span>`;
-            }).join('')
-            : '<span class="text-on-surface-variant italic font-body-md text-body-md">' + UI_TEXT.visit_detail.no_comm + '</span>';
-
-        document.getElementById('d-address').textContent = e.correspondence_address || UI_TEXT.common.dash;
-        document.getElementById('d-location').textContent = e.location || '';
-
-        const locationUrlLink = document.getElementById('d-location-url');
+        $('d-address').textContent = e.correspondence_address || UI_TEXT.common.dash;
+        $('d-location').textContent = e.location || '';
         if (e.location_url) {
-            locationUrlLink.href = e.location_url;
-            locationUrlLink.classList.remove('hidden');
-            locationUrlLink.classList.add('inline-flex');
+            $('d-location-url').href = e.location_url;
+            $('d-location-url').classList.remove('hidden');
         }
 
-        const fatherCode = e.father_membership_code;
-        const servantCode = e.servant_membership_code;
-        document.getElementById('d-father').textContent = fatherCode
-            ? (memberNames[fatherCode] ? memberNames[fatherCode] + ' (' + fatherCode + ')' : fatherCode)
-            : UI_TEXT.common.dash;
-        document.getElementById('d-servant').textContent = servantCode
-            ? (memberNames[servantCode] ? memberNames[servantCode] + ' (' + servantCode + ')' : servantCode)
-            : UI_TEXT.common.dash;
+        $('d-father').textContent = person(e.father_membership_code);
+        $('d-servant').textContent = person(e.servant_membership_code);
 
-        document.getElementById('d-mass').textContent = e.mass_attendence ? e.mass_attendence.name : UI_TEXT.common.dash;
-        document.getElementById('d-attend_meetings').textContent = yesNo(e.attend_meetings);
-        document.getElementById('d-father_confession').textContent = textYesNo(e.father_confession);
-        document.getElementById('d-mother_confession').textContent = textYesNo(e.mother_confession);
-        document.getElementById('d-children_confession').textContent = textYesNo(e.children_confession);
-        document.getElementById('d-need_eftkad_from_meeting').textContent = textYesNo(e.need_eftkad_from_meeting);
-        document.getElementById('d-need_eftkad_by_father').textContent = yesNo(e.need_eftkad_by_father);
+        $('d-status').innerHTML = [
+            statusItem(t.mass, !!e.mass_attendence && e.mass_attendence.value === 2, e.mass_attendence ? e.mass_attendence.name : ''),
+            statusItem(t.meetings, enumYes(e.attend_meetings)),
+            statusItem(t.father_conf, isYes(e.father_confession)),
+            statusItem(t.mother_conf, isYes(e.mother_confession)),
+            statusItem(t.children_conf, isYes(e.children_confession)),
+            statusItem(t.need_meeting, isYes(e.need_eftkad_from_meeting)),
+            statusItem(t.need_father, enumYes(e.need_eftkad_by_father)),
+        ].join('');
 
-        document.getElementById('d-notes').textContent = e.general_notes || UI_TEXT.visit_detail.no_notes;
+        $('d-notes').textContent = e.general_notes || UI_TEXT.visit_detail.no_notes;
     }
 
     async function loadDetail() {
-        const loading = document.getElementById('detail-loading');
-        const errorBox = document.getElementById('detail-error');
-        const content = document.getElementById('detail-content');
-
         await loadDirectory();
-
         const res = await Eftkad.api('/eftkads/detail/' + VISIT_ID);
-
-        loading.classList.add('hidden');
+        $('detail-loading').classList.add('hidden');
 
         if (!res.ok || !res.data || !res.data.data) {
-            errorBox.classList.remove('hidden');
+            $('detail-error').classList.remove('hidden');
             return;
         }
-
         renderDetail(res.data.data);
-        content.classList.remove('hidden');
+        $('detail-content').classList.remove('hidden');
     }
 
     document.addEventListener('DOMContentLoaded', function () {

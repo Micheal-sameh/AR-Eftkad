@@ -1,276 +1,222 @@
 @extends('layouts.app')
 
-@php($uiSections = ['visits'])
+@php($uiSections = ['common', 'visits'])
 
 @php($activeNav = 'visits')
 
-@section('title', __('ui.visits.title') . ' - Eftkad')
-@section('page-title', __('ui.visits.title'))
-@section('page-title-mobile', __('ui.visits.title'))
+@section('title', __('ui.fg.visits.title') . ' - Eftkad')
 
 @section('content')
-<!-- Filter Bar -->
-<div class="bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 relative z-20 overflow-hidden">
-    <button type="button" id="filter-toggle-btn" class="pressable w-full flex items-center justify-between px-4 py-3 md:hidden" onclick="toggleFilterPanel()">
-        <span class="flex items-center gap-2 font-title-md text-[17px] text-on-surface">
-            <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary-fixed text-primary"><span class="material-symbols-outlined text-[20px]">filter_list</span></span>
-            {{ __('ui.visits.filters_button') }}
-        </span>
-        <span class="material-symbols-outlined text-on-surface-variant chevron" id="filter-chevron">expand_more</span>
+<div class="page-content">
+    <div class="page-heading">
+        <div>
+            <div class="eyebrow">{{ __('ui.fg.visits.eyebrow') }}</div>
+            <div class="page-title">{{ __('ui.fg.visits.title') }}</div>
+            <p>{{ __('ui.fg.visits.subtitle') }}</p>
+        </div>
+        <a href="/visits/create" class="button button-primary desktop-only-flex">
+            <x-icon name="plus" :size="18" />
+            <span>{{ __('ui.fg.visits.new_visit') }}</span>
+        </a>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-bar">
+            <x-icon name="search" :size="19" />
+            <input id="visit-search" aria-label="{{ __('ui.fg.visits.search') }}" placeholder="{{ __('ui.fg.visits.search') }}" />
+            <kbd>⌘ K</kbd>
+        </div>
+        <button type="button" class="button button-secondary" id="open-filters">
+            <x-icon name="filter" :size="18" />
+            <span>{{ __('ui.fg.visits.filters') }}</span>
+            <span class="filter-count hidden" id="filter-count">0</span>
+        </button>
+    </div>
+
+    <div class="visit-summary">
+        <div><span>{{ __('ui.fg.visits.all_visits') }}</span><strong id="stat-total">—</strong></div>
+        <div><span>{{ __('ui.fg.visits.this_month') }}</span><strong id="stat-month">—</strong></div>
+        <div class="summary-accent"><span>{{ __('ui.fg.visits.need_followup') }}</span><strong id="stat-followup">—</strong></div>
+    </div>
+
+    <div class="list-heading">
+        <strong>{{ __('ui.fg.visits.recent') }}</strong>
+        <span id="list-count"></span>
+    </div>
+
+    <div class="visits-grid" id="visits-grid"></div>
+
+    <div class="skeleton-stack" id="visits-loading" aria-label="Loading">
+        @for ($i = 0; $i < 2; $i++)
+        <div class="skeleton-preview"><span></span><div><i></i><i></i><i></i></div></div>
+        @endfor
+    </div>
+
+    <div class="empty-state hidden" id="visits-empty">
+        <div class="empty-icon"><x-icon name="calendar" :size="30" /></div>
+        <strong>{{ __('ui.fg.visits.empty_title') }}</strong>
+        <span>{{ __('ui.fg.visits.empty_text') }}</span>
+        <a href="/visits/create" class="button button-primary">
+            <x-icon name="plus" :size="18" />
+            <span>{{ __('ui.fg.visits.new_visit') }}</span>
+        </a>
+    </div>
+
+    <div class="feed-error hidden" id="visits-error" role="alert">
+        <span><x-icon name="alert" :size="19" /></span>
+        <div>
+            <strong>{{ __('ui.fg.visits.error_title') }}</strong>
+            <small>{{ __('ui.fg.visits.error_hint') }}</small>
+        </div>
+        <button type="button" class="button button-secondary" id="visits-retry"><span>{{ __('ui.fg.visits.retry') }}</span></button>
+    </div>
+
+    <button type="button" class="button button-secondary load-more hidden" id="visits-more">
+        <span>{{ __('ui.fg.visits.load_more') }}</span>
+        <x-icon name="chevron" :size="16" />
     </button>
-    <div class="section-content collapsed md:!max-h-none md:!opacity-100 md:overflow-visible" id="filter-panel">
-        <div class="p-4 pt-0 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-stack-gap">
-            <!-- Father Dropdown -->
-            <div class="relative">
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_father') }}</label>
-                <select id="filter-father" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-                    <option value="">{{ __('ui.visits.filter_father_all') }}</option>
-                </select>
-                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+
+    <div class="sheet-wrap" id="filter-sheet">
+        <div class="sheet-backdrop" id="filter-backdrop"></div>
+        <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="section-header">
+                <div class="section-title">{{ __('ui.fg.visits.filters') }}</div>
+                <button type="button" class="icon-button" id="close-filters" aria-label="Close"><x-icon name="close" /></button>
             </div>
-            <!-- Servant Dropdown -->
-            <div class="relative">
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_servant') }}</label>
-                <select id="filter-servant" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-                    <option value="">{{ __('ui.visits.filter_servant_all') }}</option>
-                </select>
-                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+            <div class="sheet-fields">
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.father') }}</span>
+                    <span class="input-shell"><select id="filter-father"><option value="">{{ __('ui.visits.filter_father_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.servant') }}</span>
+                    <span class="input-shell"><select id="filter-servant"><option value="">{{ __('ui.visits.filter_servant_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.type') }}</span>
+                    <span class="input-shell"><select id="filter-type"><option value="">{{ __('ui.visits.filter_type_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.date') }}</span>
+                    <span class="input-shell"><input id="filter-date" type="date" /></span>
+                </label>
             </div>
-            <!-- Visit Type -->
-            <div class="relative">
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_type') }}</label>
-                <select id="filter-type" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none rtl:pr-8 ltr:pl-8 cursor-pointer">
-                    <option value="">{{ __('ui.visits.filter_type_all') }}</option>
-                </select>
-                <span class="material-symbols-outlined absolute rtl:left-3 ltr:right-3 top-[32px] text-on-surface-variant pointer-events-none">arrow_drop_down</span>
-            </div>
-            <!-- Date search -->
-            <div class="relative">
-                <label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">{{ __('ui.visits.filter_date') }}</label>
-                <div class="flex items-center bg-surface border border-outline-variant rounded-lg px-3 py-2 cursor-text">
-                    <span class="material-symbols-outlined rtl:ml-2 ltr:mr-2 text-on-surface-variant text-sm">calendar_today</span>
-                    <input id="filter-date" class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-on-surface" placeholder="{{ __('ui.visits.filter_date_placeholder') }}" type="text" />
-                </div>
+            <div class="sheet-actions">
+                <button type="button" class="button button-ghost" id="clear-filters"><span>{{ __('ui.fg.visits.clear') }}</span></button>
+                <button type="button" class="button button-primary" id="apply-filters"><span>{{ __('ui.fg.visits.apply') }}</span></button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Cards List -->
-<div id="visits-loading" class="state-box" role="status">
-    <div class="spinner"></div>
-    <p class="font-body-md">{{ __('ui.visits.loading') }}</p>
-</div>
-<div id="visits-empty" class="hidden state-box">
-    <div class="state-icon"><span class="material-symbols-outlined">church</span></div>
-    <p class="font-title-md text-[18px] text-on-surface">{{ __('ui.visits.empty') }}</p>
-    <a href="/visits/create" class="pressable mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-[14px] font-semibold shadow-sm">
-        <span class="material-symbols-outlined text-[18px]">add</span>{{ __('ui.nav.new_visit') }}
-    </a>
-</div>
-<div id="visits-error" class="hidden state-box is-error" role="alert">
-    <div class="state-icon"><span class="material-symbols-outlined">error</span></div>
-    <p class="font-body-md text-error">{{ __('ui.visits.error') }}</p>
-</div>
-<div id="visits-grid" class="rise grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"></div>
-<button type="button" id="visits-more" class="hidden mx-auto px-6 py-3 rounded-lg border border-outline-variant text-primary font-title-md text-title-md hover:bg-surface-container-low transition-colors disabled:opacity-50">{{ __('ui.visits.load_more') }}</button>
-@endsection
-
-@section('fab')
-<a href="/visits/create" aria-label="{{ __('ui.nav.new_visit') }}" class="pressable fixed bottom-[6.5rem] md:bottom-8 rtl:left-5 ltr:right-5 md:rtl:left-8 md:ltr:right-8 w-14 h-14 md:w-12 md:h-12 btn-brand rounded-full shadow-[0_10px_24px_rgba(0,93,172,0.45)] ring-4 ring-white/70 flex items-center justify-center hover:bg-surface-tint z-40">
-    <span class="material-symbols-outlined text-[28px] md:text-[24px]">add</span>
-</a>
 @endsection
 
 @section('scripts')
 <script>
-    const NEED_ICONS = { 1: 'elderly', 2: 'healing', 3: 'work', 4: 'school', 5: 'local_dining', 6: 'emergency_home' };
-    const MASS_STYLES = {
-        1: 'bg-surface-dim text-on-surface-variant', // unknown
-        2: 'bg-tertiary-fixed text-on-tertiary-fixed-variant', // regular
-        3: "bg-[#FFD54F]/20 text-[#8F6A00]", // irregular
-    };
-    const ACCENT_STYLES = { 1: 'bg-outline-variant', 2: 'bg-primary', 3: 'bg-secondary' };
-    const TYPE_ICON = { 1: 'call', 2: 'home' }; // 1=Call, 2=Home
-
     const PER_PAGE = 12;
+    const TYPE_TONE = { 1: 'gold', 2: 'blue' }; // 1=Call, 2=Home
     let allVisits = [];
     let currentPage = 1;
     let lastPage = 1;
+    let totalVisits = null;
     let loadSeq = 0;
+    let applied = { father: '', servant: '', type: '', date: '' };
+    const memberNames = {};
+    const $ = function (id) { return document.getElementById(id); };
 
-    function toggleFilterPanel() {
-        document.getElementById('filter-panel').classList.toggle('collapsed');
-        document.getElementById('filter-chevron').classList.toggle('rotate-180');
+    function toDMY(iso) {
+        if (!iso) return '';
+        const p = iso.split('-');
+        return p.length === 3 ? p[2] + '-' + p[1] + '-' + p[0] : iso;
     }
 
-    function typeBadge(eftkad) {
-        const t = eftkad.type;
-        if (!t) return '';
-        const isHome = t.value === 2;
-        const icon = TYPE_ICON[t.value] || 'help';
-        const cls = isHome
-            ? 'bg-primary-container text-on-primary-container'
-            : 'bg-surface-variant text-on-surface border border-outline-variant';
-        return `<span class="px-2 py-1 rounded-md ${cls} font-label-sm text-label-sm font-bold flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px] filled">${icon}</span> ${escapeHtml(t.name)}
-        </span>`;
+    function personName(code) {
+        if (!code) return UI_TEXT.common.dash;
+        return memberNames[code] || code;
     }
 
-    function massBadge(eftkad) {
-        const m = eftkad.mass_attendence;
-        if (!m) return '';
-        const cls = MASS_STYLES[m.value] || 'bg-surface-dim text-on-surface-variant';
-        return `<span class="px-2 py-1 rounded-md ${cls} font-label-sm text-label-sm font-bold">${escapeHtml(m.name)}</span>`;
+    function needsFollowUp(v) {
+        return (v.need_eftkad_by_father && v.need_eftkad_by_father.value === 1)
+            || v.need_eftkad_from_meeting === '1' || v.need_eftkad_from_meeting === 1;
     }
 
-    function needsChips(eftkad) {
-        const needs = eftkad.needs || [];
-        if (!needs.length) {
-            return '<span class="font-label-sm text-on-surface-variant italic">' + UI_TEXT.visits.no_needs_noted + '</span>';
-        }
-        return needs.map(function (n) {
-            const icon = NEED_ICONS[n.value] || 'info';
-            return `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant" title="${escapeHtml(n.name)}">
-                <span class="material-symbols-outlined text-[18px]">${icon}</span>
-            </div>`;
-        }).join('');
-    }
-
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
-
-    function renderCard(eftkad) {
-        const accent = ACCENT_STYLES[(eftkad.mass_attendence || {}).value] || 'bg-outline-variant';
-        const location = eftkad.location || eftkad.correspondence_address || '—';
+    function renderCard(v) {
+        const e = Eftkad.esc;
+        const tone = TYPE_TONE[(v.type || {}).value] || 'blue';
+        const needs = (v.needs || []).map(function (n) { return n.name; }).join(' • ');
+        const place = v.location || v.correspondence_address || '';
         return `
-        <a href="/visits/${eftkad.id}" class="pressable bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden md:hover:-translate-y-0.5 md:hover:shadow-lg">
-            <div class="absolute top-0 rtl:right-0 ltr:left-0 bottom-0 w-1 ${accent}"></div>
-            <div class="flex justify-between items-start">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-title-md text-[17px] font-bold text-on-surface tracking-wide">${escapeHtml(eftkad.membership_code)}</span>
-                    </div>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">event</span> ${escapeHtml(eftkad.date)}
-                    </p>
+        <a href="/visits/${v.id}" class="visit-card">
+            <div class="visit-card-top">
+                <div class="member-avatar">${e((v.membership_code || '?').replace(/[^A-Za-z0-9؀-ۿ]/g, '').slice(0, 2).toUpperCase())}</div>
+                <div class="visit-title">
+                    <strong>${e(v.membership_code)}</strong>
+                    ${place ? `<span dir="auto">${e(place)}</span>` : ''}
                 </div>
-                <div class="flex flex-col gap-1 items-end">
-                    ${typeBadge(eftkad)}
-                    ${massBadge(eftkad)}
-                </div>
+                ${v.type ? `<span class="badge badge-${tone}">${e(v.type.name)}</span>` : ''}
             </div>
-            <div class="mt-2 flex items-center gap-2 font-body-md text-body-md text-on-surface">
-                <span class="material-symbols-outlined text-tertiary">location_on</span>
-                <span class="min-w-0 break-words">${escapeHtml(location)}</span>
+            <div class="visit-meta">
+                <span>${Eftkad.icon('calendar', 16)}${e(v.date)}</span>
+                <span>${Eftkad.icon('cross', 16)}${e(personName(v.father_membership_code))}</span>
+                <span>${Eftkad.icon('user', 16)}${e(personName(v.servant_membership_code))}</span>
             </div>
-            <div class="border-t border-outline-variant pt-3 mt-2 flex gap-2 flex-wrap">
-                ${needsChips(eftkad)}
+            <div class="needs-line ${needs ? '' : 'muted'}">
+                <span class="needs-dot"></span>
+                <span>${e(needs || UI_TEXT.visits.no_needs_noted)}</span>
+                ${Eftkad.icon('chevron', 18)}
             </div>
         </a>`;
     }
 
-    function renderVisits() {
-        document.getElementById('visits-grid').innerHTML = allVisits.map(renderCard).join('');
-        document.getElementById('visits-empty').classList.toggle('hidden', allVisits.length > 0);
-        document.getElementById('visits-more').classList.toggle('hidden', currentPage >= lastPage);
+    function matchesQuery(v, q) {
+        if (!q) return true;
+        return [v.membership_code, v.location, v.correspondence_address, personName(v.father_membership_code), personName(v.servant_membership_code)]
+            .join(' ').toLowerCase().includes(q.toLowerCase());
     }
 
-    async function loadFilters() {
-        const res = await Eftkad.cachedApi('/settings/filters');
-        if (!res.ok || !res.data) return;
-        const fathers = (res.data.data && res.data.data.fathers) || [];
-        const servants = (res.data.data && res.data.data.servants) || [];
-
-        const fatherSelect = document.getElementById('filter-father');
-        fathers.forEach(function (f) {
-            const opt = document.createElement('option');
-            opt.value = f.membership_code;
-            opt.textContent = f.name + ' (' + f.membership_code + ')';
-            fatherSelect.appendChild(opt);
-        });
-
-        const servantSelect = document.getElementById('filter-servant');
-        servants.forEach(function (s) {
-            const opt = document.createElement('option');
-            opt.value = s.membership_code;
-            opt.textContent = s.name + ' (' + s.membership_code + ')';
-            servantSelect.appendChild(opt);
-        });
+    function render() {
+        const q = $('visit-search').value.trim();
+        const shown = allVisits.filter(function (v) { return matchesQuery(v, q); });
+        $('visits-grid').innerHTML = shown.map(renderCard).join('');
+        $('list-count').textContent = UI_TEXT.fg.visits.count.replace(':n', shown.length);
+        $('visits-empty').classList.toggle('hidden', allVisits.length > 0 || !loaded);
+        $('visits-more').classList.toggle('hidden', currentPage >= lastPage || !allVisits.length);
+        $('stat-total').textContent = totalVisits === null ? '—' : totalVisits;
+        $('stat-followup').textContent = allVisits.filter(needsFollowUp).length;
     }
 
-    async function loadEnums() {
-        const res = await Eftkad.cachedApi('/settings/enums');
-        if (!res.ok || !res.data) return;
-        const types = (res.data.data && res.data.data.eftkad_type) || [];
-        const typeSelect = document.getElementById('filter-type');
-        types.forEach(function (t) {
-            const opt = document.createElement('option');
-            opt.value = t.value;
-            opt.textContent = t.name;
-            typeSelect.appendChild(opt);
-        });
+    let loaded = false;
+
+    function activeFilterCount() {
+        return Object.keys(applied).filter(function (k) { return applied[k]; }).length;
     }
 
-    function currentFilters() {
-        return {
-            father: document.getElementById('filter-father').value,
-            servant: document.getElementById('filter-servant').value,
-            type: document.getElementById('filter-type').value,
-            date: document.getElementById('filter-date').value.trim(),
-        };
-    }
-
-    function hasFilters(f) {
-        return !!(f.father || f.servant || f.type || f.date);
+    function updateFilterBadge() {
+        const n = activeFilterCount();
+        $('filter-count').textContent = n;
+        $('filter-count').classList.toggle('hidden', n === 0);
     }
 
     // Loads one server-side page. reset=true starts over at page 1 (filters changed);
     // otherwise appends the next page. Stale responses from an older filter state are dropped.
     async function loadVisits(reset) {
-        const loading = document.getElementById('visits-loading');
-        const errorBox = document.getElementById('visits-error');
-        const moreBtn = document.getElementById('visits-more');
-        const filters = currentFilters();
         const seq = ++loadSeq;
         const page = reset ? 1 : currentPage + 1;
 
-        errorBox.classList.add('hidden');
-
-        // Paint the last-seen first page right away (unfiltered view only), refresh behind it.
-        let painted = false;
-        if (reset && !hasFilters(filters) && !allVisits.length) {
-            try {
-                const cached = JSON.parse(sessionStorage.getItem('eftkad_last_list') || 'null');
-                if (Array.isArray(cached) && cached.length) {
-                    allVisits = cached;
-                    renderVisits();
-                    painted = true;
-                }
-            } catch (e) {}
-        }
-        if (!painted && reset) {
-            allVisits = [];
-            renderVisits();
-            document.getElementById('visits-empty').classList.add('hidden');
-            loading.classList.remove('hidden');
-        }
-        moreBtn.disabled = true;
+        $('visits-error').classList.add('hidden');
+        $('visits-more').classList.add('hidden');
+        $('visits-loading').classList.remove('hidden');
+        if (reset) { allVisits = []; loaded = false; render(); }
 
         const params = new URLSearchParams({ page: page, per_page: PER_PAGE });
-        Object.keys(filters).forEach(function (k) { if (filters[k]) params.set(k, filters[k]); });
+        Object.keys(applied).forEach(function (k) { if (applied[k]) params.set(k, applied[k]); });
         const res = await Eftkad.api('/eftkads?' + params.toString());
 
         if (seq !== loadSeq) return;
-        loading.classList.add('hidden');
-        moreBtn.disabled = false;
+        $('visits-loading').classList.add('hidden');
 
         if (!res.ok || !res.data) {
-            if (!painted) errorBox.classList.remove('hidden');
+            $('visits-error').classList.remove('hidden');
             return;
         }
 
@@ -278,30 +224,86 @@
         const meta = res.data.meta || {};
         currentPage = meta.current_page || page;
         lastPage = meta.last_page || currentPage;
+        totalVisits = meta.total !== undefined ? meta.total
+            : ((res.data.additional_data || {}).eftkads_count !== undefined ? res.data.additional_data.eftkads_count : allVisits.length + items.length);
         allVisits = reset ? items : allVisits.concat(items);
-        if (reset && !hasFilters(filters)) {
-            try { sessionStorage.setItem('eftkad_last_list', JSON.stringify(items)); } catch (e) {}
-        }
-        renderVisits();
+        loaded = true;
+        render();
     }
+
+    async function loadMonthStat() {
+        const now = new Date();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const res = await Eftkad.api('/eftkads?per_page=1&date=' + mm + '-' + now.getFullYear());
+        if (res.ok && res.data && res.data.meta) $('stat-month').textContent = res.data.meta.total;
+    }
+
+    async function loadFilters() {
+        const res = await Eftkad.cachedApi('/settings/filters');
+        if (!res.ok || !res.data) return;
+        const data = res.data.data || {};
+        function fill(id, people) {
+            const select = $(id);
+            people.forEach(function (p) {
+                memberNames[p.membership_code] = p.name;
+                const opt = document.createElement('option');
+                opt.value = p.membership_code;
+                opt.textContent = p.name + ' (' + p.membership_code + ')';
+                select.appendChild(opt);
+            });
+        }
+        fill('filter-father', data.fathers || []);
+        fill('filter-servant', data.servants || []);
+        render();
+    }
+
+    async function loadEnums() {
+        const res = await Eftkad.cachedApi('/settings/enums');
+        if (!res.ok || !res.data) return;
+        const select = $('filter-type');
+        ((res.data.data && res.data.data.eftkad_type) || []).forEach(function (t) {
+            const opt = document.createElement('option');
+            opt.value = t.value;
+            opt.textContent = t.name;
+            select.appendChild(opt);
+        });
+    }
+
+    function setSheet(open) { $('filter-sheet').classList.toggle('open', open); }
 
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
 
-        loadFilters();
+        loadFilters().then(function () { loadVisits(true); });
         loadEnums();
-        loadVisits(true);
+        loadMonthStat();
 
-        const reload = function () { loadVisits(true); };
-        ['filter-father', 'filter-servant', 'filter-type'].forEach(function (id) {
-            document.getElementById(id).addEventListener('change', reload);
+        $('visit-search').addEventListener('input', render);
+        $('visits-more').addEventListener('click', function () { loadVisits(false); });
+        $('visits-retry').addEventListener('click', function () { loadVisits(allVisits.length === 0); });
+
+        $('open-filters').addEventListener('click', function () { setSheet(true); });
+        $('close-filters').addEventListener('click', function () { setSheet(false); });
+        $('filter-backdrop').addEventListener('click', function () { setSheet(false); });
+
+        $('apply-filters').addEventListener('click', function () {
+            applied = {
+                father: $('filter-father').value,
+                servant: $('filter-servant').value,
+                type: $('filter-type').value,
+                date: toDMY($('filter-date').value),
+            };
+            updateFilterBadge();
+            setSheet(false);
+            loadVisits(true);
         });
-        let dateTimer;
-        document.getElementById('filter-date').addEventListener('input', function () {
-            clearTimeout(dateTimer);
-            dateTimer = setTimeout(reload, 300);
+        $('clear-filters').addEventListener('click', function () {
+            ['filter-father', 'filter-servant', 'filter-type', 'filter-date'].forEach(function (id) { $(id).value = ''; });
+            applied = { father: '', servant: '', type: '', date: '' };
+            updateFilterBadge();
+            setSheet(false);
+            loadVisits(true);
         });
-        document.getElementById('visits-more').addEventListener('click', function () { loadVisits(false); });
     });
 </script>
 @endsection

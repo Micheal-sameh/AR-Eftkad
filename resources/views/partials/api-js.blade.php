@@ -149,6 +149,58 @@
         },
     };
 
+    // Shared view helpers: inline SVG icons (same set as the icon Blade component),
+    // HTML escaping, avatar initials, dark/light theme and a locale setter.
+    Eftkad.ICONS = @json(include resource_path('icons.php'));
+
+    Eftkad.icon = function (name, size) {
+        size = size || 20;
+        return '<svg class="icon" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (Eftkad.ICONS[name] || '') + '</svg>';
+    };
+
+    Eftkad.esc = function (str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    };
+
+    Eftkad.initials = function (name) {
+        var words = String(name || '?').trim().split(/\s+/);
+        if (words.length > 1) return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        return words[0].slice(0, 2).toUpperCase();
+    };
+
+    Eftkad.setLocale = function (locale) {
+        if (Eftkad.locale() === locale) return;
+        localStorage.setItem(Eftkad.LOCALE_KEY, locale);
+        Eftkad.setLocaleCookie(locale);
+        window.location.reload();
+    };
+
+    Eftkad.toggleTheme = function () {
+        var dark = document.documentElement.classList.toggle('dark');
+        try { localStorage.setItem('eftkad_theme', dark ? 'dark' : 'light'); } catch (e) {}
+        document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
+            el.innerHTML = Eftkad.icon(dark ? 'sun' : 'moon');
+        });
+    };
+
+    // Wires the AR/EN pill and the theme button (used on every page that renders them).
+    Eftkad.initChrome = function () {
+        document.querySelectorAll('.language-toggle button').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.lang === Eftkad.locale());
+            b.addEventListener('click', function () { Eftkad.setLocale(b.dataset.lang); });
+        });
+        var dark = document.documentElement.classList.contains('dark');
+        document.querySelectorAll('[data-theme-icon]').forEach(function (el) {
+            el.innerHTML = Eftkad.icon(dark ? 'sun' : 'moon');
+        });
+        document.querySelectorAll('[data-theme-toggle]').forEach(function (b) {
+            b.addEventListener('click', Eftkad.toggleTheme);
+        });
+    };
+
     // Keep the server-visible cookie in sync with localStorage even when the
     // user didn't just click the toggle (e.g. first visit after an update).
     Eftkad.setLocaleCookie(Eftkad.locale());

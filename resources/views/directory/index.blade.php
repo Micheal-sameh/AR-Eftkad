@@ -4,116 +4,92 @@
 
 @php($activeNav = 'directory')
 
-@section('title', __('ui.directory.title') . ' - Eftkad')
-@section('page-title', __('ui.directory.title'))
-@section('page-title-mobile', __('ui.directory.title'))
+@section('title', __('ui.fg.directory.title') . ' - Eftkad')
 
 @section('content')
-<div class="mt-8 -mb-3 md:-mt-4 md:mb-2">
-    <p class="font-body-md text-body-md text-on-surface-variant">{{ __('ui.directory.subtitle') }}</p>
-</div>
-
-<!-- Search Bar -->
-<div class="relative mb-2 max-w-md">
-    <div class="absolute inset-y-0 rtl:right-0 ltr:left-0 rtl:pr-3 ltr:pl-3 flex items-center pointer-events-none">
-        <span class="material-symbols-outlined text-outline">search</span>
+<div class="page-content">
+    <div class="page-heading">
+        <div>
+            <div class="eyebrow">{{ __('ui.fg.directory.eyebrow') }}</div>
+            <div class="page-title">{{ __('ui.fg.directory.title') }}</div>
+            <p>{{ __('ui.fg.directory.subtitle') }}</p>
+        </div>
     </div>
-    <input id="directory-search" class="block w-full rtl:pl-3 ltr:pr-3 rtl:pr-10 ltr:pl-10 search-input py-3.5 border border-outline-variant/70 rounded-xl leading-5 bg-surface-container-lowest placeholder-outline focus:outline-none focus:ring-2 focus:ring-primary-container/40 focus:border-primary-container font-body-md text-body-md transition-colors" placeholder="{{ __('ui.directory.search_placeholder') }}" type="text" />
-</div>
 
-<div id="directory-loading" class="state-box" role="status"><div class="spinner"></div><p class="font-body-md">{{ __('ui.directory.loading') }}</p></div>
-<div id="directory-error" class="hidden state-box is-error" role="alert">
-    <div class="state-icon"><span class="material-symbols-outlined">error</span></div>
-    <p class="font-body-md text-error">{{ __('ui.directory.error') }}</p>
-</div>
+    <div class="search-bar">
+        <x-icon name="search" :size="19" />
+        <input id="directory-search" aria-label="{{ __('ui.fg.directory.search') }}" placeholder="{{ __('ui.fg.directory.search') }}" />
+        <kbd>⌘ K</kbd>
+    </div>
 
-<div id="directory-lists" class="hidden grid grid-cols-1 md:grid-cols-2 gap-container-margin">
-    <!-- Fathers List -->
-    <div class="bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 p-4 md:p-6">
-        <h3 class="font-title-md text-[17px] font-bold text-on-surface mb-3 flex items-center gap-2">
-            <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary-fixed text-primary"><span class="material-symbols-outlined text-[20px]">person</span></span>
-            {{ __('ui.directory.fathers_list') }}
-        </h3>
-        <ul class="divide-y divide-surface-container" id="fathers-list"></ul>
-        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="fathers-empty">{{ __('ui.directory.no_results') }}</p>
+    <div class="tabs">
+        <button type="button" class="active" data-tab="father">{{ __('ui.fg.directory.fathers') }}<span id="count-father">0</span></button>
+        <button type="button" data-tab="servant">{{ __('ui.fg.directory.servants') }}<span id="count-servant">0</span></button>
     </div>
-    <!-- Servants List -->
-    <div class="bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 p-4 md:p-6">
-        <h3 class="font-title-md text-[17px] font-bold text-on-surface mb-3 flex items-center gap-2">
-            <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary-fixed text-primary"><span class="material-symbols-outlined text-[20px]">group</span></span>
-            {{ __('ui.directory.servants_list') }}
-        </h3>
-        <ul class="divide-y divide-surface-container" id="servants-list"></ul>
-        <p class="hidden text-on-surface-variant italic font-body-md text-sm py-3" id="servants-empty">{{ __('ui.directory.no_results') }}</p>
-    </div>
+
+    <div id="directory-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="directory-error" class="state-note is-error hidden">{{ __('ui.directory.error') }}</div>
+    <div class="state-note hidden" id="directory-empty">{{ __('ui.directory.no_results') }}</div>
+    <div class="people-grid" id="people-grid"></div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
-    let fathers = [];
-    let servants = [];
+    const $ = function (id) { return document.getElementById(id); };
+    let tab = 'father';
+    let people = { father: [], servant: [] };
 
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
+    function renderCard(p) {
+        const e = Eftkad.esc;
+        const phone = p.phone ? p.phone.replace(/[^\d+]/g, '') : '';
+        return `<div class="person-card">
+            <div class="person-avatar">${e(Eftkad.initials(p.name))}</div>
+            <div class="person-main">
+                <strong>${e(p.name)}</strong>
+                <span>${e(p.membership_code)}</span>
+                ${p.phone ? `<small>${e(p.phone)}</small>` : ''}
+            </div>
+            ${phone ? `<div class="person-actions">
+                <a class="icon-button" href="tel:${e(phone)}" aria-label="Call">${Eftkad.icon('phone')}</a>
+                <a class="icon-button" href="https://wa.me/${e(phone.replace('+', ''))}" target="_blank" rel="noopener" aria-label="WhatsApp">${Eftkad.icon('whatsapp')}</a>
+            </div>` : ''}
+        </div>`;
     }
 
-    function renderList(containerId, emptyId, people, query) {
-        const list = document.getElementById(containerId);
-        const empty = document.getElementById(emptyId);
-        const filtered = people.filter(function (p) {
-            if (!query) return true;
-            const q = query.toLowerCase();
-            return (p.name || '').toLowerCase().includes(q) || (p.membership_code || '').toLowerCase().includes(q);
+    function render() {
+        const q = $('directory-search').value.trim().toLowerCase();
+        const visible = people[tab].filter(function (p) {
+            return !q || (p.name || '').toLowerCase().includes(q) || (p.membership_code || '').toLowerCase().includes(q);
         });
-
-        list.innerHTML = filtered.map(function (p) {
-            return `<li class="py-2.5 flex justify-between items-center gap-3 hover:bg-surface-container-low transition-colors px-2 rounded-xl -mx-2">
-                <span class="flex items-center gap-3 min-w-0">
-                    <span class="avatar" aria-hidden="true">${escapeHtml((p.name || '?').trim().charAt(0).toUpperCase())}</span>
-                    <span class="font-body-md text-body-md text-on-background font-semibold truncate">${escapeHtml(p.name)}</span>
-                </span>
-                <span class="pill pill-muted flex-shrink-0">${escapeHtml(p.membership_code)}</span>
-            </li>`;
-        }).join('');
-
-        empty.classList.toggle('hidden', filtered.length > 0);
-    }
-
-    function applySearch() {
-        const query = document.getElementById('directory-search').value.trim();
-        renderList('fathers-list', 'fathers-empty', fathers, query);
-        renderList('servants-list', 'servants-empty', servants, query);
+        $('people-grid').innerHTML = visible.map(renderCard).join('');
+        $('directory-empty').classList.toggle('hidden', visible.length > 0);
+        $('count-father').textContent = people.father.length;
+        $('count-servant').textContent = people.servant.length;
+        document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tab); });
     }
 
     async function loadDirectory() {
-        const loading = document.getElementById('directory-loading');
-        const errorBox = document.getElementById('directory-error');
-        const lists = document.getElementById('directory-lists');
-
         const res = await Eftkad.cachedApi('/settings/filters');
-
-        loading.classList.add('hidden');
+        $('directory-loading').classList.add('hidden');
 
         if (!res.ok || !res.data) {
-            errorBox.classList.remove('hidden');
+            $('directory-error').classList.remove('hidden');
             return;
         }
-
-        fathers = (res.data.data && res.data.data.fathers) || [];
-        servants = (res.data.data && res.data.data.servants) || [];
-
-        lists.classList.remove('hidden');
-        applySearch();
+        const d = res.data.data || {};
+        people.father = d.fathers || [];
+        people.servant = d.servants || [];
+        render();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
         loadDirectory();
-        document.getElementById('directory-search').addEventListener('input', applySearch);
+        $('directory-search').addEventListener('input', render);
+        document.querySelectorAll('.tabs button').forEach(function (b) {
+            b.addEventListener('click', function () { tab = b.dataset.tab; render(); });
+        });
     });
 </script>
 @endsection

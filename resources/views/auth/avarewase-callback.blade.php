@@ -5,26 +5,17 @@
 @section('title', __('ui.callback.title'))
 
 @section('content')
-<div class="w-full max-w-md glass-card rounded-2xl p-6 sm:p-8 md:p-10 relative overflow-hidden text-center">
-    <div class="absolute top-0 rtl:right-0 ltr:left-0 w-2 h-full bg-primary-container rtl:rounded-r-2xl ltr:rounded-l-2xl"></div>
+<div class="signin-heading" id="callback-pending">
+    <div style="display:flex;justify-content:center;margin-bottom:.8rem"><span class="spinner" style="width:1.6rem;height:1.6rem;color:var(--primary)"></span></div>
+    <span>{{ __('ui.callback.pending') }}</span>
+</div>
 
-    <div class="flex flex-col items-center mb-8">
-        <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4 shadow-sm border border-outline-variant">
-            <span class="material-symbols-outlined text-primary text-3xl">church</span>
-        </div>
-        <h1 class="font-display-lg text-display-lg text-primary text-center">{{ __('ui.app_name') }}</h1>
+<div id="callback-error" class="hidden">
+    <div class="inline-error" style="margin-top:1.5rem">
+        <x-icon name="alert" :size="16" />
+        <span id="callback-error-text">{{ __('ui.callback.error_default') }}</span>
     </div>
-
-    <div id="callback-pending">
-        <span class="material-symbols-outlined text-primary text-4xl animate-spin" style="display: inline-block;">progress_activity</span>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-4">{{ __('ui.callback.pending') }}</p>
-    </div>
-
-    <div id="callback-error" class="hidden">
-        <span class="material-symbols-outlined text-error text-4xl" style="display: inline-block;">error</span>
-        <p id="callback-error-text" class="font-body-md text-body-md text-on-surface-variant mt-4">{{ __('ui.callback.error_default') }}</p>
-        <a href="/login" class="inline-block mt-6 font-label-sm text-label-sm text-primary hover:underline underline-offset-4">{{ __('ui.callback.back_to_login') }}</a>
-    </div>
+    <a href="/login" class="text-link">{{ __('ui.callback.back_to_login') }}</a>
 </div>
 @endsection
 

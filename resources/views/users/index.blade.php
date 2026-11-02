@@ -4,108 +4,189 @@
 
 @php($activeNav = 'users')
 
-@section('title', __('ui.users.title') . ' - Eftkad')
-@section('page-title', __('ui.users.title'))
-@section('page-title-mobile', __('ui.users.title'))
+@section('title', __('ui.fg.users.title') . ' - Eftkad')
 
 @section('content')
-<div class="mt-8 -mb-3 md:-mt-4 md:mb-2">
-    <p class="font-body-md text-body-md text-on-surface-variant">{{ __('ui.users.subtitle') }}</p>
-</div>
-
-<!-- Search Bar -->
-<div class="relative mb-2 max-w-md">
-    <div class="absolute inset-y-0 rtl:right-0 ltr:left-0 rtl:pr-3 ltr:pl-3 flex items-center pointer-events-none">
-        <span class="material-symbols-outlined text-outline">search</span>
+<div class="page-content">
+    <div class="page-heading">
+        <div>
+            <div class="eyebrow">{{ __('ui.fg.users.eyebrow') }}</div>
+            <div class="page-title">{{ __('ui.fg.users.title') }}</div>
+            <p>{{ __('ui.fg.users.subtitle') }}</p>
+        </div>
     </div>
-    <input id="users-search" class="block w-full rtl:pl-3 ltr:pr-3 rtl:pr-10 ltr:pl-10 search-input py-3.5 border border-outline-variant/70 rounded-xl leading-5 bg-surface-container-lowest placeholder-outline focus:outline-none focus:ring-2 focus:ring-primary-container/40 focus:border-primary-container font-body-md text-body-md transition-colors" placeholder="{{ __('ui.users.search_placeholder') }}" type="text" />
-</div>
 
-<div id="users-loading" class="state-box" role="status"><div class="spinner"></div><p class="font-body-md">{{ __('ui.users.loading') }}</p></div>
-<div id="users-empty" class="hidden state-box">
-    <div class="state-icon"><span class="material-symbols-outlined">search</span></div>
-    <p class="font-title-md text-[18px] text-on-surface">{{ __('ui.users.empty') }}</p>
-</div>
-<div id="users-error" class="hidden state-box is-error" role="alert">
-    <div class="state-icon"><span class="material-symbols-outlined">error</span></div>
-    <p class="font-body-md text-error">{{ __('ui.users.error') }}</p>
-</div>
+    <div class="search-bar">
+        <x-icon name="search" :size="19" />
+        <input id="users-search" aria-label="{{ __('ui.fg.users.search') }}" placeholder="{{ __('ui.fg.users.search') }}" />
+        <kbd>⌘ K</kbd>
+    </div>
 
-<div class="bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 overflow-hidden">
-    <ul class="rise divide-y divide-surface-container" id="users-list"></ul>
+    <div id="users-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="users-error" class="state-note is-error hidden">{{ __('ui.users.error') }}</div>
+    <div id="users-empty" class="state-note hidden">{{ __('ui.users.empty') }}</div>
+
+    <div class="users-table hidden" id="users-table">
+        <div class="users-table-head">
+            <span>{{ __('ui.fg.users.col_user') }}</span>
+            <span>{{ __('ui.fg.users.col_code') }}</span>
+            <span>{{ __('ui.fg.users.col_type') }}</span>
+            <span></span>
+        </div>
+        <div id="users-list"></div>
+    </div>
+
+    <div class="modal-wrap hidden" id="user-modal">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal">
+            <div class="section-header">
+                <div class="section-title">{{ __('ui.fg.users.edit_type') }}</div>
+                <button type="button" class="icon-button" id="modal-close" aria-label="Close"><x-icon name="close" /></button>
+            </div>
+            <div class="modal-profile">
+                <div class="person-avatar large" id="m-initials">··</div>
+                <div><strong id="m-name">—</strong><span id="m-code">—</span></div>
+            </div>
+            <div class="inline-error hidden" id="m-error" style="margin-bottom:.85rem"><x-icon name="alert" :size="16" /><span id="m-error-text"></span></div>
+            <label class="field">
+                <span class="field-label">{{ __('ui.fg.users.type') }}</span>
+                <span class="input-shell"><select id="m-type"></select><x-icon name="chevron" :size="16" /></span>
+            </label>
+            <label class="field hidden" id="m-role-field">
+                <span class="field-label">{{ __('ui.fg.users.role') }}</span>
+                <span class="input-shell"><select id="m-role"></select><x-icon name="chevron" :size="16" /></span>
+            </label>
+            <div class="modal-actions">
+                <button type="button" class="button button-ghost" id="modal-cancel"><span>{{ __('ui.fg.users.cancel') }}</span></button>
+                <button type="button" class="button button-primary" id="modal-save">
+                    <x-icon name="check" :size="18" />
+                    <span id="modal-save-label">{{ __('ui.fg.users.save_changes') }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
+    const $ = function (id) { return document.getElementById(id); };
     let allUsers = [];
 
-    function escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
-
     function typeBadge(u) {
-        if (!u.type) {
-            return '<span class="pill pill-error">' + UI_TEXT.users.pending_type + '</span>';
-        }
-        return `<span class="pill pill-primary">${escapeHtml(u.type.name)}</span>`;
+        if (!u.type) return '<span class="badge badge-gold">' + Eftkad.esc(UI_TEXT.users.pending_type) + '</span>';
+        return '<span class="badge ' + (u.type.value === 1 ? 'badge-blue' : 'badge-green') + '">' + Eftkad.esc(u.type.name) + '</span>';
     }
 
     function renderRow(u) {
-        return `<li class="p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4 hover:bg-surface-container-low transition-colors">
-            <a href="/users/${u.id}" class="flex-grow min-w-0 flex items-center gap-3">
-                <span class="avatar" aria-hidden="true">${escapeHtml((u.name || '?').trim().charAt(0).toUpperCase())}</span>
-                <span class="min-w-0 flex-1">
-                    <p class="font-body-md text-body-md text-on-surface font-semibold truncate">${escapeHtml(u.name)}</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${escapeHtml(u.membership_code || UI_TEXT.common.dash)}</p>
-                </span>
-            </a>
-            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                ${typeBadge(u)}
-                <a href="/users/${u.id}/edit" class="pressable p-2 rounded-full hover:bg-primary-fixed/60 text-on-surface-variant hover:text-primary transition-colors" title="${UI_TEXT.users.edit_type_title}">
-                    <span class="material-symbols-outlined text-[20px]">edit</span>
-                </a>
-            </div>
-        </li>`;
+        return `<button type="button" class="user-row" data-id="${u.id}">
+            <span class="user-cell"><span class="person-avatar small">${Eftkad.esc(Eftkad.initials(u.name))}</span><strong>${Eftkad.esc(u.name)}</strong></span>
+            <span dir="ltr" style="justify-self:start">${Eftkad.esc(u.membership_code || UI_TEXT.common.dash)}</span>
+            <span>${typeBadge(u)}</span>
+            ${Eftkad.icon('chevron', 18)}
+        </button>`;
     }
 
     function applySearch() {
-        const query = document.getElementById('users-search').value.trim().toLowerCase();
+        const q = $('users-search').value.trim().toLowerCase();
         const filtered = allUsers.filter(function (u) {
-            if (!query) return true;
-            return (u.name || '').toLowerCase().includes(query) || (u.membership_code || '').toLowerCase().includes(query);
+            return !q || (u.name || '').toLowerCase().includes(q) || (u.membership_code || '').toLowerCase().includes(q);
         });
-
-        document.getElementById('users-list').innerHTML = filtered.map(renderRow).join('');
-        document.getElementById('users-empty').classList.toggle('hidden', filtered.length > 0);
+        $('users-list').innerHTML = filtered.map(renderRow).join('');
+        $('users-table').classList.toggle('hidden', filtered.length === 0);
+        $('users-empty').classList.toggle('hidden', filtered.length > 0);
     }
 
     async function loadUsers() {
-        const loading = document.getElementById('users-loading');
-        const errorBox = document.getElementById('users-error');
-        loading.classList.remove('hidden');
-        errorBox.classList.add('hidden');
-
         const res = await Eftkad.api('/users');
-
-        loading.classList.add('hidden');
+        $('users-loading').classList.add('hidden');
 
         if (!res.ok || !res.data) {
-            errorBox.classList.remove('hidden');
+            $('users-error').classList.remove('hidden');
             return;
         }
-
         allUsers = res.data.data || [];
         applySearch();
+    }
+
+    let enums = {};
+    let editing = null;
+
+    function optionsHtml(list, current) {
+        return (list || []).map(function (o) {
+            return '<option value="' + Eftkad.esc(o.value) + '"' + (String(o.value) === String(current) ? ' selected' : '') + '>' + Eftkad.esc(o.name) + '</option>';
+        }).join('');
+    }
+
+    function openModal(u) {
+        editing = u;
+        $('m-initials').textContent = Eftkad.initials(u.name);
+        $('m-name').textContent = u.name || UI_TEXT.common.dash;
+        $('m-code').textContent = u.membership_code || UI_TEXT.common.dash;
+        $('m-error').classList.add('hidden');
+        $('m-type').innerHTML = optionsHtml(enums.user_type, u.type ? u.type.value : '');
+        if (!u.type) $('m-type').insertAdjacentHTML('afterbegin', '<option value="" selected disabled>' + Eftkad.esc(UI_TEXT.users.pending_type) + '</option>');
+
+        const me = Eftkad.user();
+        const isSuper = me && me.role && me.role.value === 'superadmin';
+        $('m-role-field').classList.toggle('hidden', !isSuper);
+        if (isSuper) $('m-role').innerHTML = optionsHtml(enums.user_role, u.role ? u.role.value : '');
+
+        $('user-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        $('user-modal').classList.add('hidden');
+        editing = null;
+    }
+
+    function modalError(res, fallback) {
+        const errs = res.data && res.data.errors;
+        $('m-error-text').textContent = (errs && Object.values(errs)[0] && Object.values(errs)[0][0]) || (res.data && res.data.message) || fallback;
+        $('m-error').classList.remove('hidden');
+    }
+
+    async function saveModal() {
+        if (!editing) return;
+        const btn = $('modal-save');
+        const label = $('modal-save-label');
+        btn.disabled = true;
+        label.textContent = UI_TEXT.common.saving;
+        $('m-error').classList.add('hidden');
+
+        const typeVal = $('m-type').value;
+        if (typeVal) {
+            const res = await Eftkad.api('/users/' + editing.id + '/type', { method: 'PATCH', body: { type: parseInt(typeVal, 10) } });
+            if (!res.ok) { modalError(res, UI_TEXT.user_edit.save_error); btn.disabled = false; label.textContent = UI_TEXT.fg.users.save_changes; return; }
+        }
+        if (!$('m-role-field').classList.contains('hidden') && $('m-role').value) {
+            const res = await Eftkad.api('/users/' + editing.id + '/role', { method: 'PATCH', body: { role: $('m-role').value } });
+            if (!res.ok) { modalError(res, UI_TEXT.user_edit.save_error); btn.disabled = false; label.textContent = UI_TEXT.fg.users.save_changes; return; }
+        }
+
+        btn.disabled = false;
+        label.textContent = UI_TEXT.fg.users.save_changes;
+        closeModal();
+        loadUsers();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
         loadUsers();
-        document.getElementById('users-search').addEventListener('input', applySearch);
+        Eftkad.cachedApi('/settings/enums').then(function (res) {
+            if (res.ok && res.data) enums = res.data.data || {};
+        });
+        $('users-search').addEventListener('input', applySearch);
+        $('users-list').addEventListener('click', function (e) {
+            const row = e.target.closest('.user-row');
+            if (!row) return;
+            const u = allUsers.find(function (x) { return String(x.id) === row.dataset.id; });
+            if (u) openModal(u);
+        });
+        $('modal-backdrop').addEventListener('click', closeModal);
+        $('modal-close').addEventListener('click', closeModal);
+        $('modal-cancel').addEventListener('click', closeModal);
+        $('modal-save').addEventListener('click', saveModal);
     });
 </script>
 @endsection
