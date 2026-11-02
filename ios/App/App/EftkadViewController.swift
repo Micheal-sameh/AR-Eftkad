@@ -34,9 +34,9 @@ class EftkadViewController: CAPBridgeViewController {
     (function () {
       function post(m) { try { window.webkit.messageHandlers.eftkad.postMessage(m); } catch (e) {} }
       window.EftkadNative = { retry: function () { post({ type: 'retry' }); } };
-      var token = null;
-      try { token = localStorage.getItem('eftkad_token'); } catch (e) {}
-      post({ type: 'start', host: location.host, path: location.pathname, hasToken: !!token });
+      var token = null, dark = false;
+      try { token = localStorage.getItem('eftkad_token'); dark = localStorage.getItem('eftkad_theme') === 'dark'; } catch (e) {}
+      post({ type: 'start', host: location.host, path: location.pathname, hasToken: !!token, dark: dark });
     })();
     """#
 
@@ -113,6 +113,7 @@ class EftkadViewController: CAPBridgeViewController {
         case "start":
             // Only the real site matters; Capacitor's local pages (offline.html) also report in.
             guard (body["host"] as? String) == siteHost else { return }
+            applyStatusBar(dark: body["dark"] as? Bool ?? false)
             hasToken = body["hasToken"] as? Bool ?? false
             if !hasToken {
                 sessionUnlocked = true        // signed out, or about to sign in: nothing to lock
@@ -123,6 +124,8 @@ class EftkadViewController: CAPBridgeViewController {
                 sessionUnlocked = true
                 askForLocationOnce()
             }
+        case "theme":
+            applyStatusBar(dark: body["dark"] as? Bool ?? false)   // the site's own dark-mode switch
         case "servererror":
             showServerErrorPage()
         case "retry":
@@ -130,6 +133,14 @@ class EftkadViewController: CAPBridgeViewController {
         default:
             break
         }
+    }
+
+    // MARK: - Status bar
+
+    /// The site has its own dark mode, independent of the phone's. Without this the clock and battery
+    /// follow the phone's setting and become unreadable (dark text on the dark header, or the reverse).
+    private func applyStatusBar(dark: Bool) {
+        setStatusBarStyle(dark ? .lightContent : .darkContent)
     }
 
     // MARK: - Biometric lock

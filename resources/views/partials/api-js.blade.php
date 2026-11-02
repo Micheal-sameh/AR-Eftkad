@@ -181,6 +181,8 @@
     Eftkad.toggleTheme = function () {
         var dark = document.documentElement.classList.toggle('dark');
         try { localStorage.setItem('eftkad_theme', dark ? 'dark' : 'light'); } catch (e) {}
+        // iOS app shell: tell the native side so it can switch the status bar text colour.
+        try { window.webkit.messageHandlers.eftkad.postMessage({ type: 'theme', dark: dark }); } catch (e) {}
         // Keep the phone's status bar / browser chrome in step with the theme.
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) meta.setAttribute('content', dark ? '#1c2428' : '#faf9f6');
