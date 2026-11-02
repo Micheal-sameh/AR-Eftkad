@@ -96,6 +96,7 @@ return [
     'failed' => 'Failed',
     'Request was successful.' => 'Request was successful.',
     'login successfuly' => 'Login successfuly',
+    'invalid credentials' => 'Invalid membership code or password',
     'avarewase no matching account' => 'Your Avarewase account has no membership code on file, so an AR-Eftkad account could not be created automatically. Contact an administrator.',
     'avarewase login failed' => 'Avarewase login failed. Please try again.',
     'avarewase sso unavailable' => 'The Avarewase login server is unreachable right now. Please try again shortly.',

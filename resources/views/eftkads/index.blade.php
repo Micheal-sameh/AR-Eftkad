@@ -10,13 +10,13 @@
 
 @section('content')
 <!-- Filter Bar -->
-<div class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant relative z-20 overflow-hidden">
-    <button type="button" id="filter-toggle-btn" class="w-full flex items-center justify-between p-4 md:hidden" onclick="toggleFilterPanel()">
-        <span class="flex items-center gap-2 font-title-md text-title-md text-on-surface">
-            <span class="material-symbols-outlined text-primary">filter_list</span>
+<div class="bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 relative z-20 overflow-hidden">
+    <button type="button" id="filter-toggle-btn" class="pressable w-full flex items-center justify-between px-4 py-3 md:hidden" onclick="toggleFilterPanel()">
+        <span class="flex items-center gap-2 font-title-md text-[17px] text-on-surface">
+            <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary-fixed text-primary"><span class="material-symbols-outlined text-[20px]">filter_list</span></span>
             {{ __('ui.visits.filters_button') }}
         </span>
-        <span class="material-symbols-outlined text-outline-variant chevron" id="filter-chevron">expand_more</span>
+        <span class="material-symbols-outlined text-on-surface-variant chevron" id="filter-chevron">expand_more</span>
     </button>
     <div class="section-content collapsed md:!max-h-none md:!opacity-100 md:overflow-visible" id="filter-panel">
         <div class="p-4 pt-0 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-stack-gap">
@@ -57,15 +57,27 @@
 </div>
 
 <!-- Cards List -->
-<div id="visits-loading" class="text-center py-12 text-on-surface-variant">{{ __('ui.visits.loading') }}</div>
-<div id="visits-empty" class="hidden text-center py-12 text-on-surface-variant">{{ __('ui.visits.empty') }}</div>
-<div id="visits-error" class="hidden text-center py-12 text-error">{{ __('ui.visits.error') }}</div>
-<div id="visits-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"></div>
+<div id="visits-loading" class="state-box" role="status">
+    <div class="spinner"></div>
+    <p class="font-body-md">{{ __('ui.visits.loading') }}</p>
+</div>
+<div id="visits-empty" class="hidden state-box">
+    <div class="state-icon"><span class="material-symbols-outlined">church</span></div>
+    <p class="font-title-md text-[18px] text-on-surface">{{ __('ui.visits.empty') }}</p>
+    <a href="/visits/create" class="pressable mt-1 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-sm text-[14px] font-semibold shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">add</span>{{ __('ui.nav.new_visit') }}
+    </a>
+</div>
+<div id="visits-error" class="hidden state-box is-error" role="alert">
+    <div class="state-icon"><span class="material-symbols-outlined">error</span></div>
+    <p class="font-body-md text-error">{{ __('ui.visits.error') }}</p>
+</div>
+<div id="visits-grid" class="rise grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"></div>
 <button type="button" id="visits-more" class="hidden mx-auto px-6 py-3 rounded-lg border border-outline-variant text-primary font-title-md text-title-md hover:bg-surface-container-low transition-colors disabled:opacity-50">{{ __('ui.visits.load_more') }}</button>
 @endsection
 
 @section('fab')
-<a href="/visits/create" class="fixed bottom-24 md:bottom-8 rtl:left-6 ltr:right-6 md:rtl:left-8 md:ltr:right-8 w-14 h-14 md:w-12 md:h-12 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-surface-tint transition-all scale-95 active:opacity-80 z-40">
+<a href="/visits/create" aria-label="{{ __('ui.nav.new_visit') }}" class="pressable fixed bottom-[6.5rem] md:bottom-8 rtl:left-5 ltr:right-5 md:rtl:left-8 md:ltr:right-8 w-14 h-14 md:w-12 md:h-12 btn-brand rounded-full shadow-[0_10px_24px_rgba(0,93,172,0.45)] ring-4 ring-white/70 flex items-center justify-center hover:bg-surface-tint z-40">
     <span class="material-symbols-outlined text-[28px] md:text-[24px]">add</span>
 </a>
 @endsection
@@ -136,12 +148,12 @@
         const accent = ACCENT_STYLES[(eftkad.mass_attendence || {}).value] || 'bg-outline-variant';
         const location = eftkad.location || eftkad.correspondence_address || '—';
         return `
-        <a href="/visits/${eftkad.id}" class="bg-surface-container-lowest rounded-xl card-shadow border border-outline-variant p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg">
+        <a href="/visits/${eftkad.id}" class="pressable bg-surface-container-lowest rounded-2xl card-shadow border border-outline-variant/70 p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden md:hover:-translate-y-0.5 md:hover:shadow-lg">
             <div class="absolute top-0 rtl:right-0 ltr:left-0 bottom-0 w-1 ${accent}"></div>
             <div class="flex justify-between items-start">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-title-md text-base text-on-surface">${escapeHtml(eftkad.membership_code)}</span>
+                        <span class="font-title-md text-[17px] font-bold text-on-surface tracking-wide">${escapeHtml(eftkad.membership_code)}</span>
                     </div>
                     <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
                         <span class="material-symbols-outlined text-[14px]">event</span> ${escapeHtml(eftkad.date)}
@@ -154,7 +166,7 @@
             </div>
             <div class="mt-2 flex items-center gap-2 font-body-md text-body-md text-on-surface">
                 <span class="material-symbols-outlined text-tertiary">location_on</span>
-                <span>${escapeHtml(location)}</span>
+                <span class="min-w-0 break-words">${escapeHtml(location)}</span>
             </div>
             <div class="border-t border-outline-variant pt-3 mt-2 flex gap-2 flex-wrap">
                 ${needsChips(eftkad)}

@@ -37,6 +37,10 @@ return [
         'sso_redirecting' => 'جاري التحويل...',
         'sso_unavailable' => 'تعذر الاتصال بخدمة تسجيل الدخول',
         'support_link' => 'هل تواجه مشكلة في تسجيل الدخول؟',
+        'dev_title' => 'دخول المطورين',
+        'dev_code' => 'كود العضوية',
+        'dev_password' => 'كلمة المرور',
+        'dev_button' => 'دخول',
     ],
 
     'callback' => [

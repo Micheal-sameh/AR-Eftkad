@@ -4,7 +4,7 @@
 @include('partials.head-assets')
 <title>@yield('title', 'إفتقاد')</title>
 </head>
-<body class="bg-background text-on-background min-h-screen flex flex-col relative overflow-hidden font-body-md">
+<body class="text-on-background min-h-screen flex flex-col relative overflow-hidden font-body-md" style="background: linear-gradient(170deg, #eaf2ff 0%, #f9f9ff 45%, #fff4ea 100%);">
 @include('partials.api-js')
 
 <!-- Decorative Background Elements -->

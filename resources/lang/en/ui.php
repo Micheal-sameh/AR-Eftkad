@@ -37,6 +37,10 @@ return [
         'sso_redirecting' => 'Redirecting...',
         'sso_unavailable' => 'Could not reach the sign-in service',
         'support_link' => 'Having trouble signing in?',
+        'dev_title' => 'Developer sign-in',
+        'dev_code' => 'Membership code',
+        'dev_password' => 'Password',
+        'dev_button' => 'Sign in',
     ],
 
     'callback' => [

@@ -29,6 +29,10 @@ Route::group(['prefix' => 'auth'], function () {
 
     Route::get('avarewase/redirect', [AuthController::class, 'avarewaseRedirect']);
     Route::match(['get', 'post'], 'avarewase/callback', [AuthController::class, 'avarewaseCallback']);
+
+    if (config('app.dev_login')) {
+        Route::post('dev-login', [AuthController::class, 'devLogin'])->middleware('throttle:10,1');
+    }
 });
 Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
     Route::group(['prefix' => 'eftkads'], function () {

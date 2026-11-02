@@ -33,6 +33,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Developer Login
+    |--------------------------------------------------------------------------
+    |
+    | Membership code + password sign-in for local development and testing.
+    | Needs DEV_LOGIN=true and is always off when APP_ENV=production, so a
+    | stray env value cannot expose it on the live server.
+    |
+    */
+
+    'dev_login' => (bool) env('DEV_LOGIN', false) && env('APP_ENV', 'production') !== 'production',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |

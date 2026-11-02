@@ -10,7 +10,9 @@ use Avarewase\SsoClient\Contracts\ProvisionsAvarewaseUsers;
 use Avarewase\SsoClient\Exceptions\AvarewaseConnectionException;
 use Avarewase\SsoClient\Exceptions\AvarewaseTokenException;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends BaseController
 {
@@ -77,6 +79,30 @@ class AuthController extends BaseController
 
         return $this->apiResponse([
             'token' => $token,
+            'user' => new UserResource($user),
+        ], trans('messages.login successfuly'));
+    }
+
+    /**
+     * Local-development sign-in with membership code + password. The route is
+     * only registered when config('app.dev_login') is on (never in production);
+     * see routes/api.php. Same response shape as the SSO callback.
+     */
+    public function devLogin(Request $request)
+    {
+        $data = $request->validate([
+            'membership_code' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::whereRaw('LOWER(membership_code) = ?', [mb_strtolower(trim($data['membership_code']))])->first();
+
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
+            return $this->apiErrorResponse(message: trans('messages.invalid credentials'), status_code: 422);
+        }
+
+        return $this->apiResponse([
+            'token' => $this->generateToken($user, $request),
             'user' => new UserResource($user),
         ], trans('messages.login successfuly'));
     }

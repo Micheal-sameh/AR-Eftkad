@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a337765201d50f266e4755fbc25e044a",
+    "content-hash": "06b5a16616b00ced26754a01833afc0c",
     "packages": [
         {
             "name": "avarewase/sso-client",
-            "version": "v1.4.0",
+            "version": "v1.6.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:Micheal-sameh/ar-sso-handler.git",
-                "reference": "d081e6319f886058c6222e87825b1410950219a5"
+                "url": "https://github.com/Micheal-sameh/ar-sso-handler.git",
+                "reference": "c29f99f9e538da68b867e648d515c43d5b0542ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Micheal-sameh/ar-sso-handler/zipball/d081e6319f886058c6222e87825b1410950219a5",
-                "reference": "d081e6319f886058c6222e87825b1410950219a5",
+                "url": "https://api.github.com/repos/Micheal-sameh/ar-sso-handler/zipball/c29f99f9e538da68b867e648d515c43d5b0542ff",
+                "reference": "c29f99f9e538da68b867e648d515c43d5b0542ff",
                 "shasum": ""
             },
             "require": {
@@ -29,7 +29,12 @@
             },
             "require-dev": {
                 "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
-                "phpunit/phpunit": "^10.5|^11.0|^12.0"
+                "phpunit/phpunit": "^10.5|^11.0|^12.0",
+                "spatie/laravel-medialibrary": "^10.0|^11.0"
+            },
+            "suggest": {
+                "doctrine/dbal": "Required on Laravel 10 to run the published migration that makes users.email nullable.",
+                "spatie/laravel-medialibrary": "Store the SSO profile picture in the user's `avatar` media collection instead of only the avarewase_avatar URL column."
             },
             "type": "library",
             "extra": {
@@ -64,10 +69,10 @@
                 "sso"
             ],
             "support": {
-                "source": "https://github.com/Micheal-sameh/ar-sso-handler/tree/v1.4.0",
+                "source": "https://github.com/Micheal-sameh/ar-sso-handler/tree/v1.6.1",
                 "issues": "https://github.com/Micheal-sameh/ar-sso-handler/issues"
             },
-            "time": "2026-08-22T18:34:30+00:00"
+            "time": "2026-09-17T08:05:02+00:00"
         },
         {
             "name": "brick/math",

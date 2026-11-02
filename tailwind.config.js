@@ -75,13 +75,13 @@ export default {
                 "container-margin": "24px"
             },
             "fontFamily": {
-                "title-md": ["Noto Serif Arabic", "Noto Serif", "serif"],
-                "headline-lg": ["Noto Serif Arabic", "Noto Serif", "serif"],
-                "display-lg": ["Noto Serif Arabic", "Noto Serif", "serif"],
-                "headline-lg-mobile": ["Noto Serif Arabic", "Noto Serif", "serif"],
-                "label-sm": ["Be Vietnam Pro", "sans-serif"],
-                "body-lg": ["Be Vietnam Pro", "sans-serif"],
-                "body-md": ["Be Vietnam Pro", "sans-serif"]
+                "title-md": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "headline-lg": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "display-lg": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "headline-lg-mobile": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "label-sm": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "body-lg": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"],
+                "body-md": ["Be Vietnam Pro", "IBM Plex Sans Arabic", "sans-serif"]
             },
             "fontSize": {
                 "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],

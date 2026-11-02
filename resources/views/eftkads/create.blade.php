@@ -10,7 +10,7 @@
 
 @section('content')
 <div class="md:max-w-3xl">
-<div class="mb-2 -mt-4">
+<div class="mb-2 mt-8 md:-mt-4">
     <p class="text-on-surface-variant text-sm">{{ __('ui.visit_form.subtitle') }}</p>
 </div>
 

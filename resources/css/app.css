@@ -2,9 +2,10 @@
 @import '@fontsource/be-vietnam-pro/latin-500.css';
 @import '@fontsource/be-vietnam-pro/latin-600.css';
 @import '@fontsource/be-vietnam-pro/latin-700.css';
-@import '@fontsource/noto-serif/latin-400.css';
-@import '@fontsource/noto-serif/latin-600.css';
-@import '@fontsource/noto-serif/latin-700.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-600.css';
+@import '@fontsource/ibm-plex-sans-arabic/arabic-700.css';
 
 @tailwind base;
 @tailwind components;
@@ -44,6 +45,14 @@ body {
     background-color: theme('colors.background');
     color: theme('colors.on-background');
     min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+}
+a, button { touch-action: manipulation; }
+:focus-visible {
+    outline: 2px solid theme('colors.primary-container');
+    outline-offset: 2px;
 }
 .glass-card {
     background: rgba(255, 255, 255, 0.95);
@@ -64,7 +73,33 @@ body {
     opacity: 0.3;
 }
 .card-shadow {
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 16px rgba(16, 24, 40, 0.04);
+}
+/* Tactile press feedback for tappable cards/buttons. */
+.pressable { transition: transform .15s ease, box-shadow .15s ease; }
+.pressable:active { transform: scale(0.985); }
+/* Empty / loading / error placeholders. */
+.state-box {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 48px 16px; text-align: center; color: theme('colors.on-surface-variant');
+}
+.state-box.hidden { display: none; }
+.state-box .state-icon {
+    width: 72px; height: 72px; border-radius: 9999px;
+    display: flex; align-items: center; justify-content: center;
+    background: theme('colors.primary-fixed'); color: theme('colors.primary');
+}
+.state-box .state-icon .material-symbols-outlined { font-size: 34px; }
+.state-box.is-error .state-icon { background: theme('colors.error-container'); color: theme('colors.error'); }
+.spinner {
+    width: 32px; height: 32px; border-radius: 9999px;
+    border: 3px solid theme('colors.primary-fixed'); border-top-color: theme('colors.primary-container');
+    animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .spinner { animation-duration: 2s; }
+    .pressable:active { transform: none; }
 }
 .chip-checkbox:checked + label {
     background-color: theme('colors.primary-container');
@@ -112,5 +147,78 @@ body {
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
 }
 .pb-nav-safe {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px)) !important;
 }
+
+/* People rows: initial-letter avatar and compact code/type pills. */
+.avatar {
+    width: 40px; height: 40px; border-radius: 9999px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: theme('colors.primary-fixed'); color: theme('colors.primary');
+    font-weight: 700; font-size: 16px;
+}
+.pill {
+    display: inline-flex; align-items: center; white-space: nowrap;
+    padding: 2px 10px; border-radius: 9999px;
+    font-size: 12px; line-height: 20px; font-weight: 600;
+}
+.pill-primary { background: theme('colors.primary-fixed'); color: theme('colors.on-primary-fixed-variant'); }
+.pill-muted { background: theme('colors.surface-container-high'); color: theme('colors.on-surface-variant'); }
+.pill-error { background: theme('colors.error-container'); color: theme('colors.on-error-container'); }
+.search-input { box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); }
+
+/* Brand hero: deep-blue header that carries the page title on phones. */
+.brand-hero {
+    position: relative; color: #fff; overflow: hidden;
+    background:
+        radial-gradient(120% 90% at 100% 0%, rgba(165, 200, 255, 0.35) 0%, rgba(165, 200, 255, 0) 55%),
+        linear-gradient(160deg, #1976d2 0%, #005dac 55%, #00428a 100%);
+    border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;
+    padding-bottom: 44px;
+}
+.brand-hero::after {
+    content: ''; position: absolute; width: 220px; height: 220px; border-radius: 9999px;
+    inset-inline-start: -70px; bottom: -120px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+}
+@media (min-width: 768px) {
+    .brand-hero { background: none; color: inherit; border-radius: 0; padding-bottom: 0; overflow: visible; }
+    .brand-hero::after { display: none; }
+}
+.hero-chip {
+    display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.16); color: #fff; font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.28); backdrop-filter: blur(6px);
+    transition: background .15s ease;
+}
+.hero-chip:hover { background: rgba(255, 255, 255, 0.26); }
+
+/* Floating pill navigation (phones). */
+.float-nav {
+    position: fixed; z-index: 50; inset-inline: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    display: flex; align-items: stretch; justify-content: space-around;
+    padding: 6px 6px; border-radius: 26px;
+    background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(14px);
+    border: 1px solid rgba(193, 198, 212, 0.55);
+    box-shadow: 0 10px 30px rgba(0, 40, 90, 0.18);
+}
+.float-nav a { border-radius: 20px; }
+.float-nav a.is-active {
+    background: linear-gradient(160deg, #1976d2, #005dac); color: #fff;
+    box-shadow: 0 6px 14px rgba(0, 93, 172, 0.35);
+}
+.btn-brand {
+    background: linear-gradient(160deg, #1976d2 0%, #005dac 100%); color: #fff;
+}
+
+/* Entrance: cards and rows rise in one after another. */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.rise > * { animation: rise .35s ease both; }
+.rise > *:nth-child(2) { animation-delay: .04s; }
+.rise > *:nth-child(3) { animation-delay: .08s; }
+.rise > *:nth-child(4) { animation-delay: .12s; }
+.rise > *:nth-child(5) { animation-delay: .16s; }
+.rise > *:nth-child(n+6) { animation-delay: .2s; }
+@media (prefers-reduced-motion: reduce) { .rise > * { animation: none; } }

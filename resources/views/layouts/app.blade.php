@@ -87,23 +87,29 @@
 <!-- Main Content Area -->
 <div class="flex-grow flex flex-col md:rtl:mr-64 md:ltr:ml-64 w-full relative min-w-0">
     <!-- TopAppBar (Mobile & Desktop Header Area) -->
-    <header class="safe-top flex justify-between items-center w-full px-container-margin md:px-8 py-unit md:py-4 max-w-7xl mx-auto bg-surface border-b border-outline-variant md:border-none sticky top-0 z-30 md:static md:bg-transparent">
-        <div class="flex items-center gap-stack-gap md:hidden">
-            <div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center">
-                <span class="material-symbols-outlined text-outline">person</span>
+    <header class="brand-hero safe-top w-full md:static">
+        <div class="relative z-10 max-w-7xl mx-auto px-container-margin md:px-8 pt-1 md:py-4 flex flex-col gap-5 md:gap-0">
+            <div class="flex justify-between items-center w-full">
+                <div class="flex items-center gap-3 md:hidden">
+                    <img src="/icons/icon-192.png?v=2" alt="" width="40" height="40" class="w-10 h-10 rounded-2xl shadow-md ring-2 ring-white/40" />
+                    <div class="leading-tight min-w-0">
+                        <h1 class="font-title-md text-[18px] font-bold">{{ __('ui.app_name') }}</h1>
+                        <p class="font-label-sm text-[12px] text-white/80 truncate max-w-[10rem]" id="topbar-user-name">&nbsp;</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-stack-gap flex-grow justify-between">
+                    <h2 class="font-headline-lg text-2xl font-bold text-on-surface">@yield('page-title', __('ui.app_name'))</h2>
+                </div>
+                <button type="button" id="topbar-locale-toggle" class="hero-chip md:!bg-primary-fixed/60 md:!text-primary md:!border-transparent font-label-sm text-label-sm">
+                    <span class="material-symbols-outlined text-[16px]">language</span>
+                    <span id="topbar-locale-label">AR/EN</span>
+                </button>
             </div>
-            <h1 class="font-title-md text-title-md font-semibold text-primary">Eftkad</h1>
+            <h2 class="md:hidden font-headline-lg-mobile text-[28px] leading-9 font-bold tracking-tight">@yield('page-title-mobile', __('ui.app_name'))</h2>
         </div>
-        <div class="hidden md:flex items-center gap-stack-gap flex-grow justify-between">
-            <h2 class="font-headline-lg text-2xl text-on-surface">@yield('page-title', __('ui.app_name'))</h2>
-        </div>
-        <button type="button" id="topbar-locale-toggle" class="text-primary hover:bg-surface-container p-2 rounded-full transition-colors font-label-sm text-label-sm">
-            AR/EN
-        </button>
     </header>
 
-    <main class="flex-grow p-container-margin md:px-8 md:py-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
-        <h2 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden text-on-surface mb-2">@yield('page-title-mobile', __('ui.app_name'))</h2>
+    <main class="flex-grow px-container-margin pb-container-margin pt-0 -mt-7 md:mt-0 md:px-8 md:py-6 max-w-7xl mx-auto w-full flex flex-col gap-6 relative z-10">
 
         @yield('content')
     </main>
@@ -114,26 +120,27 @@
 @endif
 
 <!-- BottomNavBar (Mobile Only) -->
-<nav class="safe-bottom fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-1 sm:px-4 pb-4 pt-2 md:hidden bg-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
-    <a href="/visits" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'visits' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'visits' ? 'filled' : '' }}">home</span>
-        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'visits' ? 'font-bold' : '' }}">{{ __('ui.nav.visits_short') }}</span>
-    </a>
-    <a href="/visits/create" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'create' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'create' ? 'filled' : '' }}">add_circle</span>
-        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'create' ? 'font-bold' : '' }}">{{ __('ui.nav.new_visit_short') }}</span>
-    </a>
-    <a href="/directory" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'directory' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'directory' ? 'filled' : '' }}">settings</span>
-        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'directory' ? 'font-bold' : '' }}">{{ __('ui.nav.directory_short') }}</span>
-    </a>
-    <a href="/users" class="flex flex-col items-center justify-center px-2 sm:px-3 py-1 transition-transform duration-200 {{ ($activeNav ?? '') === 'users' ? 'bg-primary-container text-on-primary-container rounded-xl scale-90' : 'text-on-surface-variant hover:text-primary' }}">
-        <span class="material-symbols-outlined text-[22px] sm:text-[24px] {{ ($activeNav ?? '') === 'users' ? 'filled' : '' }}">manage_accounts</span>
-        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1 {{ ($activeNav ?? '') === 'users' ? 'font-bold' : '' }}">{{ __('ui.nav.users_short') }}</span>
-    </a>
-    <a href="#" id="bottomnav-signout" class="flex flex-col items-center justify-center text-on-surface-variant px-2 sm:px-3 py-1 hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-[22px] sm:text-[24px]">logout</span>
-        <span class="font-label-sm text-[10px] sm:text-label-sm mt-1">{{ __('ui.nav.sign_out_short') }}</span>
+<?php $bottomNav = [
+    ['key' => 'visits', 'href' => '/visits', 'icon' => 'home', 'label' => __('ui.nav.visits_short')],
+    ['key' => 'create', 'href' => '/visits/create', 'icon' => 'add_circle', 'label' => __('ui.nav.new_visit_short')],
+    ['key' => 'directory', 'href' => '/directory', 'icon' => 'settings', 'label' => __('ui.nav.directory_short')],
+    ['key' => 'users', 'href' => '/users', 'icon' => 'manage_accounts', 'label' => __('ui.nav.users_short')],
+]; ?>
+<nav class="float-nav md:hidden">
+    @foreach ($bottomNav as $item)
+        @php($active = ($activeNav ?? '') === $item['key'])
+        <a href="{{ $item['href'] }}" @if($active) aria-current="page" @endif class="pressable flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 {{ $active ? 'is-active' : 'text-on-surface-variant' }}">
+            <span class="flex items-center justify-center h-7 w-12">
+                <span class="material-symbols-outlined text-[24px] {{ $active ? 'filled' : '' }}">{{ $item['icon'] }}</span>
+            </span>
+            <span class="font-label-sm text-[11px] {{ $active ? 'font-bold' : '' }}">{{ $item['label'] }}</span>
+        </a>
+    @endforeach
+    <a href="#" id="bottomnav-signout" class="pressable flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 text-on-surface-variant">
+        <span class="flex items-center justify-center h-7 w-12">
+            <span class="material-symbols-outlined text-[24px]">logout</span>
+        </span>
+        <span class="font-label-sm text-[11px]">{{ __('ui.nav.sign_out_short') }}</span>
     </a>
 </nav>
 
@@ -151,9 +158,16 @@
             typeEl.textContent = (user.type && user.type.name) ? user.type.name : '';
         }
 
+        var topbarName = document.getElementById('topbar-user-name');
+        if (user && topbarName) {
+            topbarName.textContent = user.name || user.membership_code || '';
+        }
+
         var localeLabel = Eftkad.locale() === 'ar' ? 'EN' : 'AR';
         var navLocaleLabel = document.getElementById('nav-locale-label');
         if (navLocaleLabel) navLocaleLabel.textContent = localeLabel;
+        var topbarLocaleLabel = document.getElementById('topbar-locale-label');
+        if (topbarLocaleLabel) topbarLocaleLabel.textContent = localeLabel;
 
         document.getElementById('nav-locale-toggle')?.addEventListener('click', function () { Eftkad.toggleLocale(); });
         document.getElementById('topbar-locale-toggle')?.addEventListener('click', function () { Eftkad.toggleLocale(); });
