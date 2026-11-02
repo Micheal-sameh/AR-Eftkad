@@ -213,9 +213,7 @@
             if (e.cancelable) e.preventDefault();
             pull = Math.min(MAX, dy * 0.5);
             render(pull);
-            var nowArmed = pull >= THRESHOLD;
-            if (nowArmed && !armed && navigator.vibrate) navigator.vibrate(8);
-            armed = nowArmed;
+            armed = pull >= THRESHOLD;
         }, { passive: false });
 
         function end() {

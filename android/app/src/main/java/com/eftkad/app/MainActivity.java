@@ -53,6 +53,14 @@ public class MainActivity extends BridgeActivity {
             + "}catch(e){EftkadNative.route('visits');}"
             + "})();";
 
+    // True when the loaded page is a server-error page rather than the app: Cloudflare's "502: Bad
+    // gateway" family (title "host | 502: ...", element #cf-error-details) or nginx's own 5xx page.
+    private static final String SERVER_ERROR_PAGE_JS =
+        "(function(){var t=document.title||'';"
+            + "return /(^|\\|)\\s*5\\d\\d\\b/.test(t)"
+            + "||/Bad gateway|Gateway time-?out|Service Unavailable|Web server is down|Host Error/i.test(t)"
+            + "||!!document.getElementById('cf-error-details');})()";
+
     private static final String CLEAR_AUTH_JS =
         "localStorage.removeItem('eftkad_token');localStorage.removeItem('eftkad_user');";
 
@@ -95,6 +103,14 @@ public class MainActivity extends BridgeActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 if (url == null) return;
+                if (!url.startsWith("file:")) {
+                    // The site's service worker answers navigations, and the web view does not report
+                    // HTTP errors for those (onReceivedHttpError never fires), so look at the page that
+                    // actually loaded: a Cloudflare / nginx 5xx page gets replaced by our retrying page.
+                    view.evaluateJavascript(SERVER_ERROR_PAGE_JS, result -> {
+                        if ("true".equals(result)) view.loadUrl(SERVER_ERROR_URL);
+                    });
+                }
                 if (url.startsWith("file:")) {
                     removeLockOverlay();
                     hideSplash(view);
