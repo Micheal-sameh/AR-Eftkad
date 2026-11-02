@@ -20,6 +20,7 @@ docker-compose.yml
 resources/views/refrence
 *.md
 android
+ios
 www
 capacitor.config.json
 tests

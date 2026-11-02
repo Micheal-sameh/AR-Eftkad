@@ -213,6 +213,18 @@
         Eftkad.deferredInstallPrompt = e;
     });
 
+    // iOS app shell only: capacitor.config.json holds the splash screen until it is hidden, and on
+    // Android MainActivity does that itself after its biometric/route check. Nothing native does it
+    // on iOS, so hide it as soon as the page is ready (otherwise it waits for the 10 s timeout).
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            if (window.Capacitor && typeof Capacitor.getPlatform === 'function' && Capacitor.getPlatform() === 'ios'
+                && Capacitor.Plugins && Capacitor.Plugins.SplashScreen) {
+                Capacitor.Plugins.SplashScreen.hide();
+            }
+        } catch (e) {}
+    });
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
             navigator.serviceWorker.register('/sw.js').catch(function () {});

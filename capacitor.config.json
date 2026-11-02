@@ -6,7 +6,9 @@
     "url": "https://eftkad.avarewase.com/visits",
     "cleartext": false,
     "errorPath": "offline.html",
-    "allowNavigation": ["*.avarewase.com"]
+    "allowNavigation": [
+      "*.avarewase.com"
+    ]
   },
   "plugins": {
     "SplashScreen": {
@@ -16,7 +18,11 @@
       "androidScaleType": "CENTER_INSIDE",
       "showSpinner": false
     }
+  },
+  "ios": {
+    "contentInset": "never",
+    "limitsNavigationsToAppBoundDomains": false,
+    "allowsLinkPreview": false,
+    "backgroundColor": "#faf9f6"
   }
 }
-
-
