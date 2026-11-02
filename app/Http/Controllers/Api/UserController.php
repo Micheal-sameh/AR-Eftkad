@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\BaseController;
+use App\Models\User;
 use App\Http\Requests\UpdateUserRoleRequest;
 use App\Http\Requests\UpdateUserTypeRequest;
 use App\Http\Resources\UserResource;
@@ -15,7 +17,7 @@ class UserController extends BaseController
 
     public function me(Request $request)
     {
-        return $request->user();
+        return new UserResource($request->user()->loadMissing('roles'));
     }
 
     public function index()
@@ -52,6 +54,15 @@ class UserController extends BaseController
 
     public function updateRole(UpdateUserRoleRequest $request, $id)
     {
+        // Guard against locking everyone out: no self-demotion, and the last superadmin stays.
+        $target = $this->userService->show($id);
+        $newRole = $request->string('role')->toString();
+
+        if ($target && $newRole !== UserRole::SUPERADMIN && $target->hasRole(UserRole::SUPERADMIN)
+            && ($target->is($request->user()) || User::role(UserRole::SUPERADMIN)->count() <= 1)) {
+            return $this->apiErrorResponse(message: trans('messages.cannot demote superadmin'), status_code: 422);
+        }
+
         $user = $this->userService->updateRole($id, $request->string('role')->toString());
 
         if (! $user) {

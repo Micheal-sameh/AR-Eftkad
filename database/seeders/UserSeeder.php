@@ -14,6 +14,13 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // These are throwaway demo accounts with a known password.
+        if (app()->environment('production')) {
+            $this->command?->warn('UserSeeder creates demo accounts with a known password; refusing to run in production.');
+
+            return;
+        }
+
         User::create([
             'name' => 'ابونا مينا',
             'email' => 'abouna.mina@gmail.com',

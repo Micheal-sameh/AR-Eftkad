@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Enums\BoolType;
+use App\Enums\UserRole;
 use App\Models\Eftkad;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -19,11 +21,11 @@ class EftkadRepository
     /**
      * @param  array{father?: ?string, servant?: ?string, type?: ?string, date?: ?string, date_from?: ?string, date_to?: ?string}  $filters
      */
-    public function index(array $filters = [], int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function index(array $filters = [], int $perPage = self::DEFAULT_PER_PAGE, ?User $viewer = null): LengthAwarePaginator
     {
         $perPage = max(1, min($perPage, self::MAX_PER_PAGE));
 
-        return $this->model->query()
+        return $this->visibleTo($viewer)
             ->when($filters['father'] ?? null, fn (Builder $q, $v) => $q->where('father_membership_code', $v))
             ->when($filters['servant'] ?? null, fn (Builder $q, $v) => $q->where('servant_membership_code', $v))
             ->when($filters['type'] ?? null, fn (Builder $q, $v) => $q->where('type', (int) $v))
@@ -33,6 +35,25 @@ class EftkadRepository
             ->orderByDesc('date')
             ->orderByDesc('id')
             ->paginate($perPage);
+    }
+
+    /**
+     * Admins and superadmins see every visit; everyone else only the visits they are
+     * the assigned father or servant of.
+     */
+    protected function visibleTo(?User $viewer): Builder
+    {
+        $query = $this->model->query();
+
+        if ($viewer && $viewer->hasAnyRole([UserRole::ADMIN, UserRole::SUPERADMIN])) {
+            return $query;
+        }
+
+        $code = $viewer?->membership_code;
+
+        return $query->where(fn (Builder $q) => $code
+            ? $q->where('father_membership_code', $code)->orWhere('servant_membership_code', $code)
+            : $q->whereRaw('1 = 0'));
     }
 
     /** d-m-Y (the format the API speaks) to a Carbon day, or null when empty/invalid. */
@@ -86,11 +107,9 @@ class EftkadRepository
         return $this->model->find($id);
     }
 
-    public function show($id)
+    public function show($id, ?User $viewer = null)
     {
-        $eftkad = $this->find($id);
-
-        return $eftkad;
+        return $this->visibleTo($viewer)->whereKey($id)->first();
     }
 
     public function create($input)

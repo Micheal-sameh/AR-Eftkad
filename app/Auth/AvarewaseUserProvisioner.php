@@ -36,7 +36,9 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
             $user = User::query()->where('membership_code', $userInfo->membershipCode)->first();
         }
 
-        if (! $user && $userInfo->email) {
+        // Email is only a safe link to an existing account when the SSO vouches for it;
+        // otherwise anyone could claim a victim's address and inherit their role.
+        if (! $user && $userInfo->email && $userInfo->emailVerified) {
             $user = User::query()->where('email', $userInfo->email)->first();
         }
 
@@ -53,12 +55,23 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
             ]);
         }
 
+        // Never take over an identifier that already belongs to a different local user.
+        $membershipCode = $userInfo->membershipCode;
+        if ($membershipCode && User::query()->where('membership_code', $membershipCode)->whereKeyNot($user->getKey() ?? 0)->exists()) {
+            $membershipCode = null;
+        }
+
+        $email = $userInfo->email;
+        if ($email && User::query()->where('email', $email)->whereKeyNot($user->getKey() ?? 0)->exists()) {
+            $email = null;
+        }
+
         $user->forceFill(array_filter([
             'avarewase_sub' => $userInfo->sub,
             'avarewase_avatar' => $userInfo->picture,
-            'membership_code' => $userInfo->membershipCode,
+            'membership_code' => $membershipCode,
             'name' => $userInfo->name,
-            'email' => $userInfo->email,
+            'email' => $email,
             'date_of_birth' => $userInfo->dateOfBirth,
         ], fn ($value) => ! is_null($value)))->save();
 

@@ -19,7 +19,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // The web app is same-origin and the mobile shell loads it from the site itself, so no
+    // other origin needs browser access to the API. Extend via CORS_ALLOWED_ORIGINS if needed.
+    'allowed_origins' => array_values(array_filter(array_merge(
+        [env('APP_URL')],
+        explode(',', (string) env('CORS_ALLOWED_ORIGINS', ''))
+    ))),
 
     'allowed_origins_patterns' => [],
 

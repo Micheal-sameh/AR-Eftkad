@@ -101,6 +101,7 @@ return [
     'internal_server_error' => 'Something went wrong on our side',
     'not_found' => 'Not found',
     'user not found' => 'User not found',
+    'cannot demote superadmin' => 'Cannot remove the superadmin role from yourself or the last superadmin',
     'eftkad not found' => 'Visit not found',
     'logout successfuly' => 'Signed out successfully',
     'avarewase no matching account' => 'Your Avarewase account has no membership code on file, so an AR-Eftkad account could not be created automatically. Contact an administrator.',

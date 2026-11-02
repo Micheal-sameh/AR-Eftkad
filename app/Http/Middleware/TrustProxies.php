@@ -12,7 +12,9 @@ class TrustProxies extends Middleware
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    // The container only listens on 127.0.0.1 behind the host's reverse proxy, so every
+    // hop that can reach it is trusted; this makes $request->ip() the real client address.
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.

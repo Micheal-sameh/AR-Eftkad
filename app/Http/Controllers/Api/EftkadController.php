@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DTOs\EftkadCreateDTO;
+use App\Enums\UserRole;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\EftkadCreateRequest;
 use App\Http\Resources\EftkadResource;
@@ -16,12 +17,20 @@ class EftkadController extends BaseController
 
     public function create(EftkadCreateRequest $request)
     {
-        $input = new EftkadCreateDTO(...$request->only(
+        $data = $request->only(
             'membership_code', 'date', 'correspondence_address', 'mass_attendence', 'needs',
             'communication_means', 'attend_meetings', 'need_eftkad_from_meeting', 'father_confession',
             'mother_confession', 'children_confession', 'need_eftkad_by_father', 'location', 'location_url', 'general_notes',
             'father_membership_code', 'servant_membership_code', 'type'
-        ));
+        );
+
+        // A regular user can only record visits as themselves; only admins may file on behalf of others.
+        $user = $request->user();
+        if (! $user->hasAnyRole([UserRole::ADMIN, UserRole::SUPERADMIN])) {
+            $data['servant_membership_code'] = $user->membership_code;
+        }
+
+        $input = new EftkadCreateDTO(...$data);
 
         $eftkad = $this->eftkadService->create($input);
 
@@ -33,6 +42,7 @@ class EftkadController extends BaseController
         $data = $this->eftkadService->index(
             $request->only('father', 'servant', 'type', 'date', 'date_from', 'date_to'),
             (int) $request->query('per_page', EftkadRepository::DEFAULT_PER_PAGE),
+            $request->user(),
         );
 
         return $this->respondResource(EftkadResource::collection($data['eftkads']),
@@ -41,9 +51,9 @@ class EftkadController extends BaseController
             ]);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $eftkad = $this->eftkadService->show($id);
+        $eftkad = $this->eftkadService->show($id, $request->user());
 
         if (! $eftkad) {
             return $this->apiErrorResponse(message: trans('messages.eftkad not found'), status_code: 404);

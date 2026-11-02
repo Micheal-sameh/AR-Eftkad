@@ -3,6 +3,8 @@ set -e
 
 if [ ! -f /var/www/html/.env ]; then
     cp /var/www/html/.env.example /var/www/html/.env
+    # The example file is for local development; never fall back to it with debug on.
+    sed -i 's/^APP_DEBUG=.*/APP_DEBUG=false/; s/^APP_ENV=.*/APP_ENV=production/; s/^DEV_LOGIN=.*/DEV_LOGIN=false/' /var/www/html/.env
 fi
 
 if ! grep -q "^APP_KEY=base64" /var/www/html/.env; then

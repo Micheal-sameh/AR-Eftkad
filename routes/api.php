@@ -27,8 +27,8 @@ Route::view('/documentation', 'vendor.l5-swagger.index', [
 Route::group(['prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-    Route::get('avarewase/redirect', [AuthController::class, 'avarewaseRedirect']);
-    Route::match(['get', 'post'], 'avarewase/callback', [AuthController::class, 'avarewaseCallback']);
+    Route::get('avarewase/redirect', [AuthController::class, 'avarewaseRedirect'])->middleware('throttle:20,1');
+    Route::match(['get', 'post'], 'avarewase/callback', [AuthController::class, 'avarewaseCallback'])->middleware('throttle:20,1');
 
     if (config('app.dev_login')) {
         Route::post('dev-login', [AuthController::class, 'devLogin'])->middleware('throttle:10,1');
