@@ -61,6 +61,7 @@
 @endsection
 
 @section('scripts')
+@include('partials.share-sheet')
 <script>
     const TYPE_TONE = { 1: 'gold', 2: 'blue' }; // 1=Call, 2=Home
     const memberNames = {};
@@ -88,6 +89,7 @@
                     ${place ? `<span dir="auto">${e(place)}</span>` : ''}
                 </div>
                 ${reason}${v.type ? `<span class="badge badge-${tone}">${e(v.type.name)}</span>` : ''}
+                <button type="button" class="icon-button" data-share="${v.id}" aria-label="${e(UI_TEXT.fg.visits.share)}">${Eftkad.icon('share', 18)}</button>
             </div>
             <div class="visit-meta">
                 <span>${Eftkad.icon('calendar', 16)}${e(v.date)}</span>
@@ -133,6 +135,13 @@
         if (!Eftkad.requireAuth()) return;
         loadHome();
         $('home-retry').addEventListener('click', loadHome);
+        // The share button sits inside the card link: open the popup instead of the visit.
+        $('home-content').addEventListener('click', function (ev) {
+            const b = ev.target.closest('[data-share]');
+            if (!b) return;
+            ev.preventDefault();
+            ShareSheet.open(b.getAttribute('data-share'));
+        });
     });
 </script>
 @endsection

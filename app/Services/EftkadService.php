@@ -44,6 +44,12 @@ class EftkadService
         }
     }
 
+    /** Who a visit is shared with, without counting as the viewer opening it. */
+    public function shareInfo($id, User $viewer)
+    {
+        return $this->eftkadRepository->show($id, $viewer)?->load('shares');
+    }
+
     public function share($id, array $codes, User $viewer)
     {
         $eftkad = $this->eftkadRepository->show($id, $viewer);

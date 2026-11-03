@@ -3,6 +3,7 @@
 // Inline SVG icon paths (24x24 viewBox, stroke-based), shared by the Blade
 // <x-icon> component and the client-side Eftkad.icon() helper.
 return [
+    'share' => '<circle cx="18" cy="5" r="2.6" /><circle cx="6" cy="12" r="2.6" /><circle cx="18" cy="19" r="2.6" /><path d="m8.3 10.7 7.4-4.2M8.3 13.3l7.4 4.2" />',
     'home' => '<path d="M3 10.8 12 3l9 7.8" /><path d="M5 9.8V21h14V9.8M9 21v-7h6v7" />',
     'plus' => '<path d="M12 5v14M5 12h14" />',
     'book' => '<path d="M4 4.5A3.5 3.5 0 0 1 7.5 8H12v13H7.5A3.5 3.5 0 0 0 4 17.5z" /><path d="M20 4.5A3.5 3.5 0 0 0 16.5 8H12v13h4.5a3.5 3.5 0 0 1 3.5-3.5z" />',

@@ -86,6 +86,10 @@ return [
     ],
 
     'visit_detail' => [
+        'share_assigned' => 'مُسندة',
+        'share_save' => 'حفظ',
+        'share_search' => 'ابحث بالاسم أو الكود',
+        'share_title' => 'مشاركة مع',
         'share_heading' => 'مشاركة هذه الزيارة',
         'share_hint' => 'من تشاركهم الزيارة يمكنهم فتحها من قائمتهم.',
         'share_select' => 'اختر أبًا كاهنًا أو خادمًا',
@@ -260,6 +264,7 @@ return [
             'subtitle' => 'تابع الزيارات واحتياجات كل عائلة',
             'search' => 'ابحث بالاسم أو الكود',
             'filters' => 'تصفية',
+            'share' => 'مشاركة',
             'all_visits' => 'كل الزيارات',
             'this_month' => 'هذا الشهر',
             'need_followup' => 'تحتاج متابعة',

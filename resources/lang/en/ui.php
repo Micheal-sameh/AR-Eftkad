@@ -86,6 +86,10 @@ return [
     ],
 
     'visit_detail' => [
+        'share_assigned' => 'Assigned',
+        'share_save' => 'Save',
+        'share_search' => 'Search by name or code',
+        'share_title' => 'Share with',
         'share_heading' => 'Share this visit',
         'share_hint' => 'People you share with can open this visit from their list.',
         'share_select' => 'Choose a father or servant',
@@ -263,6 +267,7 @@ return [
             'all_visits' => 'All visits',
             'this_month' => 'This month',
             'need_followup' => 'Need follow-up',
+            'share' => 'Share',
             'recent' => 'Recent visits',
             'count' => ':n visits',
             'empty_title' => 'No visits yet',

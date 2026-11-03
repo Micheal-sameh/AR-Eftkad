@@ -28,6 +28,10 @@
                     <x-icon name="calendar" :size="16" />
                     <span id="d-date">—</span>
                 </div>
+                <button type="button" class="button button-secondary" id="share-open" style="margin-top:.7rem">
+                    <x-icon name="share" :size="18" />
+                    <span>{{ __('ui.visit_detail.share_button') }}</span>
+                </button>
             </div>
         </div>
 
@@ -71,17 +75,6 @@
                 <div class="status-grid" id="d-status"></div>
             </section>
 
-            <section class="detail-section wide" id="share-section">
-                <div class="detail-section-title"><span><x-icon name="users" :size="19" /></span><strong>{{ __('ui.visit_detail.share_heading') }}</strong></div>
-                <p class="section-copy" style="margin-top:0">{{ __('ui.visit_detail.share_hint') }}</p>
-                <div class="chips" id="d-shared" style="margin-bottom:.8rem"></div>
-                <div class="form-grid">
-                    <span class="input-shell"><select id="share-select"><option value="">{{ __('ui.visit_detail.share_select') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                    <button type="button" class="button button-primary" id="share-btn"><x-icon name="users" :size="18" /><span>{{ __('ui.visit_detail.share_button') }}</span></button>
-                </div>
-                <button type="button" class="button button-secondary" id="share-link-btn" style="margin-top:.7rem"><x-icon name="map" :size="18" /><span>{{ __('ui.visit_detail.share_link') }}</span></button>
-            </section>
-
             <section class="detail-section wide">
                 <div class="detail-section-title"><span><x-icon name="book" :size="19" /></span><strong>{{ __('ui.fg.detail.notes') }}</strong></div>
                 <p class="notes-copy" id="d-notes">{{ __('ui.visit_detail.no_notes') }}</p>
@@ -92,11 +85,10 @@
 @endsection
 
 @section('scripts')
+@include('partials.share-sheet')
 <script>
     const VISIT_ID = {{ (int) $id }};
     const memberNames = {};
-    let people = [];
-    let visit = {};
     const TYPE_TONE = { 1: 'gold', 2: 'blue' };
     const $ = function (id) { return document.getElementById(id); };
 
@@ -120,8 +112,7 @@
         const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const d = res.data.data || {};
-        people = (d.fathers || []).concat(d.servants || []);
-        people.forEach(function (p) { memberNames[p.membership_code] = p.name; });
+        (d.fathers || []).concat(d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
     }
 
     function person(code) {
@@ -129,51 +120,7 @@
         return memberNames[code] ? memberNames[code] + ' (' + code + ')' : code;
     }
 
-    // Who the visit is shared with (each with a remove button), and who can still be picked.
-    function renderShares(codes) {
-        const box = $('d-shared');
-        box.innerHTML = codes.length
-            ? codes.map(function (c) {
-                return '<span class="chip selected">' + Eftkad.esc(person(c)) +
-                    ' <button type="button" data-unshare="' + Eftkad.esc(c) + '" aria-label="' + Eftkad.esc(UI_TEXT.visit_detail.share_remove) + '" style="border:0;background:none;color:inherit;cursor:pointer;font-size:1rem;line-height:1">&times;</button></span>';
-            }).join('')
-            : '<span class="section-copy" style="margin:0">' + Eftkad.esc(UI_TEXT.visit_detail.share_none) + '</span>';
-
-        const taken = codes.concat([visit.father_membership_code, visit.servant_membership_code].filter(Boolean));
-        $('share-select').innerHTML = '<option value="">' + Eftkad.esc(UI_TEXT.visit_detail.share_select) + '</option>' +
-            people.filter(function (p) { return taken.indexOf(p.membership_code) === -1; })
-                .map(function (p) { return '<option value="' + Eftkad.esc(p.membership_code) + '">' + Eftkad.esc(p.name) + ' (' + Eftkad.esc(p.membership_code) + ')</option>'; }).join('');
-    }
-
-    async function shareWith() {
-        const code = $('share-select').value;
-        if (!code) return;
-        const res = await Eftkad.api('/eftkads/detail/' + VISIT_ID + '/share', { method: 'POST', body: { membership_codes: [code] } });
-        if (!res.ok) { Eftkad.toast(UI_TEXT.visit_detail.share_error); return; }
-        renderShares(res.data.data.shared_with || []);
-        Eftkad.toast(UI_TEXT.visit_detail.share_done);
-    }
-
-    async function unshare(code) {
-        const res = await Eftkad.api('/eftkads/detail/' + VISIT_ID + '/share/' + encodeURIComponent(code), { method: 'DELETE' });
-        if (!res.ok) { Eftkad.toast(UI_TEXT.visit_detail.share_error); return; }
-        renderShares(res.data.data.shared_with || []);
-        Eftkad.toast(UI_TEXT.visit_detail.share_removed);
-    }
-
-    // The link opens this visit in the app (when installed) or on the site.
-    async function shareLink() {
-        const url = location.origin + '/visits/' + VISIT_ID;
-        try {
-            if (navigator.share) { await navigator.share({ title: UI_TEXT.visit_detail.share_text, url: url }); return; }
-            await navigator.clipboard.writeText(url);
-            Eftkad.toast(UI_TEXT.visit_detail.share_copied);
-        } catch (err) { /* share sheet dismissed */ }
-    }
-
     function renderDetail(e) {
-        visit = e;
-        renderShares(e.shared_with || []);
         const t = UI_TEXT.fg.detail;
         $('d-avatar').textContent = (e.membership_code || '?').replace(/[^A-Za-z0-9؀-ۿ]/g, '').slice(0, 2).toUpperCase();
         $('d-membership_code').textContent = e.membership_code || UI_TEXT.common.dash;
@@ -223,12 +170,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
         loadDetail();
-        $('share-btn').addEventListener('click', shareWith);
-        $('share-link-btn').addEventListener('click', shareLink);
-        $('d-shared').addEventListener('click', function (ev) {
-            const b = ev.target.closest('[data-unshare]');
-            if (b) unshare(b.getAttribute('data-unshare'));
-        });
+        $('share-open').addEventListener('click', function () { ShareSheet.open(VISIT_ID); });
     });
 </script>
 @endsection
