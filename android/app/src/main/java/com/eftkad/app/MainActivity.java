@@ -50,6 +50,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
@@ -62,6 +63,8 @@ public class MainActivity extends BridgeActivity {
     private static final String OFFLINE_URL = "file:///android_asset/public/offline.html";
     // Same page, in "server problem" mode: says the service is unavailable and retries by itself.
     private static final String SERVER_ERROR_URL = OFFLINE_URL + "#server";
+    // One background availability check at a time (the retry button and the 5 s auto-retry share it).
+    private final AtomicBoolean retrying = new AtomicBoolean(false);
     private static final long SPLASH_TIMEOUT_MS = 10000;
     private static final long RELOCK_AFTER_MS = 60000;
 
@@ -437,13 +440,37 @@ public class MainActivity extends BridgeActivity {
         getBridge().getWebView().addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void retry() {
-                runOnUiThread(() -> {
-                    if (isOnline()) {
-                        getBridge().getWebView().loadUrl(VISITS_URL);
-                    } else {
+                if (!isOnline()) {
+                    runOnUiThread(() -> {
                         Toast.makeText(MainActivity.this, "لا يوجد اتصال بالإنترنت / No internet connection", Toast.LENGTH_SHORT).show();
+                        retryFinished("offline");
+                    });
+                    return;
+                }
+                if (!retrying.compareAndSet(false, true)) return;
+                // Ask the server in the background first: the app is only opened on a 2xx answer, so a
+                // 5xx (or no answer) keeps the user on this page instead of flashing a broken site.
+                new Thread(() -> {
+                    int code = -1;
+                    HttpURLConnection conn = null;
+                    try {
+                        conn = (HttpURLConnection) new URL(VISITS_URL).openConnection();
+                        conn.setConnectTimeout(8000);
+                        conn.setReadTimeout(8000);
+                        conn.setRequestProperty("Cache-Control", "no-cache");
+                        code = conn.getResponseCode();
+                    } catch (Exception ignored) {
+                        // unreachable: treated like a server error below
+                    } finally {
+                        if (conn != null) conn.disconnect();
+                        retrying.set(false);
                     }
-                });
+                    final boolean up = code >= 200 && code < 300;
+                    runOnUiThread(() -> {
+                        if (up) getBridge().getWebView().loadUrl(VISITS_URL);
+                        else retryFinished("server");
+                    });
+                }).start();
             }
 
             @JavascriptInterface
@@ -468,6 +495,11 @@ public class MainActivity extends BridgeActivity {
                 });
             }
         }, "EftkadNative");
+    }
+
+    // Tells the error page the check is over and the service is still not available (it re-enables its button).
+    private void retryFinished(String reason) {
+        getBridge().getWebView().evaluateJavascript("window.onRetryResult && window.onRetryResult('" + reason + "')", null);
     }
 
     private void signOutToLogin(WebView view) {
