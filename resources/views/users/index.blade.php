@@ -187,20 +187,10 @@
         loadUsers();
     }
 
-    // The role saved in the browser can be stale (it was set at login), so re-read it from the account.
-    async function refreshMyRole() {
-        const res = await Eftkad.api('/user');
-        const me = res && res.ok !== false && res.data && (res.data.data || res.data);
-        const u = Eftkad.user();
-        if (me && u) {
-            u.role = me.role;
-            try { localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); } catch (e) {}
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', async function () {
         if (!Eftkad.requireAuth()) return;
-        await refreshMyRole();
+        // The cached user is refreshed once per app open (see Eftkad.syncUser), not on every page.
+        await Eftkad.syncUser();
         if (myRole() === 'user') { window.location.replace('/visits'); return; }
         loadUsers();
         Eftkad.cachedApi('/settings/enums').then(function (res) {

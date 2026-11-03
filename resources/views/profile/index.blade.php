@@ -84,10 +84,10 @@
         document.querySelectorAll('#p-theme .chip').forEach(function (c) { c.classList.toggle('selected', (c.dataset.theme === 'dark') === dark); });
     }
 
+    // Shows the cached user straight away; the cache is refreshed once per app open (Eftkad.syncUser).
     async function loadProfile() {
-        const res = await Eftkad.api('/user');
+        const u = await Eftkad.syncUser();
         $('profile-loading').classList.add('hidden');
-        const u = res && res.ok !== false && res.data && (res.data.data || res.data);
         if (!u || !u.id) { $('profile-error').classList.remove('hidden'); return; }
         renderProfile(u);
         $('profile-content').classList.remove('hidden');

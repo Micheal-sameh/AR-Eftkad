@@ -59,19 +59,21 @@
                 <strong>{{ __('ui.fg.welcome') }}</strong>
             </div>
             <div class="topbar-actions">
-                <div class="language-toggle">
-                    <button type="button" data-lang="ar">ع</button>
-                    <button type="button" data-lang="en">EN</button>
-                </div>
                 <button type="button" class="icon-button font-size-button" data-font-toggle aria-label="{{ __('ui.fg.font_size') }}" title="{{ __('ui.fg.font_size') }}">Aa</button>
-                <button type="button" class="icon-button" data-theme-toggle aria-label="{{ __('ui.fg.theme') }}"><span data-theme-icon style="display:contents"></span></button>
-                <a href="/profile" class="profile-button" aria-label="{{ __('ui.fg.profile.title') }}" title="{{ __('ui.fg.profile.title') }}">
-                    <span id="profile-initials"><x-icon name="user" :size="20" /></span>
-                    <div class="desktop-only">
-                        <strong id="profile-name">&nbsp;</strong>
-                        <small id="profile-type">&nbsp;</small>
+                {{-- Language and theme live on the profile page. --}}
+                <div class="profile-menu">
+                    <button type="button" class="profile-button" id="profile-toggle" aria-haspopup="menu" aria-expanded="false" aria-label="{{ __('ui.fg.profile.title') }}" title="{{ __('ui.fg.profile.title') }}">
+                        <span id="profile-initials"><x-icon name="user" :size="20" /></span>
+                        <div class="desktop-only">
+                            <strong id="profile-name">&nbsp;</strong>
+                            <small id="profile-type">&nbsp;</small>
+                        </div>
+                    </button>
+                    <div class="menu-pop hidden" id="profile-pop" role="menu">
+                        <a href="/profile" role="menuitem"><x-icon name="user" :size="18" /><span>{{ __('ui.fg.profile.title') }}</span></a>
+                        <button type="button" role="menuitem" class="danger" data-signout><x-icon name="logout" :size="18" /><span>{{ __('ui.fg.nav.sign_out') }}</span></button>
                     </div>
-                </a>
+                </div>
             </div>
         </header>
 
@@ -98,10 +100,6 @@
                 <small>{{ $item['label'] }}</small>
             </a>
         @endforeach
-        <button type="button" data-signout>
-            <span class="bottom-icon"><x-icon name="logout" /></span>
-            <small>{{ __('ui.fg.nav.sign_out') }}</small>
-        </button>
     </nav>
 </div>
 
@@ -129,26 +127,37 @@
 
         Eftkad.initChrome();
 
-        // Pick up a text size changed on another device: refresh it from the account once per tab session.
-        try {
-            if (!sessionStorage.getItem('eftkad_font_synced')) {
-                sessionStorage.setItem('eftkad_font_synced', '1');
-                Eftkad.api('/user').then(function (res) {
-                    var me = res && res.ok !== false && res.data && (res.data.data || res.data);
-                    if (me && typeof me.font_size === 'number') {
-                        Eftkad.applyFontSize(me.font_size);
-                        var u = Eftkad.user();
-                        if (u) { u.font_size = me.font_size; u.role = me.role; localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); }
-                    }
-                }).catch(function () {});
+        // Header, menu and role-based links come from the cached user; the cache is refreshed from the
+        // server once each time the app is opened (text size changed on another device, new role...).
+        function paintUser(user) {
+            if (!user) return;
+            // The users page is for admins and above; plain users never see the link.
+            if (user.role && ['admin', 'superadmin', 'owner'].indexOf(user.role.value) !== -1) {
+                document.querySelectorAll('[data-managers-only]').forEach(function (el) { el.classList.remove('hidden'); });
             }
-        } catch (e) {}
-
-        var user = Eftkad.user();
-        // The users page is for admins and above; plain users never see the link.
-        if (user && user.role && ['admin', 'superadmin', 'owner'].indexOf(user.role.value) !== -1) {
-            document.querySelectorAll('[data-managers-only]').forEach(function (el) { el.classList.remove('hidden'); });
+            var name = user.name || user.membership_code || '';
+            var first = name.trim().split(/\s+/)[0];
+            if (first) {
+                document.getElementById('topbar-greeting').textContent = UI_TEXT.fg.greeting.replace(':name', first);
+            }
+            document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-type').textContent = (user.type && user.type.name) ? user.type.name : '';
         }
+        paintUser(Eftkad.user());
+        Eftkad.syncUser().then(paintUser);
+
+        // Profile icon: a small menu with the profile page and sign out.
+        var profileToggle = document.getElementById('profile-toggle');
+        var profilePop = document.getElementById('profile-pop');
+        function setProfileMenu(open) {
+            profilePop.classList.toggle('hidden', !open);
+            profileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        profileToggle.addEventListener('click', function (e) { e.stopPropagation(); setProfileMenu(profilePop.classList.contains('hidden')); });
+        profilePop.addEventListener('click', function () { setProfileMenu(false); });
+        document.addEventListener('click', function () { setProfileMenu(false); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setProfileMenu(false); });
+
         // Badge on the Home tab: how many visits are new for me (assigned or shared, not opened yet).
         Eftkad.api('/eftkads/home').then(function (res) {
             var d = res && res.ok && res.data && res.data.data;
@@ -159,17 +168,7 @@
             });
         }).catch(function () {});
 
-        if (user) {
-            var name = user.name || user.membership_code || '';
-            var first = name.trim().split(/\s+/)[0];
-            if (first) {
-                document.getElementById('topbar-greeting').textContent = UI_TEXT.fg.greeting.replace(':name', first);
-            }
-            document.getElementById('profile-name').textContent = name;
-            document.getElementById('profile-type').textContent = (user.type && user.type.name) ? user.type.name : '';
-        }
-
-        // Signing out always asks first (sidebar, bottom bar and profile button all land here).
+        // Signing out always asks first (the sidebar and the profile menu both land here).
         var signoutModal = document.getElementById('signout-modal');
         function setSignoutModal(open) {
             signoutModal.classList.toggle('hidden', !open);

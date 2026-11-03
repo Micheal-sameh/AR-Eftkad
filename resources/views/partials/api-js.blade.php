@@ -216,6 +216,34 @@
         if (Eftkad.toast) Eftkad.toast(UI_TEXT.fg.font_size + ': ' + (levels[next] || ''));
     };
 
+    // The signed-in user's data (name, type, role, font size...) is cached in localStorage and re-read
+    // from the server once each time the app is opened (once per tab / web view session, while the
+    // splash screen is still up). Pages read Eftkad.user() and never fetch /user themselves.
+    Eftkad.saveUser = function (u) {
+        if (!u || !u.id) return;
+        try { localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); } catch (e) {}
+        if (typeof u.font_size === 'number') Eftkad.applyFontSize(u.font_size);
+    };
+
+    Eftkad.syncUser = function () {
+        if (Eftkad._userSync) return Eftkad._userSync;
+        var synced = false;
+        try { synced = !!sessionStorage.getItem('eftkad_user_synced'); } catch (e) {}
+        if (synced && Eftkad.user()) {
+            Eftkad._userSync = Promise.resolve(Eftkad.user());
+            return Eftkad._userSync;
+        }
+        Eftkad._userSync = Eftkad.api('/user').then(function (res) {
+            var me = res && res.ok !== false && res.data && (res.data.data || res.data);
+            if (me && me.id) {
+                Eftkad.saveUser(me);
+                try { sessionStorage.setItem('eftkad_user_synced', '1'); } catch (e) {}
+            }
+            return Eftkad.user();
+        }).catch(function () { return Eftkad.user(); });
+        return Eftkad._userSync;
+    };
+
     // Wires the AR/EN pill and the theme button (used on every page that renders them).
     Eftkad.initChrome = function () {
         document.querySelectorAll('.language-toggle button').forEach(function (b) {
