@@ -49,6 +49,66 @@
     <div class="visits-grid" id="visits-loading" aria-label="Loading" style="margin-top:.85rem">
         @include('partials.skeleton-cards', ['count' => 6])
     </div>
+
+    <div class="empty-state hidden" id="visits-empty">
+        <div class="empty-icon"><x-icon name="calendar" :size="30" /></div>
+        <strong>{{ __('ui.fg.visits.empty_title') }}</strong>
+        <span>{{ __('ui.fg.visits.empty_text') }}</span>
+        <a href="/visits/create" class="button button-primary">
+            <x-icon name="plus" :size="18" />
+            <span>{{ __('ui.fg.visits.new_visit') }}</span>
+        </a>
+    </div>
+
+    <div class="feed-error hidden" id="visits-error" role="alert">
+        <span><x-icon name="alert" :size="19" /></span>
+        <div>
+            <strong>{{ __('ui.fg.visits.error_title') }}</strong>
+            <small>{{ __('ui.fg.visits.error_hint') }}</small>
+        </div>
+        <button type="button" class="button button-secondary" id="visits-retry"><span>{{ __('ui.fg.visits.retry') }}</span></button>
+    </div>
+
+    <nav class="pagination hidden" id="visits-pagination" aria-label="Pagination"></nav>
+
+    <div class="sheet-wrap" id="filter-sheet">
+        <div class="sheet-backdrop" id="filter-backdrop"></div>
+        <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="section-header">
+                <div class="section-title">{{ __('ui.fg.visits.filters') }}</div>
+                <button type="button" class="icon-button" id="close-filters" aria-label="Close"><x-icon name="close" /></button>
+            </div>
+            <div class="sheet-fields">
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.father') }}</span>
+                    <span class="input-shell"><select id="filter-father"><option value="">{{ __('ui.visits.filter_father_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.servant') }}</span>
+                    <span class="input-shell"><select id="filter-servant"><option value="">{{ __('ui.visits.filter_servant_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.visits.type') }}</span>
+                    <span class="input-shell"><select id="filter-type"><option value="">{{ __('ui.visits.filter_type_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <div class="form-grid">
+                    <label class="field">
+                        <span class="field-label">{{ __('ui.fg.visits.date_from') }}</span>
+                        <span class="input-shell"><input id="filter-date-from" type="date" /></span>
+                    </label>
+                    <label class="field">
+                        <span class="field-label">{{ __('ui.fg.visits.date_to') }}</span>
+                        <span class="input-shell"><input id="filter-date-to" type="date" /></span>
+                    </label>
+                </div>
+            </div>
+            <div class="sheet-actions">
+                <button type="button" class="button button-ghost" id="clear-filters"><span>{{ __('ui.fg.visits.clear') }}</span></button>
+                <button type="button" class="button button-primary" id="apply-filters"><span>{{ __('ui.fg.visits.apply') }}</span></button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -123,7 +183,7 @@
         $('visits-grid').innerHTML = shown.map(renderCard).join('');
         $('list-count').textContent = UI_TEXT.fg.visits.count.replace(':n', shown.length);
         $('visits-empty').classList.toggle('hidden', allVisits.length > 0 || !loaded);
-        $('visits-more').classList.toggle('hidden', currentPage >= lastPage || !allVisits.length);
+        renderPagination();
         $('stat-total').textContent = totalVisits === null ? '—' : totalVisits;
         $('stat-followup').textContent = allVisits.filter(needsFollowUp).length;
     }
@@ -140,16 +200,35 @@
         $('filter-count').classList.toggle('hidden', n === 0);
     }
 
-    // Loads one server-side page. reset=true starts over at page 1 (filters changed);
-    // otherwise appends the next page. Stale responses from an older filter state are dropped.
-    async function loadVisits(reset) {
+    // Page numbers: first, last and the ones around the current page, with gaps as ellipses.
+    function renderPagination() {
+        const nav = $('visits-pagination');
+        if (!allVisits.length) { nav.classList.add('hidden'); return; }
+        const pages = [];
+        for (let p = 1; p <= lastPage; p++) {
+            if (p === 1 || p === lastPage || Math.abs(p - currentPage) <= 1) pages.push(p);
+            else if (pages[pages.length - 1] !== '…') pages.push('…');
+        }
+        nav.innerHTML =
+            '<button type="button" class="pg-btn pg-arrow" data-page="' + (currentPage - 1) + '"' + (currentPage <= 1 ? ' disabled' : '') + ' aria-label="Previous">&lsaquo;</button>' +
+            pages.map(function (p) {
+                return p === '…' ? '<span class="pg-gap">…</span>'
+                    : '<button type="button" class="pg-btn' + (p === currentPage ? ' active' : '') + '" data-page="' + p + '"' + (p === currentPage ? ' aria-current="page"' : '') + '>' + p + '</button>';
+            }).join('') +
+            '<button type="button" class="pg-btn pg-arrow" data-page="' + (currentPage + 1) + '"' + (currentPage >= lastPage ? ' disabled' : '') + ' aria-label="Next">&rsaquo;</button>' +
+            '<span class="pg-info">' + Eftkad.esc(UI_TEXT.fg.visits.page_of.replace(':p', currentPage).replace(':n', lastPage)) + '</span>';
+        nav.classList.remove('hidden');
+    }
+
+    // Loads one server-side page, replacing the list. Stale responses from an older filter state are dropped.
+    async function loadVisits(page) {
         const seq = ++loadSeq;
-        const page = reset ? 1 : currentPage + 1;
 
         $('visits-error').classList.add('hidden');
-        $('visits-more').classList.add('hidden');
+        $('visits-pagination').classList.add('hidden');
         $('visits-loading').classList.remove('hidden');
-        if (reset) { allVisits = []; loaded = false; render(); }
+        allVisits = []; loaded = false; render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         const params = new URLSearchParams({ page: page, per_page: PER_PAGE });
         Object.keys(applied).forEach(function (k) { if (applied[k]) params.set(k, applied[k]); });
@@ -169,7 +248,7 @@
         lastPage = meta.last_page || currentPage;
         totalVisits = meta.total !== undefined ? meta.total
             : ((res.data.additional_data || {}).eftkads_count !== undefined ? res.data.additional_data.eftkads_count : allVisits.length + items.length);
-        allVisits = reset ? items : allVisits.concat(items);
+        allVisits = items;
         loaded = true;
         render();
     }
@@ -217,7 +296,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
 
-        loadFilters().then(function () { loadVisits(true); });
+        loadFilters().then(function () { loadVisits(1); });
         loadEnums();
         loadMonthStat();
 
@@ -230,8 +309,11 @@
         });
 
         $('visit-search').addEventListener('input', render);
-        $('visits-more').addEventListener('click', function () { loadVisits(false); });
-        $('visits-retry').addEventListener('click', function () { loadVisits(allVisits.length === 0); });
+        $('visits-pagination').addEventListener('click', function (ev) {
+            const b = ev.target.closest('[data-page]');
+            if (b && !b.disabled) loadVisits(parseInt(b.getAttribute('data-page'), 10));
+        });
+        $('visits-retry').addEventListener('click', function () { loadVisits(currentPage); });
 
         $('open-filters').addEventListener('click', function () { setSheet(true); });
         $('close-filters').addEventListener('click', function () { setSheet(false); });
@@ -250,14 +332,14 @@
             };
             updateFilterBadge();
             setSheet(false);
-            loadVisits(true);
+            loadVisits(1);
         });
         $('clear-filters').addEventListener('click', function () {
             ['filter-father', 'filter-servant', 'filter-type', 'filter-date-from', 'filter-date-to'].forEach(function (id) { $(id).value = ''; });
             applied = { father: '', servant: '', type: '', date_from: '', date_to: '' };
             updateFilterBadge();
             setSheet(false);
-            loadVisits(true);
+            loadVisits(1);
         });
     });
 </script>

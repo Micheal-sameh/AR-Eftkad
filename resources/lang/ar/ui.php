@@ -284,6 +284,7 @@ return [
             'search' => 'ابحث بالاسم أو الكود',
             'filters' => 'تصفية',
             'share' => 'مشاركة',
+            'page_of' => 'صفحة :p من :n',
             'all_visits' => 'كل الزيارات',
             'this_month' => 'هذا الشهر',
             'need_followup' => 'تحتاج متابعة',

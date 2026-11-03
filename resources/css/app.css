@@ -540,3 +540,14 @@ main { min-height: calc(100vh - 5rem); }
 .sk-heading { width: 9rem; height: .9rem; margin: 1.4rem 0 .85rem; }
 .sk-block { height: 6rem; border-radius: 1rem; }
 @keyframes sk-sweep { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* Visits list pagination */
+.pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem; margin: 1.4rem 0 .5rem; }
+.pg-btn { min-width: 2.4rem; height: 2.4rem; padding: 0 .6rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--surface-raised); color: var(--ink-soft); font-size: .8rem; font-weight: 650; transition: .18s ease; }
+.pg-btn:hover:not(:disabled):not(.active) { color: var(--ink); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+.pg-btn.active { border-color: var(--primary); background: var(--primary); color: var(--surface-raised); }
+.pg-btn:disabled { opacity: .4; cursor: default; }
+.pg-arrow { font-size: 1.2rem; line-height: 1; }
+[dir="rtl"] .pg-arrow { transform: scaleX(-1); }
+.pg-gap { color: var(--ink-faint); padding: 0 .1rem; }
+.pg-info { flex: 1 0 100%; text-align: center; color: var(--ink-soft); font-size: .7rem; }

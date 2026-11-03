@@ -287,6 +287,7 @@ return [
             'this_month' => 'This month',
             'need_followup' => 'Need follow-up',
             'share' => 'Share',
+            'page_of' => 'Page :p of :n',
             'recent' => 'Recent visits',
             'count' => ':n visits',
             'empty_title' => 'No visits yet',
