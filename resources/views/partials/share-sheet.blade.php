@@ -23,7 +23,7 @@
 </div>
 <script>
     window.ShareSheet = (function () {
-        const T = @json([
+        const T = {!! json_encode([
             'done' => __('ui.visit_detail.share_done'),
             'error' => __('ui.visit_detail.share_error'),
             'copied' => __('ui.visit_detail.share_copied'),
@@ -31,7 +31,7 @@
             'assigned' => __('ui.visit_detail.share_assigned'),
             'father' => __('ui.fg.visits.father'),
             'servant' => __('ui.fg.visits.servant'),
-        ]);
+        ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!};
         const $ = function (id) { return document.getElementById(id); };
         let visitId = null;
         let people = [];            // [{name, membership_code, role}]
@@ -87,4 +87,35 @@
                 if (!ok) break;
                 ok = (await Eftkad.api('/eftkads/detail/' + visitId + '/share/' + encodeURIComponent(c), { method: 'DELETE' })).ok;
             }
-            $(
+            $('share-save').disabled = false;
+            if (!ok) { $('share-error').classList.remove('hidden'); return; }
+            close();
+            Eftkad.toast(T.done);
+        }
+
+        // Pass the visit on as a link: the phone's share menu when there is one, otherwise copy it.
+        async function shareLink() {
+            const url = location.origin + '/visits/' + visitId;
+            try {
+                if (navigator.share) { await navigator.share({ title: T.text, text: T.text, url: url }); return; }
+                await navigator.clipboard.writeText(url);
+                Eftkad.toast(T.copied);
+            } catch (e) {}
+        }
+
+        $('share-search').addEventListener('input', render);
+        $('share-people').addEventListener('click', function (ev) {
+            const b = ev.target.closest('[data-code]');
+            if (!b || b.disabled) return;
+            const code = b.getAttribute('data-code');
+            if (selected.has(code)) selected.delete(code); else selected.add(code);
+            render();
+        });
+        $('share-close').addEventListener('click', close);
+        $('share-backdrop').addEventListener('click', close);
+        $('share-save').addEventListener('click', save);
+        $('share-link').addEventListener('click', shareLink);
+
+        return { open: open };
+    })();
+</script>
