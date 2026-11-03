@@ -30,7 +30,7 @@
         </div>
         <nav class="sidebar-nav">
             @foreach ($nav as $item)
-                <a href="{{ $item['href'] }}" class="{{ ($activeNav ?? '') === $item['key'] ? 'active' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif>
+                <a href="{{ $item['href'] }}" data-nav-key="{{ $item['key'] }}" class="{{ ($activeNav ?? '') === $item['key'] ? 'active' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif>
                     <x-icon :name="$item['icon']" />
                     <span>{{ $item['label'] }}</span>
                 </a>
@@ -93,7 +93,7 @@
     <nav class="bottom-nav">
         @foreach ($bottomNav as $item)
             @php($active = ($activeNav ?? '') === $item['key'])
-            <a href="{{ $item['href'] }}" class="{{ $active ? 'active' : '' }} {{ $item['key'] === 'create' ? 'new-action' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif @if($active) aria-current="page" @endif>
+            <a href="{{ $item['href'] }}" data-nav-key="{{ $item['key'] }}" class="{{ $active ? 'active' : '' }} {{ $item['key'] === 'create' ? 'new-action' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif @if($active) aria-current="page" @endif>
                 <span class="bottom-icon"><x-icon :name="$item['icon']" /></span>
                 <small>{{ $item['label'] }}</small>
             </a>
@@ -149,6 +149,16 @@
         if (user && user.role && ['admin', 'superadmin', 'owner'].indexOf(user.role.value) !== -1) {
             document.querySelectorAll('[data-managers-only]').forEach(function (el) { el.classList.remove('hidden'); });
         }
+        // Badge on the Home tab: how many visits are new for me (assigned or shared, not opened yet).
+        Eftkad.api('/eftkads/home').then(function (res) {
+            var d = res && res.ok && res.data && res.data.data;
+            var n = d && d.new ? d.new.length : 0;
+            if (!n) return;
+            document.querySelectorAll('[data-nav-key="home"]').forEach(function (a) {
+                (a.querySelector('.bottom-icon') || a).insertAdjacentHTML('beforeend', '<span class="nav-badge">' + (n > 9 ? '9+' : n) + '</span>');
+            });
+        }).catch(function () {});
+
         if (user) {
             var name = user.name || user.membership_code || '';
             var first = name.trim().split(/\s+/)[0];

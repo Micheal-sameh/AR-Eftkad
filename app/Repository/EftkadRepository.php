@@ -155,14 +155,27 @@ class EftkadRepository
         $eftkad->seen()->firstOrCreate(['membership_code' => strtoupper($code)]);
     }
 
-    /** Gives each code access to the visit; people who already have a share are left alone. */
+    /**
+     * Gives each code access to the visit; people who already have a share are left alone, and
+     * sharing with yourself is ignored. A new share is "new" for the person it goes to, even if
+     * they had opened the visit before, so their seen mark is cleared.
+     */
     public function share(Eftkad $eftkad, array $codes, string $sharedBy): void
     {
         foreach ($codes as $code) {
-            $eftkad->shares()->firstOrCreate(
-                ['membership_code' => strtoupper($code)],
+            $code = strtoupper($code);
+            if ($code === strtoupper($sharedBy)) {
+                continue;
+            }
+
+            $share = $eftkad->shares()->firstOrCreate(
+                ['membership_code' => $code],
                 ['shared_by' => $sharedBy],
             );
+
+            if ($share->wasRecentlyCreated) {
+                $eftkad->seen()->where('membership_code', $code)->delete();
+            }
         }
     }
 

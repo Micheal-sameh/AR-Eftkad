@@ -515,3 +515,8 @@ main { min-height: calc(100vh - 5rem); }
 }
 
 .section-link { color: var(--primary); font-size: .72rem; font-weight: 650; }
+
+/* Count of new visits on the Home tab */
+.sidebar-nav a[data-nav-key], .bottom-nav a .bottom-icon { position: relative; }
+.nav-badge { position: absolute; top: -.25rem; inset-inline-end: -.25rem; min-width: 1.15rem; height: 1.15rem; padding: 0 .3rem; border-radius: 999px; background: #d64545; color: #fff; font-size: .68rem; font-weight: 700; line-height: 1; display: grid; place-items: center; }
+.sidebar-nav a .nav-badge { position: static; margin-inline-start: auto; }

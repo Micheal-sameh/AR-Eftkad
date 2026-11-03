@@ -67,8 +67,12 @@
             if (!dir.ok || !info.ok || !info.data || !info.data.data) { $('share-error').classList.remove('hidden'); return; }
 
             const d = dir.data.data || {};
+            const me = Eftkad.user();
+            const myCode = me && me.membership_code ? String(me.membership_code).toUpperCase() : '';
+            // You can't share a visit with yourself.
             people = (d.fathers || []).map(function (p) { return Object.assign({ role: T.father }, p); })
-                .concat((d.servants || []).map(function (p) { return Object.assign({ role: T.servant }, p); }));
+                .concat((d.servants || []).map(function (p) { return Object.assign({ role: T.servant }, p); }))
+                .filter(function (p) { return String(p.membership_code).toUpperCase() !== myCode; });
             assigned = info.data.data.assigned || [];
             original = info.data.data.shared_with || [];
             selected = new Set(original);
