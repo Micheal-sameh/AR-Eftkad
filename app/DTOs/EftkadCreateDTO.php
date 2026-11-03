@@ -18,6 +18,9 @@ class EftkadCreateDTO extends DTO
     public ?string $father_confession;
     public ?string $mother_confession;
     public ?string $children_confession;
+    public ?string $father_confessor;
+    public ?string $mother_confessor;
+    public ?string $children_confessor;
     public ?int $need_eftkad_by_father;
     public ?string $location;
     public ?string $location_url;
@@ -39,6 +42,9 @@ class EftkadCreateDTO extends DTO
         string $father_confession = parent::STRING,
         string $mother_confession = parent::STRING,
         string $children_confession = parent::STRING,
+        string $father_confessor = parent::STRING,
+        string $mother_confessor = parent::STRING,
+        string $children_confessor = parent::STRING,
         int $need_eftkad_by_father = parent::INT,
         string $location = parent::STRING,
         string $location_url = parent::STRING,

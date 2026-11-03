@@ -100,6 +100,8 @@
 
     const isYes = function (v) { return v === '1' || v === 1 || v === true; };
     const enumYes = function (r) { return !!r && r.value === 1; };
+    // "Yes" plus the confessor's name when one was recorded.
+    const confessionText = function (flag, name) { return isYes(flag) && name ? UI_TEXT.common.yes + ' - ' + name : ''; };
 
     async function loadDirectory() {
         const res = await Eftkad.cachedApi('/settings/filters');
@@ -137,9 +139,9 @@
         $('d-status').innerHTML = [
             statusItem(t.mass, !!e.mass_attendence && e.mass_attendence.value === 2, e.mass_attendence ? e.mass_attendence.name : ''),
             statusItem(t.meetings, enumYes(e.attend_meetings)),
-            statusItem(t.father_conf, isYes(e.father_confession)),
-            statusItem(t.mother_conf, isYes(e.mother_confession)),
-            statusItem(t.children_conf, isYes(e.children_confession)),
+            statusItem(t.father_conf, isYes(e.father_confession), confessionText(e.father_confession, e.father_confessor)),
+            statusItem(t.mother_conf, isYes(e.mother_confession), confessionText(e.mother_confession, e.mother_confessor)),
+            statusItem(t.children_conf, isYes(e.children_confession), confessionText(e.children_confession, e.children_confessor)),
             statusItem(t.need_meeting, isYes(e.need_eftkad_from_meeting)),
             statusItem(t.need_father, enumYes(e.need_eftkad_by_father)),
         ].join('');

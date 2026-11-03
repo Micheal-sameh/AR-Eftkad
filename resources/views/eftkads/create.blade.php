@@ -38,7 +38,7 @@
             <div class="form-grid">
                 <label class="field">
                     <span class="field-label">{{ __('ui.fg.form.member_code') }} *</span>
-                    <span class="input-shell" data-shell="membership_code"><input id="f-membership_code" type="text" placeholder="CH-0000" style="text-transform: uppercase" autocomplete="off" /></span>
+                    <span class="input-shell" data-shell="membership_code"><input id="f-membership_code" type="text" placeholder="E1C1FxxxNRx" style="text-transform: uppercase" autocomplete="off" /></span>
                     <span class="field-error" id="error-membership_code"></span>
                 </label>
                 <label class="field">
@@ -74,9 +74,14 @@
             <div class="type-options form-chips" id="mass-attendance-options" style="margin-bottom: 1rem"></div>
             <span class="field-error" id="error-mass_attendence"></span>
             <div class="toggle-grid">
-                @include('partials.toggle-row', ['id' => 'father_confession', 'label' => __('ui.fg.detail.father_conf')])
-                @include('partials.toggle-row', ['id' => 'mother_confession', 'label' => __('ui.fg.detail.mother_conf')])
-                @include('partials.toggle-row', ['id' => 'children_confession', 'label' => __('ui.fg.detail.children_conf')])
+                @foreach (['father', 'mother', 'children'] as $who)
+                    @include('partials.toggle-row', ['id' => $who.'_confession', 'label' => __('ui.fg.detail.'.$who.'_conf'), 'reveals' => 'field-'.$who.'_confessor'])
+                    <label class="field hidden" id="field-{{ $who }}_confessor" style="grid-column: 1 / -1">
+                        <span class="field-label">{{ __('ui.fg.detail.'.$who.'_confessor') }}</span>
+                        <span class="input-shell" data-shell="{{ $who }}_confessor"><input id="f-{{ $who }}_confessor" type="text" maxlength="255" autocomplete="off" /></span>
+                        <span class="field-error" id="error-{{ $who }}_confessor"></span>
+                    </label>
+                @endforeach
             </div>
         </section>
 
@@ -164,6 +169,8 @@
                 const on = row.getAttribute('aria-pressed') !== 'true';
                 row.setAttribute('aria-pressed', on ? 'true' : 'false');
                 row.querySelector('.toggle').classList.toggle('on', on);
+                // A confession toggle reveals the field for the confessor's name right below it.
+                if (row.dataset.reveals) $(row.dataset.reveals).classList.toggle('hidden', !on);
             });
         });
     }
@@ -321,6 +328,12 @@
             father_membership_code: $('f-father_membership_code').value.trim(),
             servant_membership_code: $('f-servant_membership_code').value.trim(),
         };
+
+        // The confessor's name is only sent when that confession toggle is on and a name was typed.
+        ['father', 'mother', 'children'].forEach(function (who) {
+            const name = $('f-' + who + '_confessor').value.trim();
+            if (boolToggle('f-' + who + '_confession') && name) payload[who + '_confessor'] = name;
+        });
 
         const res = await Eftkad.api('/eftkads', { method: 'POST', body: payload });
         setSaving(false);
