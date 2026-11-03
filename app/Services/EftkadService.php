@@ -21,7 +21,27 @@ class EftkadService
 
     public function show($id, ?User $viewer = null)
     {
-        return $this->eftkadRepository->show($id, $viewer)?->load('shares');
+        $eftkad = $this->eftkadRepository->show($id, $viewer)?->load('shares');
+
+        // Opening a visit clears its "new" flag on the viewer's home page.
+        if ($eftkad && $viewer?->membership_code) {
+            $this->eftkadRepository->markSeen($eftkad, $viewer->membership_code);
+        }
+
+        return $eftkad;
+    }
+
+    public function home(User $viewer): array
+    {
+        return $this->eftkadRepository->home($viewer);
+    }
+
+    /** The person who files a visit has obviously seen it. */
+    public function markSeen($eftkad, User $viewer): void
+    {
+        if ($viewer->membership_code) {
+            $this->eftkadRepository->markSeen($eftkad, $viewer->membership_code);
+        }
     }
 
     public function share($id, array $codes, User $viewer)

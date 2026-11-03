@@ -43,6 +43,8 @@ class EftkadResource extends JsonResource
             'father_membership_code' => $this->father_membership_code,
             'servant_membership_code' => $this->servant_membership_code,
             'type' => new EnumResource($this->type, EftkadType::class),
+            // Only present on the home page's "new" list: 'assigned' or 'shared'.
+            'new_reason' => $this->whenHas('new_reason'),
             // Only present on the detail view, where the relation is loaded.
             'shared_with' => $this->whenLoaded('shares', fn () => $this->shares->pluck('membership_code')->all()),
         ];

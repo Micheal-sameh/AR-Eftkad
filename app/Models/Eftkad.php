@@ -45,6 +45,11 @@ class Eftkad extends Model
         return $this->hasMany(EftkadShare::class);
     }
 
+    public function seen(): HasMany
+    {
+        return $this->hasMany(EftkadSeen::class);
+    }
+
     protected function membershipCode(): Attribute
     {
         return Attribute::make(

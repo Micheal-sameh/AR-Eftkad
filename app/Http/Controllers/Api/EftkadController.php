@@ -33,6 +33,7 @@ class EftkadController extends BaseController
         $input = new EftkadCreateDTO(...$data);
 
         $eftkad = $this->eftkadService->create($input);
+        $this->eftkadService->markSeen($eftkad, $user);
 
         return $this->apiResponse(new EftkadResource($eftkad));
     }
@@ -49,6 +50,16 @@ class EftkadController extends BaseController
             additional_data: [
                 'eftkads_count' => $data['eftkads_count'],
             ]);
+    }
+
+    public function home(Request $request)
+    {
+        $home = $this->eftkadService->home($request->user());
+
+        return $this->apiResponse([
+            'new' => EftkadResource::collection($home['new']),
+            'recent' => EftkadResource::collection($home['recent']),
+        ]);
     }
 
     public function share(EftkadShareRequest $request, $id)

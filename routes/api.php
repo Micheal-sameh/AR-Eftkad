@@ -38,6 +38,7 @@ Route::group(['prefix' => 'auth'], function () {
 });
 Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
     Route::group(['prefix' => 'eftkads'], function () {
+        Route::get('home', [EftkadController::class, 'home']);
         Route::get('detail/{id}', [EftkadController::class, 'show']);
         Route::post('detail/{id}/share', [EftkadController::class, 'share']);
         Route::delete('detail/{id}/share/{code}', [EftkadController::class, 'unshare']);

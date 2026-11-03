@@ -8,6 +8,7 @@ use App\Models\Eftkad;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class EftkadRepository
@@ -112,6 +113,46 @@ class EftkadRepository
     public function show($id, ?User $viewer = null)
     {
         return $this->visibleTo($viewer)->whereKey($id)->first();
+    }
+
+    /** Visits that belong to this person: assigned to them as father/servant, or shared with them. */
+    protected function mine(string $code): Builder
+    {
+        return $this->model->query()->where(fn (Builder $q) => $q
+            ->where('father_membership_code', $code)
+            ->orWhere('servant_membership_code', $code)
+            ->orWhereHas('shares', fn (Builder $s) => $s->where('membership_code', $code)));
+    }
+
+    /**
+     * The home page: what is new to this person (assigned to or shared with them and not opened yet)
+     * and their most recent visits.
+     *
+     * @return array{new: Collection, recent: Collection}
+     */
+    public function home(User $viewer, int $newLimit = 20, int $recentLimit = 5): array
+    {
+        $code = strtoupper((string) $viewer->membership_code);
+
+        $new = $this->mine($code)
+            ->whereDoesntHave('seen', fn (Builder $s) => $s->where('membership_code', $code))
+            ->with('shares')
+            ->orderByDesc('id')
+            ->limit($newLimit)
+            ->get()
+            ->each(function (Eftkad $e) use ($code) {
+                $assigned = $e->father_membership_code === $code || $e->servant_membership_code === $code;
+                $e->setAttribute('new_reason', $assigned ? 'assigned' : 'shared');
+            });
+
+        $recent = $this->mine($code)->orderByDesc('date')->orderByDesc('id')->limit($recentLimit)->get();
+
+        return ['new' => $new, 'recent' => $recent];
+    }
+
+    public function markSeen(Eftkad $eftkad, string $code): void
+    {
+        $eftkad->seen()->firstOrCreate(['membership_code' => strtoupper($code)]);
     }
 
     /** Gives each code access to the visit; people who already have a share are left alone. */

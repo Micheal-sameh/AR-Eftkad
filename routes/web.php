@@ -33,7 +33,9 @@ Route::withoutMiddleware([
     Route::view('/login', 'auth.login')->name('login');
     Route::view('/login/avarewase/callback', 'auth.avarewase-callback')->name('login.avarewase.callback');
 
-    Route::view('/visits', 'eftkads.index')->name('visits.index');
+    // /visits is the home page (what's new for me + my recent visits); the full list with filters is /visits/all.
+    Route::view('/visits', 'eftkads.home')->name('home');
+    Route::view('/visits/all', 'eftkads.index')->name('visits.index');
     Route::view('/visits/create', 'eftkads.create')->name('visits.create');
     Route::view('/visits/{id}', 'eftkads.show')->name('visits.show');
 

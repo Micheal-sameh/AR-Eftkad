@@ -9,11 +9,14 @@
 @include('partials.api-js')
 
 @php($nav = [
-    ['key' => 'visits', 'href' => '/visits', 'icon' => 'home', 'label' => __('ui.fg.nav.visits')],
+    ['key' => 'home', 'href' => '/visits', 'icon' => 'home', 'label' => __('ui.fg.nav.home')],
+    ['key' => 'visits', 'href' => '/visits/all', 'icon' => 'calendar', 'label' => __('ui.fg.nav.visits')],
     ['key' => 'create', 'href' => '/visits/create', 'icon' => 'plus', 'label' => __('ui.fg.nav.new_visit')],
     ['key' => 'directory', 'href' => '/directory', 'icon' => 'book', 'label' => __('ui.fg.nav.directory')],
     ['key' => 'users', 'href' => '/users', 'icon' => 'users', 'label' => __('ui.fg.nav.users'), 'managers' => true],
 ])
+{{-- Phone bottom bar: Home sits in the middle (Visits and New on one side, Directory and the rest on the other). --}}
+@php($bottomNav = collect($nav)->sortBy(fn ($item) => ['visits' => 0, 'create' => 1, 'home' => 2, 'directory' => 3, 'users' => 4][$item['key']])->values()->all())
 
 <div class="app-shell">
     <aside class="sidebar" id="sidebar">
@@ -88,7 +91,7 @@
     </div>
 
     <nav class="bottom-nav">
-        @foreach ($nav as $item)
+        @foreach ($bottomNav as $item)
             @php($active = ($activeNav ?? '') === $item['key'])
             <a href="{{ $item['href'] }}" class="{{ $active ? 'active' : '' }} {{ $item['key'] === 'create' ? 'new-action' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif @if($active) aria-current="page" @endif>
                 <span class="bottom-icon"><x-icon :name="$item['icon']" /></span>
