@@ -423,7 +423,7 @@ main { min-height: calc(100vh - 5rem); }
   .language-toggle button { min-width: 1.65rem; height: 1.65rem; }
   .profile-button > span { width: 2rem; height: 2rem; }
   .topbar-brand { font-size: .98rem; }
-  .profile-button { display: none; }
+  .profile-button { padding: .1rem; }
   .install-banner { min-height: 3.9rem; gap: .55rem; }
   .install-banner .button { min-height: 2.35rem; padding: .4rem .7rem; }
   .install-banner > .icon-button { width: 2rem; }
