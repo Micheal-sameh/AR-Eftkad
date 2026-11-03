@@ -9,10 +9,11 @@ use Spatie\Permission\Models\Role;
 class RolesAndPermissionsSeeder extends Seeder
 {
     /**
-     * Three-tier authorization roles:
-     * - user: no special permissions - regular member, can create/see all visits.
-     * - admin: everything a user can do, plus managing users (list/view/change type).
-     * - superadmin: everything admin has, plus assigning roles.
+     * Four-tier authorization roles:
+     * - user: no special permissions - regular member, cannot see the users page.
+     * - admin: everything a user can do, plus assigning/editing servants only.
+     * - superadmin: everything admin has, plus assigning admins and user types (father/servant).
+     * - owner: can do anything in the app, including assigning superadmins.
      */
     public function run(): void
     {
@@ -26,6 +27,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ->syncPermissions([$manageUsers, $manageVisits]);
 
         Role::firstOrCreate(['name' => 'superadmin'])
+            ->syncPermissions([$manageUsers, $manageVisits, $manageRoles]);
+
+        Role::firstOrCreate(['name' => 'owner'])
             ->syncPermissions([$manageUsers, $manageVisits, $manageRoles]);
     }
 }

@@ -118,19 +118,36 @@
         }).join('');
     }
 
+    const RANKS = { user: 0, admin: 1, superadmin: 2, owner: 3 };
+
+    function myRole() {
+        const me = Eftkad.user();
+        return me && me.role ? me.role.value : 'user';
+    }
+
+    // Mirrors the API: the owner manages everyone, anyone else only users ranked below them.
+    function canManage(u) {
+        const mine = myRole();
+        return mine === 'owner' || (RANKS[u.role ? u.role.value : 'user'] || 0) < (RANKS[mine] || 0);
+    }
+
     function openModal(u) {
         editing = u;
         $('m-initials').textContent = Eftkad.initials(u.name);
         $('m-name').textContent = u.name || UI_TEXT.common.dash;
         $('m-code').textContent = u.membership_code || UI_TEXT.common.dash;
         $('m-error').classList.add('hidden');
-        $('m-type').innerHTML = optionsHtml(enums.user_type, u.type ? u.type.value : '');
+        const mine = myRole();
+        // Admins only assign/edit servants; superadmin and owner pick any type.
+        const types = (enums.user_type || []).filter(function (t) { return mine !== 'admin' || t.value === 2; });
+        $('m-type').innerHTML = optionsHtml(types, u.type ? u.type.value : '');
         if (!u.type) $('m-type').insertAdjacentHTML('afterbegin', '<option value="" selected disabled>' + Eftkad.esc(UI_TEXT.users.pending_type) + '</option>');
 
-        const me = Eftkad.user();
-        const isSuper = me && me.role && me.role.value === 'superadmin';
-        $('m-role-field').classList.toggle('hidden', !isSuper);
-        if (isSuper) $('m-role').innerHTML = optionsHtml(enums.user_role, u.role ? u.role.value : '');
+        // Superadmins hand out roles below their own; the owner hands out any.
+        const canAssignRole = mine === 'superadmin' || mine === 'owner';
+        const roles = (enums.user_role || []).filter(function (r) { return mine === 'owner' || RANKS[r.value] < RANKS[mine]; });
+        $('m-role-field').classList.toggle('hidden', !canAssignRole);
+        if (canAssignRole) $('m-role').innerHTML = optionsHtml(roles, u.role ? u.role.value : '');
 
         $('user-modal').classList.remove('hidden');
     }
@@ -172,6 +189,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
+        if (myRole() === 'user') { window.location.replace('/visits'); return; }
         loadUsers();
         Eftkad.cachedApi('/settings/enums').then(function (res) {
             if (res.ok && res.data) enums = res.data.data || {};
@@ -181,7 +199,7 @@
             const row = e.target.closest('.user-row');
             if (!row) return;
             const u = allUsers.find(function (x) { return String(x.id) === row.dataset.id; });
-            if (u) openModal(u);
+            if (u && canManage(u)) openModal(u);
         });
         $('modal-backdrop').addEventListener('click', closeModal);
         $('modal-close').addEventListener('click', closeModal);

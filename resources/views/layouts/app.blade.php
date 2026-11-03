@@ -12,7 +12,7 @@
     ['key' => 'visits', 'href' => '/visits', 'icon' => 'home', 'label' => __('ui.fg.nav.visits')],
     ['key' => 'create', 'href' => '/visits/create', 'icon' => 'plus', 'label' => __('ui.fg.nav.new_visit')],
     ['key' => 'directory', 'href' => '/directory', 'icon' => 'book', 'label' => __('ui.fg.nav.directory')],
-    ['key' => 'users', 'href' => '/users', 'icon' => 'users', 'label' => __('ui.fg.nav.users')],
+    ['key' => 'users', 'href' => '/users', 'icon' => 'users', 'label' => __('ui.fg.nav.users'), 'managers' => true],
 ])
 
 <div class="app-shell">
@@ -27,7 +27,7 @@
         </div>
         <nav class="sidebar-nav">
             @foreach ($nav as $item)
-                <a href="{{ $item['href'] }}" class="{{ ($activeNav ?? '') === $item['key'] ? 'active' : '' }}">
+                <a href="{{ $item['href'] }}" class="{{ ($activeNav ?? '') === $item['key'] ? 'active' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif>
                     <x-icon :name="$item['icon']" />
                     <span>{{ $item['label'] }}</span>
                 </a>
@@ -90,7 +90,7 @@
     <nav class="bottom-nav">
         @foreach ($nav as $item)
             @php($active = ($activeNav ?? '') === $item['key'])
-            <a href="{{ $item['href'] }}" class="{{ $active ? 'active' : '' }} {{ $item['key'] === 'create' ? 'new-action' : '' }}" @if($active) aria-current="page" @endif>
+            <a href="{{ $item['href'] }}" class="{{ $active ? 'active' : '' }} {{ $item['key'] === 'create' ? 'new-action' : '' }} {{ ! empty($item['managers']) ? 'hidden' : '' }}" @if(! empty($item['managers'])) data-managers-only @endif @if($active) aria-current="page" @endif>
                 <span class="bottom-icon"><x-icon :name="$item['icon']" /></span>
                 <small>{{ $item['label'] }}</small>
             </a>
@@ -135,13 +135,17 @@
                     if (me && typeof me.font_size === 'number') {
                         Eftkad.applyFontSize(me.font_size);
                         var u = Eftkad.user();
-                        if (u) { u.font_size = me.font_size; localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); }
+                        if (u) { u.font_size = me.font_size; u.role = me.role; localStorage.setItem(Eftkad.USER_KEY, JSON.stringify(u)); }
                     }
                 }).catch(function () {});
             }
         } catch (e) {}
 
         var user = Eftkad.user();
+        // The users page is for admins and above; plain users never see the link.
+        if (user && user.role && ['admin', 'superadmin', 'owner'].indexOf(user.role.value) !== -1) {
+            document.querySelectorAll('[data-managers-only]').forEach(function (el) { el.classList.remove('hidden'); });
+        }
         if (user) {
             var name = user.name || user.membership_code || '';
             var first = name.trim().split(/\s+/)[0];

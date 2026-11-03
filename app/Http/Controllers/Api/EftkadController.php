@@ -26,7 +26,7 @@ class EftkadController extends BaseController
 
         // A regular user can only record visits as themselves; only admins may file on behalf of others.
         $user = $request->user();
-        if (! $user->hasAnyRole([UserRole::ADMIN, UserRole::SUPERADMIN])) {
+        if (! $user->hasAnyRole(UserRole::MANAGERS)) {
             $data['servant_membership_code'] = $user->membership_code;
         }
 

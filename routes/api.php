@@ -43,11 +43,11 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
         Route::post('', [EftkadController::class, 'create']);
     });
 
-    Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin'], function () {
+    Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin|owner'], function () {
         Route::get('', [UserController::class, 'index']);
         Route::get('{id}', [UserController::class, 'show']);
         Route::patch('{id}/type', [UserController::class, 'updateType']);
-        Route::patch('{id}/role', [UserController::class, 'updateRole'])->middleware('role:superadmin');
+        Route::patch('{id}/role', [UserController::class, 'updateRole'])->middleware('role:superadmin|owner');
     });
 
     Route::group(['as' => 'api.', 'prefix' => 'settings'], function () {

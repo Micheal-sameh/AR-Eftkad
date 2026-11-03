@@ -38,14 +38,14 @@ class EftkadRepository
     }
 
     /**
-     * Admins and superadmins see every visit; everyone else only the visits they are
+     * Admins, superadmins and owners see every visit; everyone else only the visits they are
      * the assigned father or servant of.
      */
     protected function visibleTo(?User $viewer): Builder
     {
         $query = $this->model->query();
 
-        if ($viewer && $viewer->hasAnyRole([UserRole::ADMIN, UserRole::SUPERADMIN])) {
+        if ($viewer && $viewer->hasAnyRole(UserRole::MANAGERS)) {
             return $query;
         }
 
