@@ -103,7 +103,7 @@ return [
         'communication_means.*' => 'وسائل التواصل',
         'attend_meetings' => 'حضور الاجتماعات',
         'need_eftkad_from_meeting' => 'يحتاج زيارة من مسؤول الاجتماع',
-        'need_eftkad_by_father' => 'يحتاج زيارة من أب (كاهن)',
+        'need_eftkad_by_father' => 'يحتاج زيارة من أب كاهن',
         'father_confession' => 'اعتراف الأب',
         'mother_confession' => 'اعتراف الأم',
         'children_confession' => 'اعتراف الأبناء',

@@ -131,16 +131,17 @@
             </div>
             <div class="form-grid">
                 <label class="field">
-                    <span class="field-label">{{ __('ui.fg.form.father') }} *</span>
+                    <span class="field-label">{{ __('ui.fg.form.father') }}</span>
                     <span class="input-shell" data-shell="father_membership_code"><select id="f-father_membership_code"><option value="">{{ __('ui.visit_form.father_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
                     <span class="field-error" id="error-father_membership_code"></span>
                 </label>
                 <label class="field">
-                    <span class="field-label">{{ __('ui.fg.form.servant') }} *</span>
+                    <span class="field-label">{{ __('ui.fg.form.servant') }}</span>
                     <span class="input-shell" data-shell="servant_membership_code"><select id="f-servant_membership_code"><option value="">{{ __('ui.visit_form.servant_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
                     <span class="field-error" id="error-servant_membership_code"></span>
                 </label>
             </div>
+            <p style="margin: .5rem 0 0; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.form.father_or_servant_hint') }}</p>
             <label class="field" style="margin-top: .9rem">
                 <span class="field-label">{{ __('ui.fg.form.notes') }}</span>
                 <textarea id="f-general_notes" class="textarea" rows="4" placeholder="{{ __('ui.visit_form.general_notes_placeholder') }}"></textarea>
@@ -325,9 +326,13 @@
             mother_confession: boolToggle('f-mother_confession') ? '1' : '0',
             children_confession: boolToggle('f-children_confession') ? '1' : '0',
             general_notes: $('f-general_notes').value.trim(),
-            father_membership_code: $('f-father_membership_code').value.trim(),
-            servant_membership_code: $('f-servant_membership_code').value.trim(),
         };
+
+        // Only one of father / servant is required, so empty selections are not sent.
+        ['father', 'servant'].forEach(function (who) {
+            const code = $('f-' + who + '_membership_code').value.trim();
+            if (code) payload[who + '_membership_code'] = code;
+        });
 
         // The confessor's name is only sent when that confession toggle is on and a name was typed.
         ['father', 'mother', 'children'].forEach(function (who) {

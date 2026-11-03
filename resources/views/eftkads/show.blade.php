@@ -92,16 +92,16 @@
         return items.map(function (n) { return '<span class="chip selected">' + Eftkad.esc(n.name) + '</span>'; }).join('');
     }
 
-    function statusItem(label, yes, text) {
+    function statusItem(label, yes, text, note) {
         const shown = text || (yes ? UI_TEXT.common.yes : UI_TEXT.common.no);
         return `<div class="status-item"><span>${Eftkad.esc(label)}</span>
-            <span class="badge ${yes ? 'badge-green' : 'badge-neutral'}">${Eftkad.icon(yes ? 'check' : 'close', 13)}${Eftkad.esc(shown)}</span></div>`;
+            <span class="badge ${yes ? 'badge-green' : 'badge-neutral'}">${Eftkad.icon(yes ? 'check' : 'close', 13)}${Eftkad.esc(shown)}</span>${note ? `<span class="status-note">${Eftkad.esc(note)}</span>` : ''}</div>`;
     }
 
     const isYes = function (v) { return v === '1' || v === 1 || v === true; };
     const enumYes = function (r) { return !!r && r.value === 1; };
-    // "Yes" plus the confessor's name when one was recorded.
-    const confessionText = function (flag, name) { return isYes(flag) && name ? UI_TEXT.common.yes + ' - ' + name : ''; };
+    // "<whose confessor>: <name>" when the confession is on and a name was recorded.
+    const confessorNote = function (flag, label, name) { return isYes(flag) && name ? label + ': ' + name : ''; };
 
     async function loadDirectory() {
         const res = await Eftkad.cachedApi('/settings/filters');
@@ -139,9 +139,9 @@
         $('d-status').innerHTML = [
             statusItem(t.mass, !!e.mass_attendence && e.mass_attendence.value === 2, e.mass_attendence ? e.mass_attendence.name : ''),
             statusItem(t.meetings, enumYes(e.attend_meetings)),
-            statusItem(t.father_conf, isYes(e.father_confession), confessionText(e.father_confession, e.father_confessor)),
-            statusItem(t.mother_conf, isYes(e.mother_confession), confessionText(e.mother_confession, e.mother_confessor)),
-            statusItem(t.children_conf, isYes(e.children_confession), confessionText(e.children_confession, e.children_confessor)),
+            statusItem(t.father_conf, isYes(e.father_confession), '', confessorNote(e.father_confession, t.father_confessor, e.father_confessor)),
+            statusItem(t.mother_conf, isYes(e.mother_confession), '', confessorNote(e.mother_confession, t.mother_confessor, e.mother_confessor)),
+            statusItem(t.children_conf, isYes(e.children_confession), '', confessorNote(e.children_confession, t.children_confessor, e.children_confessor)),
             statusItem(t.need_meeting, isYes(e.need_eftkad_from_meeting)),
             statusItem(t.need_father, enumYes(e.need_eftkad_by_father)),
         ].join('');

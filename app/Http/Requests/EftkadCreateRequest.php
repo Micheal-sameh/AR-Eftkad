@@ -36,8 +36,9 @@ class EftkadCreateRequest extends FormRequest
             'location' => 'string|max:2000',
             'location_url' => 'nullable|string|max:2000|url:http,https',
             'general_notes' => 'string|max:5000',
-            'father_membership_code' => ['required', 'string', Rule::exists('users', 'membership_code')->where('type', UserType::FATHER)],
-            'servant_membership_code' => 'required|string|exists:users,membership_code',
+            // At least one of father / servant is required; the other is optional.
+            'father_membership_code' => ['required_without:servant_membership_code', 'nullable', 'string', Rule::exists('users', 'membership_code')->where('type', UserType::FATHER)],
+            'servant_membership_code' => 'required_without:father_membership_code|nullable|string|exists:users,membership_code',
             'type' => 'required|integer|in:'.implode(',', array_column(EftkadType::all(), 'value')),
         ];
     }

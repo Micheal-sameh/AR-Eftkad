@@ -306,6 +306,7 @@ return [
             'location_ok' => 'Location captured',
             'father' => 'Father',
             'servant' => 'Servant',
+            'father_or_servant_hint' => 'Choose at least one: a father or a servant.',
             'notes' => 'Visit Notes',
             'select' => 'Select',
             'banner_title' => 'Check required information',
