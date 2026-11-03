@@ -65,13 +65,13 @@
                 </div>
                 <button type="button" class="icon-button font-size-button" data-font-toggle aria-label="{{ __('ui.fg.font_size') }}" title="{{ __('ui.fg.font_size') }}">Aa</button>
                 <button type="button" class="icon-button" data-theme-toggle aria-label="{{ __('ui.fg.theme') }}"><span data-theme-icon style="display:contents"></span></button>
-                <div class="profile-button">
-                    <span id="profile-initials">··</span>
+                <a href="/profile" class="profile-button" aria-label="{{ __('ui.fg.profile.title') }}" title="{{ __('ui.fg.profile.title') }}">
+                    <span id="profile-initials"><x-icon name="user" :size="20" /></span>
                     <div class="desktop-only">
                         <strong id="profile-name">&nbsp;</strong>
                         <small id="profile-type">&nbsp;</small>
                     </div>
-                </div>
+                </a>
             </div>
         </header>
 
@@ -165,7 +165,6 @@
             if (first) {
                 document.getElementById('topbar-greeting').textContent = UI_TEXT.fg.greeting.replace(':name', first);
             }
-            document.getElementById('profile-initials').textContent = Eftkad.initials(name);
             document.getElementById('profile-name').textContent = name;
             document.getElementById('profile-type').textContent = (user.type && user.type.name) ? user.type.name : '';
         }

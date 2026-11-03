@@ -41,6 +41,8 @@ Route::withoutMiddleware([
 
     Route::view('/directory', 'directory.index')->name('directory.index');
 
+    Route::view('/profile', 'profile.index')->name('profile');
+
     Route::view('/users', 'users.index')->name('users.index');
     // Editing a user's type/role happens in a modal on the users list.
     Route::redirect('/users/{id}', '/users');
