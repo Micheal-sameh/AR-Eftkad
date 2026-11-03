@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Eftkad extends Model
 {
@@ -38,6 +39,11 @@ class Eftkad extends Model
         'needs' => 'array',
         'communication_means' => 'array',
     ];
+
+    public function shares(): HasMany
+    {
+        return $this->hasMany(EftkadShare::class);
+    }
 
     protected function membershipCode(): Attribute
     {

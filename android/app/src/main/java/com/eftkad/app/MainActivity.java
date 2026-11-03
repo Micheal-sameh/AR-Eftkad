@@ -95,6 +95,10 @@ public class MainActivity extends BridgeActivity {
     private String target = null; // "visits" or "login", set once the auth check has run
     private long stoppedAt = 0;
     private boolean prompting = false;
+    // A shared visit link (https://eftkad.avarewase.com/visits/<id>) the app was opened with; shown once
+    // the user is signed in and unlocked, instead of the visits list.
+    private String pendingLink = null;
+
     private View lockOverlay;
     // Set while the app is locked: what to run once the user passes the biometric check.
     private Runnable pendingUnlock = null;
@@ -111,6 +115,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pendingLink = visitLink(getIntent());
 
         // Hold the splash while the app decides where to go: /visits when the stored
         // token is valid (after biometric unlock), /login otherwise. The splash is
@@ -174,6 +179,28 @@ public class MainActivity extends BridgeActivity {
         });
 
         handler.postDelayed(splashTimeout, SPLASH_TIMEOUT_MS);
+    }
+
+    /** The visit URL carried by a VIEW intent, or null when it isn't one of our visit links. */
+    private String visitLink(Intent intent) {
+        Uri uri = intent == null ? null : intent.getData();
+        if (uri == null || !"https".equals(uri.getScheme()) || !"eftkad.avarewase.com".equals(uri.getHost())) return null;
+        String path = uri.getPath();
+        return path != null && path.matches("/visits/\\d+") ? BASE_URL + path : null;
+    }
+
+    // Tapped a shared link while the app is already running.
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String link = visitLink(intent);
+        if (link == null) return;
+        pendingLink = link;
+        // Already signed in and unlocked: go straight to it. Otherwise it opens after sign-in / unlock.
+        if ("visits".equals(target) && lockOverlay == null && pendingUnlock == null) {
+            pendingLink = null;
+            getBridge().getWebView().loadUrl(link);
+        }
     }
 
     private boolean onTargetPage(WebView view) {
@@ -603,7 +630,11 @@ public class MainActivity extends BridgeActivity {
     private void openVisits(WebView view) {
         // give the page a moment to paint before the system dialog appears
         handler.postDelayed(this::askForLocationOnce, 1500);
-        if (onTargetPage(view)) {
+        String link = pendingLink;
+        pendingLink = null;
+        if (link != null) {
+            view.loadUrl(link);
+        } else if (onTargetPage(view)) {
             handler.postDelayed(() -> { hideSplash(view); removeLockOverlay(); }, 350);
         } else {
             view.loadUrl(VISITS_URL);

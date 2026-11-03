@@ -62,6 +62,8 @@ class EftkadViewController: CAPBridgeViewController {
     private var lockIcon: UIImageView?
     private var lockStatus: UILabel?
     private var lockRetryButton: UIButton?
+    /// A shared visit link the app was opened with; shown once the user is signed in and unlocked.
+    private var pendingLink: URL?
     private var sessionUnlocked = false   // past the lock (or signed in fresh) during this launch
     private var hasToken = false
     private var backgroundedAt: Date?
@@ -127,6 +129,7 @@ class EftkadViewController: CAPBridgeViewController {
             } else {
                 sessionUnlocked = true
                 askForLocationOnce()
+                openPendingLink()
             }
         case "theme":
             applyStatusBar(dark: body["dark"] as? Bool ?? false)   // the site's own dark-mode switch
@@ -209,6 +212,21 @@ class EftkadViewController: CAPBridgeViewController {
         sessionUnlocked = true
         removeLockOverlay()
         askForLocationOnce()
+        openPendingLink()
+    }
+
+    /// Called by the SceneDelegate when a https://eftkad.avarewase.com/visits/<id> link opens the app.
+    func openSharedLink(_ url: URL) {
+        guard url.host == siteHost, url.path.range(of: #"^/visits/[0-9]+$"#, options: .regularExpression) != nil else { return }
+        pendingLink = url
+        // Already signed in and unlocked: go straight to it. Otherwise it opens after sign-in / unlock.
+        if sessionUnlocked && hasToken && lockOverlay == nil { openPendingLink() }
+    }
+
+    private func openPendingLink() {
+        guard let url = pendingLink else { return }
+        pendingLink = nil
+        webView?.load(URLRequest(url: url))
     }
 
     /// "Use login": forget the stored session and go to the sign-in page.

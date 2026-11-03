@@ -39,7 +39,7 @@ class EftkadRepository
 
     /**
      * Admins, superadmins and owners see every visit; everyone else only the visits they are
-     * the assigned father or servant of.
+     * the assigned father or servant of, or that were shared with them.
      */
     protected function visibleTo(?User $viewer): Builder
     {
@@ -52,7 +52,9 @@ class EftkadRepository
         $code = $viewer?->membership_code;
 
         return $query->where(fn (Builder $q) => $code
-            ? $q->where('father_membership_code', $code)->orWhere('servant_membership_code', $code)
+            ? $q->where('father_membership_code', $code)
+                ->orWhere('servant_membership_code', $code)
+                ->orWhereHas('shares', fn (Builder $s) => $s->where('membership_code', $code))
             : $q->whereRaw('1 = 0'));
     }
 
@@ -110,6 +112,22 @@ class EftkadRepository
     public function show($id, ?User $viewer = null)
     {
         return $this->visibleTo($viewer)->whereKey($id)->first();
+    }
+
+    /** Gives each code access to the visit; people who already have a share are left alone. */
+    public function share(Eftkad $eftkad, array $codes, string $sharedBy): void
+    {
+        foreach ($codes as $code) {
+            $eftkad->shares()->firstOrCreate(
+                ['membership_code' => strtoupper($code)],
+                ['shared_by' => $sharedBy],
+            );
+        }
+    }
+
+    public function unshare(Eftkad $eftkad, string $code): void
+    {
+        $eftkad->shares()->where('membership_code', strtoupper($code))->delete();
     }
 
     public function create($input)

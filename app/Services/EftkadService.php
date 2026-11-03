@@ -21,7 +21,31 @@ class EftkadService
 
     public function show($id, ?User $viewer = null)
     {
-        return $this->eftkadRepository->show($id, $viewer);
+        return $this->eftkadRepository->show($id, $viewer)?->load('shares');
+    }
+
+    public function share($id, array $codes, User $viewer)
+    {
+        $eftkad = $this->eftkadRepository->show($id, $viewer);
+
+        if ($eftkad) {
+            $this->eftkadRepository->share($eftkad, $codes, $viewer->membership_code);
+            $eftkad->load('shares');
+        }
+
+        return $eftkad;
+    }
+
+    public function unshare($id, string $code, User $viewer)
+    {
+        $eftkad = $this->eftkadRepository->show($id, $viewer);
+
+        if ($eftkad) {
+            $this->eftkadRepository->unshare($eftkad, $code);
+            $eftkad->load('shares');
+        }
+
+        return $eftkad;
     }
 
     public function create($input)

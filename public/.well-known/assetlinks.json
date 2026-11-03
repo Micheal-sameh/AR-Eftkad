@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.eftkad.app",
+      "sha256_cert_fingerprints": [
+        "46:D4:1A:2C:A3:8E:76:49:80:6C:EE:8B:68:66:85:1B:71:6E:C3:8A:FA:31:92:AD:F4:74:2D:D9:15:B7:09:60"
+      ]
+    }
+  }
+]

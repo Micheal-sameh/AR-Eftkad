@@ -51,6 +51,28 @@ class EftkadController extends BaseController
             ]);
     }
 
+    public function share(EftkadShareRequest $request, $id)
+    {
+        $eftkad = $this->eftkadService->share($id, $request->validated('membership_codes'), $request->user());
+
+        if (! $eftkad) {
+            return $this->apiErrorResponse(message: trans('messages.eftkad not found'), status_code: 404);
+        }
+
+        return $this->apiResponse(new EftkadResource($eftkad));
+    }
+
+    public function unshare(Request $request, $id, string $code)
+    {
+        $eftkad = $this->eftkadService->unshare($id, $code, $request->user());
+
+        if (! $eftkad) {
+            return $this->apiErrorResponse(message: trans('messages.eftkad not found'), status_code: 404);
+        }
+
+        return $this->apiResponse(new EftkadResource($eftkad));
+    }
+
     public function show(Request $request, $id)
     {
         $eftkad = $this->eftkadService->show($id, $request->user());

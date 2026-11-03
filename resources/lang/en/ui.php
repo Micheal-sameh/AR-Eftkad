@@ -86,6 +86,18 @@ return [
     ],
 
     'visit_detail' => [
+        'share_heading' => 'Share this visit',
+        'share_hint' => 'People you share with can open this visit from their list.',
+        'share_select' => 'Choose a father or servant',
+        'share_button' => 'Share',
+        'share_link' => 'Share link',
+        'share_done' => 'Visit shared',
+        'share_removed' => 'Access removed',
+        'share_copied' => 'Link copied',
+        'share_none' => 'Not shared with anyone yet',
+        'share_remove' => 'Remove',
+        'share_error' => 'Could not share the visit.',
+        'share_text' => 'Eftkad visit',
         'title' => 'Visit Details',
         'loading' => 'Loading...',
         'error' => 'Failed to load visit details.',
