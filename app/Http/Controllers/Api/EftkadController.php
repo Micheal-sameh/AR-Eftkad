@@ -6,6 +6,7 @@ use App\DTOs\EftkadCreateDTO;
 use App\Enums\UserRole;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\EftkadCreateRequest;
+use App\Http\Requests\EftkadShareRequest;
 use App\Http\Resources\EftkadResource;
 use App\Repository\EftkadRepository;
 use App\Services\EftkadService;
