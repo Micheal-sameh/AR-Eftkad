@@ -16,7 +16,9 @@
         </div>
     </div>
 
-    <div id="profile-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="profile-loading" aria-label="Loading" aria-hidden="true">
+        <div class="sk-card"><div class="sk-row"><span class="sk sk-avatar lg"></span><div class="sk-col"><span class="sk sk-line" style="width:45%;height:.9rem"></span><span class="sk sk-line" style="width:30%"></span></div></div><span class="sk sk-block"></span></div>
+    </div>
     <div id="profile-error" class="state-note is-error hidden">{{ __('ui.fg.profile.error') }}</div>
 
     <div class="form-layout hidden" id="profile-content">

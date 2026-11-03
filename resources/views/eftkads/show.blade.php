@@ -13,7 +13,17 @@
         {{ __('ui.fg.nav.visits') }}
     </a>
 
-    <div id="detail-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="detail-loading" aria-label="Loading" aria-hidden="true">
+        <div class="sk-row" style="margin-bottom:1.2rem">
+            <span class="sk sk-avatar lg"></span>
+            <div class="sk-col"><span class="sk sk-line" style="width:40%;height:.9rem"></span><span class="sk sk-line" style="width:25%"></span></div>
+        </div>
+        <div class="details-grid">
+            @for ($i = 0; $i < 4; $i++)
+                <div class="sk-card"><span class="sk sk-line" style="width:35%"></span><span class="sk sk-line" style="width:80%"></span><span class="sk sk-line" style="width:60%"></span></div>
+            @endfor
+        </div>
+    </div>
     <div id="detail-error" class="state-note is-error hidden">{{ __('ui.visit_detail.error') }}</div>
 
     <div id="detail-content" class="hidden">

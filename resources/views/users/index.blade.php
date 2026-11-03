@@ -22,7 +22,7 @@
         <kbd>⌘ K</kbd>
     </div>
 
-    <div id="users-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div id="users-loading" aria-label="Loading" style="display:grid;gap:.6rem">@include('partials.skeleton-people', ['count' => 6])</div>
     <div id="users-error" class="state-note is-error hidden">{{ __('ui.users.error') }}</div>
     <div id="users-empty" class="state-note hidden">{{ __('ui.users.empty') }}</div>
 

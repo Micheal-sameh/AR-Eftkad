@@ -29,7 +29,12 @@
         <button type="button" class="button button-secondary" id="home-retry"><span>{{ __('ui.fg.visits.retry') }}</span></button>
     </div>
 
-    <div class="is-loading-block" id="home-loading"><span class="spinner"></span></div>
+    <div id="home-loading" aria-label="Loading">
+        <span class="sk sk-heading"></span>
+        <div class="visits-grid">@include('partials.skeleton-cards', ['count' => 2])</div>
+        <span class="sk sk-heading"></span>
+        <div class="visits-grid">@include('partials.skeleton-cards', ['count' => 4])</div>
+    </div>
 
     <div id="home-content" class="hidden">
         <div class="list-heading">

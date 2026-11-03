@@ -46,73 +46,8 @@
 
     <div class="visits-grid" id="visits-grid"></div>
 
-    <div class="skeleton-stack" id="visits-loading" aria-label="Loading">
-        @for ($i = 0; $i < 2; $i++)
-        <div class="skeleton-preview"><span></span><div><i></i><i></i><i></i></div></div>
-        @endfor
-    </div>
-
-    <div class="empty-state hidden" id="visits-empty">
-        <div class="empty-icon"><x-icon name="calendar" :size="30" /></div>
-        <strong>{{ __('ui.fg.visits.empty_title') }}</strong>
-        <span>{{ __('ui.fg.visits.empty_text') }}</span>
-        <a href="/visits/create" class="button button-primary">
-            <x-icon name="plus" :size="18" />
-            <span>{{ __('ui.fg.visits.new_visit') }}</span>
-        </a>
-    </div>
-
-    <div class="feed-error hidden" id="visits-error" role="alert">
-        <span><x-icon name="alert" :size="19" /></span>
-        <div>
-            <strong>{{ __('ui.fg.visits.error_title') }}</strong>
-            <small>{{ __('ui.fg.visits.error_hint') }}</small>
-        </div>
-        <button type="button" class="button button-secondary" id="visits-retry"><span>{{ __('ui.fg.visits.retry') }}</span></button>
-    </div>
-
-    <button type="button" class="button button-secondary load-more hidden" id="visits-more">
-        <span>{{ __('ui.fg.visits.load_more') }}</span>
-        <x-icon name="chevron" :size="16" />
-    </button>
-
-    <div class="sheet-wrap" id="filter-sheet">
-        <div class="sheet-backdrop" id="filter-backdrop"></div>
-        <div class="sheet">
-            <div class="sheet-handle"></div>
-            <div class="section-header">
-                <div class="section-title">{{ __('ui.fg.visits.filters') }}</div>
-                <button type="button" class="icon-button" id="close-filters" aria-label="Close"><x-icon name="close" /></button>
-            </div>
-            <div class="sheet-fields">
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.visits.father') }}</span>
-                    <span class="input-shell"><select id="filter-father"><option value="">{{ __('ui.visits.filter_father_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                </label>
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.visits.servant') }}</span>
-                    <span class="input-shell"><select id="filter-servant"><option value="">{{ __('ui.visits.filter_servant_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                </label>
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.visits.type') }}</span>
-                    <span class="input-shell"><select id="filter-type"><option value="">{{ __('ui.visits.filter_type_all') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                </label>
-                <div class="form-grid">
-                    <label class="field">
-                        <span class="field-label">{{ __('ui.fg.visits.date_from') }}</span>
-                        <span class="input-shell"><input id="filter-date-from" type="date" /></span>
-                    </label>
-                    <label class="field">
-                        <span class="field-label">{{ __('ui.fg.visits.date_to') }}</span>
-                        <span class="input-shell"><input id="filter-date-to" type="date" /></span>
-                    </label>
-                </div>
-            </div>
-            <div class="sheet-actions">
-                <button type="button" class="button button-ghost" id="clear-filters"><span>{{ __('ui.fg.visits.clear') }}</span></button>
-                <button type="button" class="button button-primary" id="apply-filters"><span>{{ __('ui.fg.visits.apply') }}</span></button>
-            </div>
-        </div>
+    <div class="visits-grid" id="visits-loading" aria-label="Loading" style="margin-top:.85rem">
+        @include('partials.skeleton-cards', ['count' => 6])
     </div>
 </div>
 @endsection

@@ -27,7 +27,7 @@
         <button type="button" data-tab="servant">{{ __('ui.fg.directory.servants') }}<span id="count-servant">0</span></button>
     </div>
 
-    <div id="directory-loading" class="is-loading-block"><span class="spinner"></span></div>
+    <div class="people-grid" id="directory-loading" aria-label="Loading">@include('partials.skeleton-people', ['count' => 6])</div>
     <div id="directory-error" class="state-note is-error hidden">{{ __('ui.directory.error') }}</div>
     <div class="state-note hidden" id="directory-empty">{{ __('ui.directory.no_results') }}</div>
     <div class="people-grid" id="people-grid"></div>
