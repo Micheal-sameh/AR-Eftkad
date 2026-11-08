@@ -356,6 +356,17 @@ public class MainActivity extends BridgeActivity {
         return Math.round(v * getResources().getDisplayMetrics().density);
     }
 
+    // "1.1 (2)": versionName and versionCode of the installed build
+    @SuppressWarnings("deprecation")
+    private String installedVersionLabel() {
+        try {
+            android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return info.versionName + " (" + info.versionCode + ")";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     private void showLockOverlay() {
         if (lockOverlay != null) return;
         FrameLayout root = new FrameLayout(this);
@@ -417,6 +428,15 @@ public class MainActivity extends BridgeActivity {
         actionsParams.setMargins(dp(32), 0, dp(32), dp(40));
         root.addView(actions, actionsParams);
 
+        // build number, small and centred at the bottom of the splash-looking lock screen
+        TextView version = new TextView(this);
+        version.setText(installedVersionLabel());
+        version.setTextSize(12);
+        version.setTextColor(Color.parseColor("#647080"));
+        version.setGravity(Gravity.CENTER);
+        root.addView(version, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+        ((FrameLayout.LayoutParams) version.getLayoutParams()).bottomMargin = dp(14);
+
         lockOverlay = root;
         ((ViewGroup) findViewById(android.R.id.content)).addView(lockOverlay,
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -474,14 +494,8 @@ public class MainActivity extends BridgeActivity {
             }
 
             @JavascriptInterface
-            @SuppressWarnings("deprecation")
             public String appVersion() {
-                try {
-                    android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
-                    return info.versionName + " (" + info.versionCode + ")";
-                } catch (Exception e) {
-                    return "";
-                }
+                return installedVersionLabel();
             }
 
             @JavascriptInterface
