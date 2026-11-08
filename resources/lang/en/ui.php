@@ -262,7 +262,6 @@ return [
             'dark' => 'Dark',
             'not_set' => 'Not set',
             'version' => 'App version',
-            'version_web' => 'Web version',
             'error' => 'Could not load your details.',
         ],
         'nav' => [

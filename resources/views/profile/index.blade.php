@@ -52,8 +52,10 @@
                 <button type="button" class="chip" data-theme="dark"><x-icon name="moon" :size="16" /><span>{{ __('ui.fg.profile.dark') }}</span></button>
             </div>
 
-            <div class="field-label">{{ __('ui.fg.profile.version') }}</div>
-            <div id="p-version" dir="ltr" style="color:var(--ink-faint)">—</div>
+            <div id="p-version-wrap" class="hidden">
+                <div class="field-label">{{ __('ui.fg.profile.version') }}</div>
+                <div id="p-version" dir="ltr" style="color:var(--ink-faint)"></div>
+            </div>
         </section>
     </div>
 </div>
@@ -106,7 +108,10 @@
         // Installed app build (from the Android shell); a normal browser has no build number.
         let v = '';
         try { v = (window.EftkadNative && EftkadNative.appVersion && EftkadNative.appVersion()) || ''; } catch (e) {}
-        $('p-version').textContent = v || P.version_web;
+        if (v) {
+            $('p-version').textContent = v;
+            $('p-version-wrap').classList.remove('hidden');
+        }
 
         $('p-lang').addEventListener('click', function (e) {
             const b = e.target.closest('[data-lang]');
