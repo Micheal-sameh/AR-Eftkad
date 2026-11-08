@@ -78,11 +78,17 @@
         return '<span class="badge ' + (u.type.value === 1 ? 'badge-blue' : 'badge-green') + '">' + Eftkad.esc(u.type.name) + '</span>';
     }
 
+    // Shown for anything above a plain user, so admins and the owner are visible in the list.
+    function roleBadge(u) {
+        if (!u.role || u.role.value === 'user') return '';
+        return '<span class="badge badge-gold">' + Eftkad.esc(u.role.name) + '</span>';
+    }
+
     function renderRow(u) {
         return `<button type="button" class="user-row" data-id="${u.id}">
             <span class="user-cell"><span class="person-avatar small">${Eftkad.esc(Eftkad.initials(u.name))}</span><strong>${Eftkad.esc(u.name)}</strong></span>
             <span dir="ltr" style="justify-self:start">${Eftkad.esc(u.membership_code || UI_TEXT.common.dash)}</span>
-            <span>${typeBadge(u)}</span>
+            <span style="display:flex;flex-wrap:wrap;gap:.3rem">${typeBadge(u)}${roleBadge(u)}</span>
             ${Eftkad.icon('chevron', 18)}
         </button>`;
     }

@@ -41,6 +41,8 @@ Route::withoutMiddleware([
 
     Route::view('/directory', 'directory.index')->name('directory.index');
 
+    Route::view('/about', 'about.index')->name('about');
+
     Route::view('/profile', 'profile.index')->name('profile');
 
     Route::view('/users', 'users.index')->name('users.index');

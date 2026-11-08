@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AboutController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EftkadController;
 use App\Http\Controllers\Api\SettingController;
@@ -46,6 +47,10 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
         Route::get('{all?}', [EftkadController::class, 'index']);
         Route::post('', [EftkadController::class, 'create']);
     });
+
+    Route::get('about', [AboutController::class, 'show']);
+    Route::put('about', [AboutController::class, 'update'])->middleware('role:owner');
+    Route::post('about/image', [AboutController::class, 'uploadImage'])->middleware('role:owner');
 
     Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin|owner'], function () {
         Route::get('', [UserController::class, 'index']);

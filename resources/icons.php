@@ -13,6 +13,7 @@ return [
     'search' => '<circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />',
     'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" />',
     'user' => '<circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" />',
+    'info' => '<circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.01" />',
     'cross' => '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" />',
     'chevron' => '<path d="m9 18 6-6-6-6" />',
     'moon' => '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z" />',

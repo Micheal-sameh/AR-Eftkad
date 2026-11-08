@@ -14,9 +14,10 @@
     ['key' => 'create', 'href' => '/visits/create', 'icon' => 'plus', 'label' => __('ui.fg.nav.new_visit')],
     ['key' => 'directory', 'href' => '/directory', 'icon' => 'book', 'label' => __('ui.fg.nav.directory')],
     ['key' => 'users', 'href' => '/users', 'icon' => 'users', 'label' => __('ui.fg.nav.users'), 'managers' => true],
+    ['key' => 'about', 'href' => '/about', 'icon' => 'info', 'label' => __('ui.fg.about.title'), 'sidebar_only' => true],
 ])
 {{-- Phone bottom bar: Home sits in the middle (Visits and New on one side, Directory and the rest on the other). --}}
-@php($bottomNav = collect($nav)->sortBy(fn ($item) => ['visits' => 0, 'create' => 1, 'home' => 2, 'directory' => 3, 'users' => 4][$item['key']])->values()->all())
+@php($bottomNav = collect($nav)->reject(fn ($item) => ! empty($item['sidebar_only']))->sortBy(fn ($item) => ['visits' => 0, 'create' => 1, 'home' => 2, 'directory' => 3, 'users' => 4][$item['key']])->values()->all())
 
 <div class="app-shell">
     <aside class="sidebar" id="sidebar">
@@ -71,6 +72,7 @@
                     </button>
                     <div class="menu-pop hidden" id="profile-pop" role="menu">
                         <a href="/profile" role="menuitem"><x-icon name="user" :size="18" /><span>{{ __('ui.fg.profile.title') }}</span></a>
+                        <a href="/about" role="menuitem"><x-icon name="info" :size="18" /><span>{{ __('ui.fg.about.title') }}</span></a>
                         <button type="button" role="menuitem" class="danger" data-signout><x-icon name="logout" :size="18" /><span>{{ __('ui.fg.nav.sign_out') }}</span></button>
                     </div>
                 </div>
