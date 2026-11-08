@@ -361,7 +361,7 @@ public class MainActivity extends BridgeActivity {
     private String installedVersionLabel() {
         try {
             android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
-            return info.versionName + " (" + info.versionCode + ")";
+            return info.versionName;
         } catch (Exception e) {
             return "";
         }
@@ -591,7 +591,7 @@ public class MainActivity extends BridgeActivity {
         card.addView(dialogLogo());
         card.addView(dialogText("تحديث جديد / Update available", 18, "#263547", true, 14));
 
-        TextView chip = dialogText("v" + info.optString("versionName") + " (" + info.optInt("versionCode") + ")", 13, "#3F5D6D", true, 10);
+        TextView chip = dialogText("v" + info.optString("versionName"), 13, "#3F5D6D", true, 10);
         GradientDrawable chipBg = new GradientDrawable();
         chipBg.setColor(Color.parseColor("#E6EDEF"));
         chipBg.setCornerRadius(dp(20));
