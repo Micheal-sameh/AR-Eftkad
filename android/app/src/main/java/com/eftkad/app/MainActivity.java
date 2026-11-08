@@ -474,6 +474,17 @@ public class MainActivity extends BridgeActivity {
             }
 
             @JavascriptInterface
+            @SuppressWarnings("deprecation")
+            public String appVersion() {
+                try {
+                    android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    return info.versionName + " (" + info.versionCode + ")";
+                } catch (Exception e) {
+                    return "";
+                }
+            }
+
+            @JavascriptInterface
             public void route(String destination) {
                 runOnUiThread(() -> {
                     if (target != null) return;

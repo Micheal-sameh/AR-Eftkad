@@ -47,10 +47,13 @@
             </div>
 
             <div class="field-label">{{ __('ui.fg.profile.theme') }}</div>
-            <div class="chips form-chips" id="p-theme">
+            <div class="chips form-chips" id="p-theme" style="margin-bottom: 1.1rem">
                 <button type="button" class="chip" data-theme="light"><x-icon name="sun" :size="16" /><span>{{ __('ui.fg.profile.light') }}</span></button>
                 <button type="button" class="chip" data-theme="dark"><x-icon name="moon" :size="16" /><span>{{ __('ui.fg.profile.dark') }}</span></button>
             </div>
+
+            <div class="field-label">{{ __('ui.fg.profile.version') }}</div>
+            <div id="p-version" dir="ltr" style="color:var(--ink-faint)">—</div>
         </section>
     </div>
 </div>
@@ -99,6 +102,11 @@
         if (!Eftkad.requireAuth()) return;
         loadProfile();
         markChoices();
+
+        // Installed app build (from the Android shell); a normal browser has no build number.
+        let v = '';
+        try { v = (window.EftkadNative && EftkadNative.appVersion && EftkadNative.appVersion()) || ''; } catch (e) {}
+        $('p-version').textContent = v || P.version_web;
 
         $('p-lang').addEventListener('click', function (e) {
             const b = e.target.closest('[data-lang]');
