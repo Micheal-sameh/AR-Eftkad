@@ -1,8 +1,8 @@
 {
-  "versionCode": 3,
-  "versionName": "1.2",
+  "versionCode": 4,
+  "versionName": "1.0.0",
   "url": "https://eftkad.avarewase.com/app/eftkad.apk",
-  "sha256": "ec9891496c1b6e7e1242d1844cfd17ae5c76fe39afcb4f184741fc194a052d7a",
-  "notes": "رقم الإصدار يظهر في الملف الشخصي وشاشة القفل / App version shown in Profile and lock screen",
+  "sha256": "cfdf9cd0f2ce9ca91ef613a51aae4e4c096d517985018a88294fa9bb072bf33a",
+  "notes": "الإصدار الأول / First release",
   "force": false
 }
