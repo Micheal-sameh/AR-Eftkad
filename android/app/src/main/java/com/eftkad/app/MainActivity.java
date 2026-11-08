@@ -586,21 +586,109 @@ public class MainActivity extends BridgeActivity {
         if (isFinishing() || updateDialog != null) return;
         boolean force = info.optBoolean("force", false);
         String notes = info.optString("notes", "");
-        AlertDialog.Builder b = new AlertDialog.Builder(this)
-            .setTitle("تحديث جديد / Update available")
-            .setMessage("الإصدار " + info.optString("versionName") + (notes.isEmpty() ? "" : "\n" + notes)
-                + "\n\nلأفضل تجربة، حدّث التطبيق الآن.\nUpdate Eftkad now for the best experience.")
-            .setCancelable(!force)
-            .setPositiveButton("تحديث / Update", (d, w) -> { updateDialog = null; startUpdate(info); });
-        if (!force) b.setNegativeButton("لاحقاً / Later", (d, w) -> updateDialog = null);
-        updateDialog = b.create();
-        updateDialog.setOnDismissListener(d -> updateDialog = null);
-        updateDialog.show();
+
+        LinearLayout card = dialogCard();
+        card.addView(dialogLogo());
+        card.addView(dialogText("تحديث جديد / Update available", 18, "#263547", true, 14));
+
+        TextView chip = dialogText("v" + info.optString("versionName") + " (" + info.optInt("versionCode") + ")", 13, "#3F5D6D", true, 10);
+        GradientDrawable chipBg = new GradientDrawable();
+        chipBg.setColor(Color.parseColor("#E6EDEF"));
+        chipBg.setCornerRadius(dp(20));
+        chip.setBackground(chipBg);
+        chip.setPadding(dp(14), dp(5), dp(14), dp(5));
+        LinearLayout.LayoutParams chipLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        chipLp.gravity = Gravity.CENTER_HORIZONTAL;
+        card.addView(chip, chipLp);
+
+        if (!notes.isEmpty()) card.addView(dialogText(notes, 14, "#263547", false, 14));
+        card.addView(dialogText("لأفضل تجربة، حدّث التطبيق الآن.\nUpdate Eftkad now for the best experience.", 13, "#647080", false, 14));
+
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(card).setCancelable(!force).create();
+
+        Button update = new Button(this);
+        update.setText("تحديث / Update");
+        update.setAllCaps(false);
+        update.setTextColor(Color.WHITE);
+        update.setTextSize(16);
+        update.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable btnBg = new GradientDrawable();
+        btnBg.setColor(Color.parseColor("#3F5D6D"));
+        btnBg.setCornerRadius(dp(14));
+        update.setBackground(btnBg);
+        update.setOnClickListener(v -> { updateDialog = null; dialog.dismiss(); startUpdate(info); });
+        LinearLayout.LayoutParams updateLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(50));
+        updateLp.topMargin = dp(20);
+        card.addView(update, updateLp);
+
+        if (!force) {
+            Button later = new Button(this);
+            later.setText("لاحقاً / Later");
+            later.setAllCaps(false);
+            later.setTextColor(Color.parseColor("#647080"));
+            later.setTextSize(14);
+            later.setBackgroundColor(Color.TRANSPARENT);
+            later.setOnClickListener(v -> dialog.dismiss());
+            card.addView(later, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46)));
+        }
+
+        updateDialog = dialog;
+        dialog.setOnDismissListener(d -> updateDialog = null);
+        dialog.show();
+        styleDialogWindow(dialog);
+    }
+
+    // ---- dialog styling (same palette as the site: warm surface, slate-blue primary, rounded corners) ----
+
+    private LinearLayout dialogCard() {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(24), dp(24), dp(24), dp(14));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor("#FFFEFA"));
+        bg.setCornerRadius(dp(22));
+        card.setBackground(bg);
+        return card;
+    }
+
+    private ImageView dialogLogo() {
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.mipmap.ic_launcher);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(64), dp(64));
+        lp.gravity = Gravity.CENTER_HORIZONTAL;
+        lp.bottomMargin = dp(14);
+        logo.setLayoutParams(lp);
+        return logo;
+    }
+
+    private TextView dialogText(String text, int sp, String color, boolean bold, int topMarginDp) {
+        TextView t = new TextView(this);
+        t.setText(text);
+        t.setTextSize(sp);
+        t.setTextColor(Color.parseColor(color));
+        t.setGravity(Gravity.CENTER);
+        t.setTextDirection(View.TEXT_DIRECTION_LOCALE);
+        if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(topMarginDp);
+        t.setLayoutParams(lp);
+        return t;
+    }
+
+    private void styleDialogWindow(AlertDialog dialog) {
+        if (dialog.getWindow() == null) return;
+        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(Math.min(dp(340), getResources().getDisplayMetrics().widthPixels - dp(40)), ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    // Before Android 8 there is no per-app "install unknown apps" switch (one global setting instead)
+    private boolean canInstallPackages() {
+        return android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O || getPackageManager().canRequestPackageInstalls();
     }
 
     private void startUpdate(JSONObject info) {
         // Android asks the user to allow installs from this app once.
-        if (!getPackageManager().canRequestPackageInstalls()) {
+        if (!canInstallPackages()) {
             pendingUpdate = info;
             Toast.makeText(this, "اسمح بالتثبيت من هذا التطبيق ثم ارجع / Allow installs from this app, then come back", Toast.LENGTH_LONG).show();
             startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName())));
@@ -608,12 +696,22 @@ public class MainActivity extends BridgeActivity {
         }
         pendingUpdate = null;
 
-        AlertDialog progress = new AlertDialog.Builder(this)
-            .setTitle("جاري التحميل / Downloading")
-            .setMessage("0%")
-            .setCancelable(false)
-            .create();
+        LinearLayout card = dialogCard();
+        card.setPadding(dp(24), dp(24), dp(24), dp(24));
+        card.addView(dialogLogo());
+        card.addView(dialogText("جاري التحميل / Downloading", 17, "#263547", true, 4));
+        TextView pct = dialogText("0%", 14, "#647080", false, 10);
+        card.addView(pct);
+        android.widget.ProgressBar bar = new android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);
+        bar.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#3F5D6D")));
+        bar.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#E6EDEF")));
+        LinearLayout.LayoutParams barLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(8));
+        barLp.topMargin = dp(12);
+        card.addView(bar, barLp);
+        AlertDialog progress = new AlertDialog.Builder(this).setView(card).setCancelable(false).create();
         progress.show();
+        styleDialogWindow(progress);
 
         new Thread(() -> {
             try {
@@ -633,11 +731,12 @@ public class MainActivity extends BridgeActivity {
                         out.write(buf, 0, n);
                         sha.update(buf, 0, n);
                         done += n;
-                        int pct = total > 0 ? (int) (done * 100 / total) : -1;
-                        if (pct != last) {
-                            last = pct;
-                            final String text = pct >= 0 ? pct + "%" : "…";
-                            runOnUiThread(() -> progress.setMessage(text));
+                        int pct0 = total > 0 ? (int) (done * 100 / total) : -1;
+                        if (pct0 != last) {
+                            last = pct0;
+                            final String text = pct0 >= 0 ? pct0 + "%" : "…";
+                            final int shown = Math.max(pct0, 0);
+                            runOnUiThread(() -> { pct.setText(text); bar.setProgress(shown); });
                         }
                     }
                 }
@@ -716,7 +815,7 @@ public class MainActivity extends BridgeActivity {
             && System.currentTimeMillis() - stoppedAt > RELOCK_AFTER_MS && biometricAvailable();
         stoppedAt = 0;
         // back from the "install unknown apps" settings screen with the permission granted
-        if (pendingUpdate != null && getPackageManager().canRequestPackageInstalls()) startUpdate(pendingUpdate);
+        if (pendingUpdate != null && canInstallPackages()) startUpdate(pendingUpdate);
         if (!relock && lockOverlay != null && pendingUnlock != null && !prompting && fingerprintEnrolled()) {
             authenticate(pendingUnlock);
         }
