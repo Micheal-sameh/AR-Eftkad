@@ -24,6 +24,7 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
+import android.app.Dialog;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -60,6 +61,7 @@ public class MainActivity extends BridgeActivity {
     private static final String BASE_URL = "https://eftkad.avarewase.com";
     private static final String VISITS_URL = BASE_URL + "/visits";
     private static final String LOGIN_URL = BASE_URL + "/login";
+    private static final String ABOUT_URL = BASE_URL + "/about/info";
     private static final String OFFLINE_URL = "file:///android_asset/public/offline.html";
     // Same page, in "server problem" mode: says the service is unavailable and retries by itself.
     private static final String SERVER_ERROR_URL = OFFLINE_URL + "#server";
@@ -411,6 +413,14 @@ public class MainActivity extends BridgeActivity {
         login.setBackgroundColor(Color.TRANSPARENT);
         login.setOnClickListener(v -> { pendingUnlock = null; signOut(); });
 
+        Button about = new Button(this);
+        about.setText("عن التطبيق / About");
+        about.setAllCaps(false);
+        about.setTextColor(Color.parseColor("#647080"));
+        about.setTextSize(14);
+        about.setBackgroundColor(Color.TRANSPARENT);
+        about.setOnClickListener(v -> showAboutDialog());
+
         LinearLayout actions = new LinearLayout(this);
         actions.setOrientation(LinearLayout.VERTICAL);
         actions.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -423,6 +433,7 @@ public class MainActivity extends BridgeActivity {
         LinearLayout.LayoutParams loginParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
         loginParams.topMargin = dp(8);
         actions.addView(login, loginParams);
+        actions.addView(about, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
         FrameLayout.LayoutParams actionsParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         actionsParams.setMargins(dp(32), 0, dp(32), dp(40));
@@ -440,6 +451,34 @@ public class MainActivity extends BridgeActivity {
         lockOverlay = root;
         ((ViewGroup) findViewById(android.R.id.content)).addView(lockOverlay,
             new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    /** Public About page (no sign-in needed), shown full screen over the lock screen with a close button. */
+    private void showAboutDialog() {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        FrameLayout box = new FrameLayout(this);
+        box.setBackgroundColor(Color.WHITE);
+
+        WebView web = new WebView(this);
+        web.getSettings().setJavaScriptEnabled(true);
+        web.getSettings().setDomStorageEnabled(true);
+        web.setWebViewClient(new android.webkit.WebViewClient());
+        web.loadUrl(ABOUT_URL);
+        FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        webParams.topMargin = dp(56);
+        box.addView(web, webParams);
+
+        Button close = new Button(this);
+        close.setText("إغلاق / Close");
+        close.setAllCaps(false);
+        close.setTextColor(Color.parseColor("#3F5D6D"));
+        close.setBackgroundColor(Color.TRANSPARENT);
+        close.setOnClickListener(v -> dialog.dismiss());
+        box.addView(close, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(56), Gravity.TOP | Gravity.END));
+
+        dialog.setContentView(box);
+        dialog.setOnDismissListener(d -> web.destroy());
+        dialog.show();
     }
 
     private void removeLockOverlay() {
