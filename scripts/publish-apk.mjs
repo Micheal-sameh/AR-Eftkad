@@ -1,7 +1,7 @@
 // Publishes the built Android APK for in-app updates (OTA).
 //
 //   1. Bump versionCode / versionName in android/app/build.gradle
-//   2. cd android && gradlew assembleDebug   (or assembleRelease)
+//   2. cd android && gradlew assembleSideloadDebug   (or assembleRelease)
 //   3. node scripts/publish-apk.mjs [--notes "what changed"] [--force] [--apk path/to/app.apk]
 //   4. Deploy: the app downloads public/app/eftkad.apk and checks public/app/version.json
 //
@@ -24,11 +24,11 @@ if (!versionCode || !versionName) throw new Error('Could not read versionCode/ve
 
 const candidates = [
     value('--apk'),
-    join(root, 'android/app/build/outputs/apk/release/app-release.apk'),
-    join(root, 'android/app/build/outputs/apk/debug/app-debug.apk'),
+    join(root, 'android/app/build/outputs/apk/sideload/release/app-sideload-release.apk'),
+    join(root, 'android/app/build/outputs/apk/sideload/debug/app-sideload-debug.apk'),
 ].filter(Boolean);
 const source = candidates.find((p) => existsSync(p));
-if (!source) throw new Error('No APK found. Build it first (cd android && gradlew assembleDebug).');
+if (!source) throw new Error('No APK found. Build it first (cd android && gradlew assembleSideloadDebug).');
 
 const outDir = join(root, 'public/app');
 mkdirSync(outDir, { recursive: true });

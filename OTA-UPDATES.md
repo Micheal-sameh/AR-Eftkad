@@ -9,7 +9,7 @@ The app is a Capacitor shell around the live site (`https://eftkad.avarewase.com
 
 ## 1. First time: send the app to people
 
-Send **`public/app/eftkad.apk`** (same file as `android/app/build/outputs/apk/debug/app-debug.apk`, version 1.1).
+Send **`public/app/eftkad.apk`** (same file as `android/app/build/outputs/apk/sideload/debug/app-sideload-debug.apk`, version 1.1).
 
 On their phone: open the file, allow "install unknown apps" for the app they opened it from (WhatsApp, Files, ...), then install.
 
@@ -26,7 +26,7 @@ Only this first install is done by hand. Builds older than 1.1 cannot update the
    ```
    npx cap sync android
    cd android
-   gradlew assembleDebug
+   gradlew assembleSideloadDebug
    ```
    On Windows set `ANDROID_HOME` first if needed: `$env:ANDROID_HOME="$env:LOCALAPPDATA\Android\Sdk"`.
 3. **Publish it** from the project root:

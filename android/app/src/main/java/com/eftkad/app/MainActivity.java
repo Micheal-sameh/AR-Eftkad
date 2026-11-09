@@ -602,7 +602,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     private void checkForUpdate() {
-        if (updateChecked || lockOverlay != null || pendingUnlock != null || !isOnline()) return;
+        if (!BuildConfig.IN_APP_UPDATE || updateChecked || lockOverlay != null || pendingUnlock != null || !isOnline()) return;
         updateChecked = true;
         new Thread(() -> {
             try {

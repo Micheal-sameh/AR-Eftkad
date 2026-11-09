@@ -1,10 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Release signing: android/keystore.properties (git-ignored) points at the upload keystore.
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
+
 android {
     namespace = "com.eftkad.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.eftkad.app"
+        applicationId "org.avarewase.eftkad"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
@@ -16,8 +21,36 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    buildFeatures {
+        buildConfig true
+    }
+    // sideload = APK from the website (has the in-app updater); play = Google Play bundle (no updater,
+    // no REQUEST_INSTALL_PACKAGES, which Play does not allow).
+    flavorDimensions "dist"
+    productFlavors {
+        sideload {
+            applicationId "com.eftkad.app" // keeps website-APK users on the same app so in-app updates still work
+            dimension "dist"
+            buildConfigField "boolean", "IN_APP_UPDATE", "true"
+        }
+        play {
+            dimension "dist"
+            buildConfigField "boolean", "IN_APP_UPDATE", "false"
+        }
+    }
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (keystoreFile.exists()) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
