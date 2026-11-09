@@ -13,7 +13,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "org.avarewase.eftkad",
+      "package_name": "org.avarewase.eftekad",
       "sha256_cert_fingerprints": [
         "F4:30:29:A8:5B:45:4C:34:78:71:DC:A6:B6:45:EC:25:C0:E9:3E:88:21:52:75:5B:0E:DA:05:BB:D5:6E:9E:A9"
       ]

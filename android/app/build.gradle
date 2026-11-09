@@ -9,7 +9,7 @@ android {
     namespace = "com.eftkad.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.avarewase.eftkad"
+        applicationId "org.avarewase.eftekad"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 5
