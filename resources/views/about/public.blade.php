@@ -18,13 +18,15 @@
 <div id="a-body" class="rich" style="margin-top:.6rem"></div>
 <p id="a-empty" class="hidden" style="color:var(--ink-faint)">{{ __('ui.fg.about.empty') }}</p>
 
-<a class="text-link" href="/login" style="display:block;margin-top:1.2rem">{{ __('ui.fg.about.back_to_login') }}</a>
+<a class="text-link" id="a-back" href="/login" style="display:block;margin-top:1.2rem">{{ __('ui.fg.about.back_to_login') }}</a>
 @endsection
 
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', async function () {
         const $ = function (id) { return document.getElementById(id); };
+        // Opened from the app's lock screen (?app=1): the popup has its own close button.
+        if (new URLSearchParams(location.search).get('app')) $('a-back').classList.add('hidden');
         const res = await Eftkad.api('/about');
         if (!res.ok || !res.data) { $('a-error').classList.remove('hidden'); return; }
         const c = res.data.data || {};

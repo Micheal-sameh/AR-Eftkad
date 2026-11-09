@@ -61,7 +61,7 @@ public class MainActivity extends BridgeActivity {
     private static final String BASE_URL = "https://eftkad.avarewase.com";
     private static final String VISITS_URL = BASE_URL + "/visits";
     private static final String LOGIN_URL = BASE_URL + "/login";
-    private static final String ABOUT_URL = BASE_URL + "/about/info";
+    private static final String ABOUT_URL = BASE_URL + "/about/info?app=1";
     private static final String OFFLINE_URL = "file:///android_asset/public/offline.html";
     // Same page, in "server problem" mode: says the service is unavailable and retries by itself.
     private static final String SERVER_ERROR_URL = OFFLINE_URL + "#server";
@@ -464,17 +464,24 @@ public class MainActivity extends BridgeActivity {
         web.getSettings().setDomStorageEnabled(true);
         web.setWebViewClient(new android.webkit.WebViewClient());
         web.loadUrl(ABOUT_URL);
-        FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        webParams.topMargin = dp(56);
-        box.addView(web, webParams);
+        box.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        Button close = new Button(this);
-        close.setText("إغلاق / Close");
-        close.setAllCaps(false);
-        close.setTextColor(Color.parseColor("#3F5D6D"));
-        close.setBackgroundColor(Color.TRANSPARENT);
+        // small round close button floating over the page (top corner, below the status bar)
+        TextView close = new TextView(this);
+        close.setText("✕");
+        close.setTextSize(18);
+        close.setTextColor(Color.WHITE);
+        close.setGravity(Gravity.CENTER);
+        GradientDrawable closeBg = new GradientDrawable();
+        closeBg.setShape(GradientDrawable.OVAL);
+        closeBg.setColor(Color.parseColor("#99263547"));
+        close.setBackground(closeBg);
+        close.setContentDescription("إغلاق / Close");
         close.setOnClickListener(v -> dialog.dismiss());
-        box.addView(close, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(56), Gravity.TOP | Gravity.END));
+        FrameLayout.LayoutParams closeParams = new FrameLayout.LayoutParams(dp(44), dp(44), Gravity.TOP | Gravity.END);
+        closeParams.topMargin = dp(32);
+        closeParams.setMarginEnd(dp(16));
+        box.addView(close, closeParams);
 
         dialog.setContentView(box);
         dialog.setOnDismissListener(d -> web.destroy());
