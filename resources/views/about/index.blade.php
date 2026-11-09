@@ -95,7 +95,7 @@
 
     function isOwner() {
         const u = Eftkad.user();
-        return !!(u && u.role && u.role.value === 'owner');
+        return !!(u && u.role && ['owner', 'superadmin'].indexOf(u.role.value) !== -1);
     }
 
     function render() {

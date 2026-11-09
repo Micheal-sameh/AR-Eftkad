@@ -49,8 +49,8 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
     });
 
     Route::get('about', [AboutController::class, 'show']);
-    Route::put('about', [AboutController::class, 'update'])->middleware('role:owner');
-    Route::post('about/image', [AboutController::class, 'uploadImage'])->middleware('role:owner');
+    Route::put('about', [AboutController::class, 'update'])->middleware('role:superadmin|owner');
+    Route::post('about/image', [AboutController::class, 'uploadImage'])->middleware('role:superadmin|owner');
 
     Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin|owner'], function () {
         Route::get('', [UserController::class, 'index']);
