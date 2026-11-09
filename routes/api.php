@@ -27,6 +27,9 @@ Route::view('/documentation', 'vendor.l5-swagger.index', [
     'useAbsolutePath' => true,
 ]);
 
+// The about text is public (shown on the sign-in page too); only editing needs a role.
+Route::get('about', [AboutController::class, 'show'])->middleware('throttle:60,1');
+
 Route::group(['prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -48,7 +51,6 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
         Route::post('', [EftkadController::class, 'create']);
     });
 
-    Route::get('about', [AboutController::class, 'show']);
     Route::put('about', [AboutController::class, 'update'])->middleware('role:superadmin|owner');
     Route::post('about/image', [AboutController::class, 'uploadImage'])->middleware('role:superadmin|owner');
 

@@ -7,15 +7,8 @@
 @section('title', __('ui.fg.about.title') . ' - Eftkad')
 
 @section('content')
+@include('about.rich-css')
 <style>
-    .rich { line-height: 1.8; overflow-wrap: anywhere; }
-    .rich img { max-width: 100%; height: auto; border-radius: .6rem; }
-    .rich h1, .rich h2, .rich h3, .rich h4 { margin: 1rem 0 .4rem; line-height: 1.4; }
-    .rich ul, .rich ol { padding-inline-start: 1.4rem; }
-    .rich ul { list-style: disc; } .rich ol { list-style: decimal; }
-    .rich blockquote { margin: .8rem 0; padding: .2rem .9rem; border-inline-start: 3px solid var(--border); color: var(--ink-soft); }
-    .rich a { color: var(--primary); text-decoration: underline; }
-    .rich p, .rich div { min-height: 1em; }
     .rte-bar { display: flex; flex-wrap: wrap; gap: .25rem; padding: .4rem; border: 1px solid var(--border); border-bottom: 0; border-radius: .8rem .8rem 0 0; background: var(--surface-soft); }
     .rte-bar button { min-width: 2.1rem; height: 2.1rem; padding: 0 .5rem; border-radius: .5rem; color: var(--ink); font-size: .8rem; }
     .rte-bar button:hover { background: var(--surface-raised); }
