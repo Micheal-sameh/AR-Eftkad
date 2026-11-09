@@ -22,6 +22,7 @@
 </button>
 <a class="text-link" href="#">{{ __('ui.login.support_link') }}</a>
 <a class="text-link" href="/about/info" style="display:block;margin-top:.6rem">{{ __('ui.login.about_link') }}</a>
+<a class="text-link" href="/privacy" style="display:block;margin-top:.6rem">Privacy Policy / سياسة الخصوصية</a>
 
 @if (config('app.dev_login'))
 <div class="divider"><span>{{ __('ui.fg.or') }}</span></div>

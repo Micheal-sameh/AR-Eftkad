@@ -44,6 +44,9 @@ Route::withoutMiddleware([
     Route::view('/about', 'about.index')->name('about');
     Route::view('/about/info', 'about.public')->name('about.public'); // signed-out version, linked from the login page
 
+    Route::view('/privacy', 'legal.privacy')->name('privacy');
+    Route::view('/account-deletion', 'legal.account-deletion')->name('account-deletion');
+
     Route::view('/profile', 'profile.index')->name('profile');
 
     Route::view('/users', 'users.index')->name('users.index');

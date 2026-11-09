@@ -42,6 +42,8 @@ return [
     |
     */
 
+    'support_email' => env('SUPPORT_EMAIL'),
+
     'dev_login' => (bool) env('DEV_LOGIN', false) && env('APP_ENV', 'production') !== 'production',
 
     /*
