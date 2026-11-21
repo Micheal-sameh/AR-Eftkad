@@ -44,6 +44,13 @@ return [
 
     'support_email' => env('SUPPORT_EMAIL'),
 
+    // Comma-separated IPs/CIDRs of reverse proxies to trust ('*' = all). Empty = private ranges.
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    // Comma-separated OAuth client_ids whose raw SSO access tokens the API accepts. When set,
+    // the userinfo response must carry a matching aud/azp/client_id claim (fail closed).
+    'sso_allowed_client_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('AVAREWASE_SSO_ALLOWED_CLIENT_IDS'))))),
+
     'dev_login' => (bool) env('DEV_LOGIN', false) && env('APP_ENV', 'production') !== 'production',
 
     /*

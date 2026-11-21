@@ -2,10 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use Avarewase\SsoClient\Client\AvarewaseClient;
+use Avarewase\SsoClient\Exceptions\AvarewaseSsoException;
 use Avarewase\SsoClient\Http\Middleware\AuthenticateWithSso as SsoMiddleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -49,6 +52,51 @@ class AuthenticateWithSsoOrSanctum
             return $next($request);
         }
 
+        $allowed = config('app.sso_allowed_client_ids', []);
+
+        if (! $allowed) {
+            return $this->ssoMiddleware->handle($request, $next);
+        }
+
+        // Raw SSO tokens are only accepted when issued to one of our own clients. The
+        // userinfo response is inspected before the shared middleware can provision a user.
+        $raw = $token ? $this->userInfoClaims($token) : null;
+
+        if (! $raw || ! $this->audienceAllowed($raw, $allowed)) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
         return $this->ssoMiddleware->handle($request, $next);
+    }
+
+    protected function userInfoClaims(string $token): ?array
+    {
+        // Same key and TTL as the package middleware, so the lookup is shared with it.
+        $cacheKey = 'avarewase-sso:userinfo:'.hash('sha256', $token);
+
+        $raw = Cache::remember($cacheKey, config('avarewase-sso.cache_ttl', 60), function () use ($token) {
+            try {
+                return app(AvarewaseClient::class)->userInfo($token)->raw;
+            } catch (AvarewaseSsoException) {
+                return null;
+            }
+        });
+
+        if ($raw === null) {
+            Cache::forget($cacheKey);
+        }
+
+        return $raw;
+    }
+
+    protected function audienceAllowed(array $claims, array $allowed): bool
+    {
+        $values = array_merge(
+            (array) ($claims['aud'] ?? []),
+            (array) ($claims['azp'] ?? []),
+            (array) ($claims['client_id'] ?? []),
+        );
+
+        return (bool) array_intersect($allowed, array_map('strval', $values));
     }
 }

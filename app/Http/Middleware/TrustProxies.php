@@ -12,9 +12,24 @@ class TrustProxies extends Middleware
      *
      * @var array<int, string>|string|null
      */
-    // The container only listens on 127.0.0.1 behind the host's reverse proxy, so every
-    // hop that can reach it is trusted; this makes $request->ip() the real client address.
-    protected $proxies = '*';
+    // Only loopback and private ranges (the host's reverse proxy / Docker network) are trusted;
+    // override with a comma-separated TRUSTED_PROXIES list of IPs/CIDRs, or '*' to trust all.
+    protected $proxies = [
+        '127.0.0.0/8',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+    ];
+
+    public function __construct()
+    {
+        $configured = config('app.trusted_proxies');
+        if (is_string($configured) && trim($configured) !== '') {
+            $this->proxies = trim($configured) === '*'
+                ? '*'
+                : array_map('trim', explode(',', $configured));
+        }
+    }
 
     /**
      * The headers that should be used to detect proxies.

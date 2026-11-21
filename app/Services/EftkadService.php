@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use App\Repository\EftkadRepository;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,9 @@ class EftkadService
         $eftkad = $this->eftkadRepository->show($id, $viewer);
 
         if ($eftkad) {
+            // Someone a visit was merely shared with can read it but not pass it on.
+            abort_unless($this->isManagerOrAssigned($eftkad, $viewer), 403);
+
             $this->eftkadRepository->share($eftkad, $codes, $viewer->membership_code);
             $eftkad->load('shares');
         }
@@ -67,11 +71,31 @@ class EftkadService
         $eftkad = $this->eftkadRepository->show($id, $viewer);
 
         if ($eftkad) {
+            // Managers and the assigned father/servant may revoke any share; anyone else
+            // only the shares they created themselves.
+            $ownShare = $eftkad->shares()
+                ->where('membership_code', strtoupper($code))
+                ->where('shared_by', strtoupper((string) $viewer->membership_code))
+                ->exists();
+            abort_unless($ownShare || $this->isManagerOrAssigned($eftkad, $viewer), 403);
+
             $this->eftkadRepository->unshare($eftkad, $code);
             $eftkad->load('shares');
         }
 
         return $eftkad;
+    }
+
+    protected function isManagerOrAssigned($eftkad, User $viewer): bool
+    {
+        if ($viewer->hasAnyRole(UserRole::MANAGERS)) {
+            return true;
+        }
+
+        $code = strtoupper((string) $viewer->membership_code);
+
+        return $code !== ''
+            && in_array($code, [strtoupper((string) $eftkad->father_membership_code), strtoupper((string) $eftkad->servant_membership_code)], true);
     }
 
     public function create($input)
