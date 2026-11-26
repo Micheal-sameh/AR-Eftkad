@@ -23,6 +23,11 @@ class UserService
         return $this->userRepository->show($id);
     }
 
+    public function create(array $data)
+    {
+        return $this->userRepository->create($data);
+    }
+
     public function updateType($id, int $type)
     {
         $user = $this->userRepository->find($id);

@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Enums\UserType;
 use App\Http\Controllers\BaseController;
 use App\Models\User;
+use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\UpdateUserRoleRequest;
 use App\Http\Requests\UpdateUserTypeRequest;
 use App\Http\Resources\UserResource;
@@ -39,6 +40,14 @@ class UserController extends BaseController
             additional_data: [
                 'users_count' => $data['users_count'],
             ]);
+    }
+
+    /** Admins add fathers and servants ahead of their first SSO sign-in. */
+    public function store(CreateUserRequest $request)
+    {
+        $user = $this->userService->create($request->validated());
+
+        return $this->apiResponse(new UserResource($user));
     }
 
     public function show($id)

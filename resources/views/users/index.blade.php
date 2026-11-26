@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@php($uiSections = ['common', 'users'])
+@php($uiSections = ['common', 'users', 'user_edit'])
 
 @php($activeNav = 'users')
 
@@ -14,6 +14,10 @@
             <div class="page-title">{{ __('ui.fg.users.title') }}</div>
             <p>{{ __('ui.fg.users.subtitle') }}</p>
         </div>
+        <button type="button" class="button button-primary" id="add-user-btn">
+            <x-icon name="plus" :size="18" />
+            <span>{{ __('ui.fg.users.add') }}</span>
+        </button>
     </div>
 
     <div class="search-bar">
@@ -61,6 +65,44 @@
                 <button type="button" class="button button-primary" id="modal-save">
                     <x-icon name="check" :size="18" />
                     <span id="modal-save-label">{{ __('ui.fg.users.save_changes') }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Add a father/servant before their first sign-in; SSO links the account by membership code. --}}
+    <div class="modal-wrap hidden" id="add-modal">
+        <div class="modal-backdrop" data-add-close></div>
+        <div class="modal">
+            <div class="section-header">
+                <div class="section-title">{{ __('ui.fg.users.add_title') }}</div>
+                <button type="button" class="icon-button" data-add-close aria-label="Close"><x-icon name="close" /></button>
+            </div>
+            <div class="inline-error hidden" id="a-error" style="margin-bottom:.85rem"><x-icon name="alert" :size="16" /><span id="a-error-text"></span></div>
+            <div class="sheet-fields">
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.users.name') }} *</span>
+                    <span class="input-shell"><input id="a-name" type="text" maxlength="255" autocomplete="off" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.users.col_code') }} *</span>
+                    <span class="input-shell"><input id="a-code" type="text" maxlength="50" dir="ltr" placeholder="E1C1FxxxNRx" style="text-transform: uppercase" autocomplete="off" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.users.type') }} *</span>
+                    <span class="input-shell"><select id="a-type"></select><x-icon name="chevron" :size="16" /></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.users.phone') }}</span>
+                    <span class="input-shell"><input id="a-phone" type="tel" maxlength="30" dir="ltr" autocomplete="off" /></span>
+                </label>
+            </div>
+            <p style="margin: .8rem 0 0; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.users.add_hint') }}</p>
+            <div class="modal-actions">
+                <button type="button" class="button button-ghost" data-add-close><span>{{ __('ui.fg.users.cancel') }}</span></button>
+                <button type="button" class="button button-primary" id="add-save">
+                    <x-icon name="check" :size="18" />
+                    <span id="add-save-label">{{ __('ui.fg.users.create') }}</span>
                 </button>
             </div>
         </div>
@@ -193,6 +235,49 @@
         loadUsers();
     }
 
+    function openAddModal() {
+        ['a-name', 'a-code', 'a-phone'].forEach(function (id) { $(id).value = ''; });
+        $('a-type').innerHTML = '<option value="" selected disabled>' + Eftkad.esc(UI_TEXT.users.pending_type) + '</option>' + optionsHtml(enums.user_type, '');
+        $('a-error').classList.add('hidden');
+        $('add-modal').classList.remove('hidden');
+        $('a-name').focus();
+    }
+
+    async function saveAdd() {
+        const btn = $('add-save');
+        const label = $('add-save-label');
+        $('a-error').classList.add('hidden');
+        btn.disabled = true;
+        label.textContent = UI_TEXT.common.saving;
+
+        const body = {
+            name: $('a-name').value.trim(),
+            membership_code: $('a-code').value.trim().toUpperCase(),
+            type: $('a-type').value ? parseInt($('a-type').value, 10) : null,
+        };
+        const phone = $('a-phone').value.trim();
+        if (phone) body.phone = phone;
+
+        const res = await Eftkad.api('/users', { method: 'POST', body: body });
+        btn.disabled = false;
+        label.textContent = UI_TEXT.fg.users.create;
+
+        if (!res.ok) {
+            const errs = res.data && res.data.errors;
+            $('a-error-text').textContent = (errs && Object.values(errs)[0] && Object.values(errs)[0][0]) || (res.data && res.data.message) || UI_TEXT.user_edit.save_error;
+            $('a-error').classList.remove('hidden');
+            return;
+        }
+        $('add-modal').classList.add('hidden');
+        // The new person must show up in the father/servant pickers on other pages.
+        try {
+            Object.keys(localStorage).filter(function (k) { return k.indexOf(Eftkad.CACHE_PREFIX) === 0 && k.indexOf('/settings/filters') !== -1; })
+                .forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
+        Eftkad.toast(UI_TEXT.fg.users.added);
+        loadUsers();
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         if (!Eftkad.requireAuth()) return;
         // The cached user is refreshed once per app open (see Eftkad.syncUser), not on every page.
@@ -213,6 +298,11 @@
         $('modal-close').addEventListener('click', closeModal);
         $('modal-cancel').addEventListener('click', closeModal);
         $('modal-save').addEventListener('click', saveModal);
+        $('add-user-btn').addEventListener('click', openAddModal);
+        $('add-save').addEventListener('click', saveAdd);
+        document.querySelectorAll('[data-add-close]').forEach(function (el) {
+            el.addEventListener('click', function () { $('add-modal').classList.add('hidden'); });
+        });
     });
 </script>
 @endsection

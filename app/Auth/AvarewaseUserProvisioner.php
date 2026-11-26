@@ -15,7 +15,9 @@ use Illuminate\Support\Str;
  * then membership_code, then email — and, on every login (not just the
  * first), refreshes that user's profile (name, email, membership_code,
  * avatar, date of birth, email-verified status) from the latest SSO data,
- * so Avarewase stays the source of truth for identity fields. If no match
+ * so Avarewase stays the source of truth for identity fields. Users an admin
+ * added beforehand (POST /users: no avarewase_sub yet) are linked here by
+ * membership_code on their first login; their type and phone are kept. If no match
  * exists, creates one from the SSO identity (Avarewase now returns
  * membership_code).
  *

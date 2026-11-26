@@ -56,6 +56,7 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
 
     Route::group(['prefix' => 'users', 'middleware' => 'role:admin|superadmin|owner'], function () {
         Route::get('', [UserController::class, 'index']);
+        Route::post('', [UserController::class, 'store'])->middleware('throttle:30,1');
         Route::get('{id}', [UserController::class, 'show']);
         Route::patch('{id}/type', [UserController::class, 'updateType']);
         Route::patch('{id}/role', [UserController::class, 'updateRole'])->middleware('role:superadmin|owner');
