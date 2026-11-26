@@ -21,16 +21,16 @@ class NeedType
                 'ar' => 'مسنين',
             ],
             self::PATIENT => [
-                'en' => 'Patent',
-                'ar' => 'منتظم',
+                'en' => 'Patient',
+                'ar' => 'مريض',
             ],
             self::JOB => [
                 'en' => 'Job',
-                'ar' => 'غير منتظم',
+                'ar' => 'فرصة عمل',
             ],
             self::STUDING_HELP => [
-                'en' => 'Studing Help',
-                'ar' => 'غير منتظم',
+                'en' => 'Study Help',
+                'ar' => 'مساعدة دراسية',
             ],
             self::TNAWEL => [
                 'en' => 'Tnawel',

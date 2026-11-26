@@ -25,7 +25,7 @@ class EftkadResource extends JsonResource
             'membership_code' => $this->membership_code,
             'date' => Carbon::parse($this->date)->format('d-m-Y'),
             'correspondence_address' => $this->correspondence_address,
-            'mass_attendence' => new EnumResource($this->mass_attendence, MassAttendanceType::class),
+            'mass_attendence' => $this->mass_attendence === null ? null : new EnumResource($this->mass_attendence, MassAttendanceType::class),
             'needs' => array_map(fn ($n) => new EnumResource($n, NeedType::class), $this->needs ?? []),
             'communication_means' => array_map(fn ($n) => new EnumResource($n, CommunicationType::class), $this->communication_means ?? []),
             'attend_meetings' => new EnumResource($this->attend_meetings, BoolType::class),

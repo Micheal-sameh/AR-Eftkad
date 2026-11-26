@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\DTOs\EftkadCreateDTO;
 use App\Enums\UserRole;
+use App\Enums\UserType;
 use App\Http\Controllers\BaseController;
 use App\Http\Requests\EftkadCreateRequest;
 use App\Http\Requests\EftkadShareRequest;
@@ -25,10 +26,18 @@ class EftkadController extends BaseController
             'father_membership_code', 'servant_membership_code', 'type'
         );
 
-        // A regular user can only record visits as themselves; only admins may file on behalf of others.
+        // Optional fields left empty arrive as null; drop them so the DTO treats them as not provided.
+        $data = array_filter($data, fn ($value) => $value !== null);
+
+        // A regular user must be on the visit they record (as its father or servant); only admins may
+        // file visits that don't include them. If they left themselves out, they go back in their own field.
         $user = $request->user();
-        if (! $user->hasAnyRole(UserRole::MANAGERS)) {
-            $data['servant_membership_code'] = $user->membership_code;
+        if (! $user->hasAnyRole(UserRole::MANAGERS)
+            && ($data['father_membership_code'] ?? null) !== $user->membership_code
+            && ($data['servant_membership_code'] ?? null) !== $user->membership_code
+        ) {
+            $field = (int) $user->type === UserType::FATHER ? 'father_membership_code' : 'servant_membership_code';
+            $data[$field] = $user->membership_code;
         }
 
         $input = new EftkadCreateDTO(...$data);

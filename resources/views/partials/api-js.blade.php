@@ -66,9 +66,14 @@
         // reference data (enums, father/servant filters) that every page
         // otherwise refetches on each navigation.
         CACHE_PREFIX: 'eftkad_cache:',
+        // Hash of app/Enums: editing any enum (names, translations) changes it, so
+        // browsers drop entries cached under the old version instead of showing
+        // stale labels until the TTL runs out.
+        CACHE_VERSION: '{{ substr(md5(implode('', array_map('file_get_contents', glob(app_path('Enums/*.php')) ?: []))), 0, 8) }}',
 
         async cachedApi(path, ttlMs = 10 * 60 * 1000) {
-            const key = this.CACHE_PREFIX + this.locale() + ':' + path;
+            const versioned = this.CACHE_PREFIX + this.CACHE_VERSION + ':';
+            const key = versioned + this.locale() + ':' + path;
             try {
                 const hit = JSON.parse(localStorage.getItem(key) || 'null');
                 if (hit && Date.now() - hit.t < ttlMs) return hit.res;
@@ -77,6 +82,10 @@
             const res = await this.api(path);
             if (res.ok && res.data) {
                 try {
+                    // Remove entries left over from older versions.
+                    Object.keys(localStorage)
+                        .filter(function (k) { return k.indexOf(Eftkad.CACHE_PREFIX) === 0 && k.indexOf(versioned) !== 0; })
+                        .forEach(function (k) { localStorage.removeItem(k); });
                     localStorage.setItem(key, JSON.stringify({ t: Date.now(), res: res }));
                 } catch (e) {}
             }

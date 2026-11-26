@@ -10,7 +10,7 @@ class EftkadCreateDTO extends DTO
     public string $membership_code;
     public ?string $date;
     public ?string $correspondence_address;
-    public int $mass_attendence;
+    public ?int $mass_attendence;
     public ?array $needs;
     public ?array $communication_means;
     public ?int $attend_meetings;

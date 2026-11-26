@@ -47,6 +47,24 @@
                     <span class="field-error" id="error-date"></span>
                 </label>
                 <label class="field">
+                    <span class="field-label">{{ __('ui.fg.form.visit_type') }} *</span>
+                    <span class="input-shell" data-shell="type"><select id="f-type"></select><x-icon name="chevron" :size="16" /></span>
+                    <span class="field-error" id="error-type"></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.form.father') }} *</span>
+                    <span class="input-shell" data-shell="father_membership_code"><select id="f-father_membership_code"><option value="">{{ __('ui.visit_form.father_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                    <span class="field-error" id="error-father_membership_code"></span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ __('ui.fg.form.servant') }} *</span>
+                    <span class="input-shell" data-shell="servant_membership_code"><select id="f-servant_membership_code"><option value="">{{ __('ui.visit_form.servant_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
+                    <span class="field-error" id="error-servant_membership_code"></span>
+                </label>
+            </div>
+            <p style="margin: .5rem 0 .9rem; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.form.father_or_servant_hint') }}</p>
+            <div class="form-grid">
+                <label class="field">
                     <span class="field-label">{{ __('ui.fg.form.address') }}</span>
                     <span class="input-shell" data-shell="correspondence_address"><input id="f-correspondence_address" type="text" placeholder="{{ __('ui.visit_form.address_placeholder') }}" /></span>
                     <span class="field-error" id="error-correspondence_address"></span>
@@ -55,11 +73,6 @@
                     <span class="field-label">{{ __('ui.fg.form.area') }}</span>
                     <span class="input-shell" data-shell="location"><input id="f-location" type="text" placeholder="{{ __('ui.visit_form.location_placeholder') }}" /></span>
                     <span class="field-error" id="error-location"></span>
-                </label>
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.form.visit_type') }} *</span>
-                    <span class="input-shell" data-shell="type"><select id="f-type"></select><x-icon name="chevron" :size="16" /></span>
-                    <span class="field-error" id="error-type"></span>
                 </label>
             </div>
         </section>
@@ -70,7 +83,7 @@
                 <span>02</span>
                 <div><strong>{{ __('ui.fg.form.s2') }}</strong><small>{{ __('ui.fg.form.s2_sub') }}</small></div>
             </div>
-            <div class="field-label">{{ __('ui.fg.form.mass') }} *</div>
+            <div class="field-label">{{ __('ui.fg.form.mass') }}</div>
             <div class="type-options form-chips" id="mass-attendance-options" style="margin-bottom: 1rem"></div>
             <span class="field-error" id="error-mass_attendence"></span>
             <div class="toggle-grid">
@@ -104,10 +117,10 @@
                 <span>04</span>
                 <div><strong>{{ __('ui.fg.form.s4') }}</strong><small>{{ __('ui.fg.form.s4_sub') }}</small></div>
             </div>
-            <div class="field-label">{{ __('ui.fg.form.needs') }} *</div>
+            <div class="field-label">{{ __('ui.fg.form.needs') }}</div>
             <div class="chips form-chips" id="needs-options"></div>
             <span class="field-error" id="error-needs"></span>
-            <div class="field-label field-gap">{{ __('ui.fg.form.comm') }} *</div>
+            <div class="field-label field-gap">{{ __('ui.fg.form.comm') }}</div>
             <div class="chips" id="communication-options"></div>
             <span class="field-error" id="error-communication_means"></span>
         </section>
@@ -129,19 +142,6 @@
                 <span class="success-text hidden" id="location-ok"><x-icon name="check" :size="15" />{{ __('ui.fg.form.location_ok') }}</span>
                 <span class="field-error" id="error-location_url"></span>
             </div>
-            <div class="form-grid">
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.form.father') }}</span>
-                    <span class="input-shell" data-shell="father_membership_code"><select id="f-father_membership_code"><option value="">{{ __('ui.visit_form.father_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                    <span class="field-error" id="error-father_membership_code"></span>
-                </label>
-                <label class="field">
-                    <span class="field-label">{{ __('ui.fg.form.servant') }}</span>
-                    <span class="input-shell" data-shell="servant_membership_code"><select id="f-servant_membership_code"><option value="">{{ __('ui.visit_form.servant_select_placeholder') }}</option></select><x-icon name="chevron" :size="16" /></span>
-                    <span class="field-error" id="error-servant_membership_code"></span>
-                </label>
-            </div>
-            <p style="margin: .5rem 0 0; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.form.father_or_servant_hint') }}</p>
             <label class="field" style="margin-top: .9rem">
                 <span class="field-label">{{ __('ui.fg.form.notes') }}</span>
                 <textarea id="f-general_notes" class="textarea" rows="4" placeholder="{{ __('ui.visit_form.general_notes_placeholder') }}"></textarea>
@@ -187,8 +187,9 @@
     }
 
     function renderRadioOptions(container, options, name) {
-        container.innerHTML = options.map(function (o, i) {
-            return `<label><input ${i === 0 ? 'checked' : ''} name="${name}" type="radio" value="${o.value}" /><span>${Eftkad.esc(o.name)}</span></label>`;
+        // Nothing is pre-selected: mass attendance is optional and stays empty unless chosen.
+        container.innerHTML = options.map(function (o) {
+            return `<label><input name="${name}" type="radio" value="${o.value}" /><span>${Eftkad.esc(o.name)}</span></label>`;
         }).join('');
     }
 
@@ -259,6 +260,23 @@
         const data = res.data.data || {};
         fillPeople('f-father_membership_code', data.fathers || []);
         fillPeople('f-servant_membership_code', data.servants || []);
+        preselectCurrentUser(await Eftkad.syncUser());
+    }
+
+    // The signed-in father or servant is selected in their own field by default; it can still be changed.
+    function preselectCurrentUser(me) {
+        if (!me || !me.membership_code || !me.type) return;
+        const selectId = { 1: 'f-father_membership_code', 2: 'f-servant_membership_code' }[me.type.value];
+        if (!selectId) return;
+        const select = $(selectId);
+        if (select.value) return;
+        if (!Array.from(select.options).some(function (o) { return o.value === me.membership_code; })) {
+            const option = document.createElement('option');
+            option.value = me.membership_code;
+            option.textContent = me.name || me.membership_code;
+            select.appendChild(option);
+        }
+        select.value = me.membership_code;
     }
 
     function setCurrentLocation() {
