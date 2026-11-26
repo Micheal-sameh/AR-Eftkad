@@ -122,6 +122,7 @@
     let lastPage = 1;
     let totalVisits = null;
     let loadSeq = 0;
+    let filtersReady = Promise.resolve();
     let applied = { father: '', servant: '', type: '', date_from: '', date_to: '' };
     const memberNames = {};
     const $ = function (id) { return document.getElementById(id); };
@@ -232,7 +233,8 @@
 
         const params = new URLSearchParams({ page: page, per_page: PER_PAGE });
         Object.keys(applied).forEach(function (k) { if (applied[k]) params.set(k, applied[k]); });
-        const res = await Eftkad.api('/eftkads?' + params.toString());
+        // The father/servant names load in parallel; the list is rendered once both are in.
+        const [res] = await Promise.all([Eftkad.api('/eftkads?' + params.toString()), filtersReady]);
 
         if (seq !== loadSeq) return;
         $('visits-loading').classList.add('hidden');
@@ -296,7 +298,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
 
-        loadFilters().then(function () { loadVisits(1); });
+        filtersReady = loadFilters().catch(function () {});
+        loadVisits(1);
         loadEnums();
         loadMonthStat();
 

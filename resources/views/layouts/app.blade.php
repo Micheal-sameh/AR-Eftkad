@@ -161,7 +161,7 @@
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setProfileMenu(false); });
 
         // Badge on the Home tab: how many visits are new for me (assigned or shared, not opened yet).
-        Eftkad.api('/eftkads/home').then(function (res) {
+        Eftkad.homeData().then(function (res) {
             var d = res && res.ok && res.data && res.data.data;
             var n = d && d.new ? d.new.length : 0;
             if (!n) return;
@@ -202,10 +202,10 @@
     // reload. The browser's own gesture is disabled (overscroll-behavior), so this replaces it.
     // A page can supply its own refresh by setting window.EftkadRefresh = function () { ... }.
     Eftkad.initPullToRefresh = function () {
-        // Native app only: the Android shell's web view has the Capacitor bridge; a phone's
-        // browser (which has its own refresh) and the installed PWA do not.
+        // Phone-sized screens: the native app, the installed PWA (no reload button) and phone browsers,
+        // whose own pull-to-refresh app.css switches off with overscroll-behavior at the same width.
         var native = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
-        if (!native) return;
+        if (!native && !Eftkad.isStandalone() && !window.matchMedia('(max-width: 820px)').matches) return;
 
         var THRESHOLD = 70, MAX = 120;
         var ring = document.createElement('div');

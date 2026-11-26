@@ -165,8 +165,8 @@
     }
 
     async function loadDetail() {
-        await loadDirectory();
-        const res = await Eftkad.api('/eftkads/detail/' + VISIT_ID);
+        // Fetched in parallel; the detail is still rendered only once the names are known.
+        const [, res] = await Promise.all([loadDirectory(), Eftkad.api('/eftkads/detail/' + VISIT_ID)]);
         $('detail-loading').classList.add('hidden');
 
         if (!res.ok || !res.data || !res.data.data) {

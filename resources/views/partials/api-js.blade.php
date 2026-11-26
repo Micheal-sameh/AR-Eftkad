@@ -253,6 +253,18 @@
         return Eftkad._userSync;
     };
 
+    // GET /eftkads/home, shared by the nav badge (layouts/app) and the home page itself, so the
+    // home page doesn't run that query twice. A failed answer is not kept, so a retry refetches.
+    Eftkad.homeData = function () {
+        if (!Eftkad._home) {
+            Eftkad._home = Eftkad.api('/eftkads/home').then(function (res) {
+                if (!res || !res.ok) Eftkad._home = null;
+                return res;
+            });
+        }
+        return Eftkad._home;
+    };
+
     // Wires the AR/EN pill and the theme button (used on every page that renders them).
     Eftkad.initChrome = function () {
         document.querySelectorAll('.language-toggle button').forEach(function (b) {

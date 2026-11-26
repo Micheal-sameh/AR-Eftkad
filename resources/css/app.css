@@ -485,11 +485,14 @@ main { min-height: calc(100vh - 5rem); }
 
   /* Respect the notch / status bar at the top and the home indicator at the bottom. */
   .topbar { height: calc(4.3rem + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px)); }
-  .bottom-nav { bottom: calc(.65rem + env(safe-area-inset-bottom, 0px)); }
-  .page-content { padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px)); }
-  .toast { bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
-  .sticky-save { bottom: calc(5.7rem + env(safe-area-inset-bottom, 0px)); }
-  .form-page { padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
+  /* The floating bar's gap to the screen edge also covers the home indicator, so the two don't
+     stack (the installed PWA reaches the screen edge; a browser's own toolbar sits below it). */
+  :root { --nav-gap: max(.65rem, env(safe-area-inset-bottom, 0px)); }
+  .bottom-nav { bottom: var(--nav-gap); }
+  .page-content { padding-bottom: calc(6.85rem + var(--nav-gap)); }
+  .toast { bottom: calc(5.35rem + var(--nav-gap)); }
+  .sticky-save { bottom: calc(5.05rem + var(--nav-gap)); }
+  .form-page { padding-bottom: calc(10.35rem + var(--nav-gap)); }
   .sheet { padding-bottom: calc(1.3rem + env(safe-area-inset-bottom, 0px)); }
 
   /* 16px inputs: smaller text makes iOS zoom the page when a field is focused. */

@@ -57,7 +57,14 @@ class User extends Authenticatable
     {
         $forget = fn () => Cache::forget(self::FILTERS_CACHE_KEY);
 
-        static::saved($forget);
+        // The cached filters only hold name/membership_code grouped by type. save() fires "saved"
+        // even when nothing changed (the SSO provisioner saves the user on every raw-token API
+        // request), so only drop the cache when one of those columns actually changed.
+        static::saved(function (self $user) use ($forget) {
+            if ($user->wasRecentlyCreated || $user->wasChanged(['name', 'membership_code', 'type'])) {
+                $forget();
+            }
+        });
         static::deleted($forget);
     }
 
