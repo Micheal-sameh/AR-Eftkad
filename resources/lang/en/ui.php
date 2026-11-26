@@ -434,7 +434,7 @@ return [
             'added' => 'User added',
             'add_hint' => 'When they sign in with SSO for the first time, the account is linked by membership code and their name, email and photo are updated from SSO.',
             'delete' => 'Delete',
-            'delete_confirm' => 'Tap again to delete',
+            'delete_title' => 'Delete this user?',
             'deleted' => 'User deleted',
             'delete_hint' => 'Deleting keeps their visit history; they will no longer be able to sign in.',
         ],

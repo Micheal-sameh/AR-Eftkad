@@ -62,14 +62,33 @@
             </label>
             <p class="hidden" id="m-delete-hint" style="margin: .8rem 0 0; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.users.delete_hint') }}</p>
             <div class="modal-actions">
-                {{-- Two taps: the first arms it (label changes), the second deletes. --}}
+                {{-- Opens the confirmation popup below; nothing is deleted from here. --}}
                 <button type="button" class="button button-danger hidden" id="modal-delete" style="margin-inline-end: auto">
-                    <span id="modal-delete-label">{{ __('ui.fg.users.delete') }}</span>
+                    <x-icon name="trash" :size="18" />
+                    <span>{{ __('ui.fg.users.delete') }}</span>
                 </button>
                 <button type="button" class="button button-ghost" id="modal-cancel"><span>{{ __('ui.fg.users.cancel') }}</span></button>
                 <button type="button" class="button button-primary" id="modal-save">
                     <x-icon name="check" :size="18" />
                     <span id="modal-save-label">{{ __('ui.fg.users.save_changes') }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete confirmation, on top of the edit dialog (same look as the sign-out confirmation). --}}
+    <div class="modal-wrap hidden" id="delete-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-text">
+        <div class="modal-backdrop" data-delete-cancel></div>
+        <div class="modal signout-modal">
+            <div class="signout-icon"><x-icon name="trash" :size="24" /></div>
+            <div class="section-title" id="delete-title">{{ __('ui.fg.users.delete_title') }}</div>
+            <p class="signout-text" id="delete-text"><strong id="delete-name"></strong> <span dir="ltr" id="delete-code"></span><br />{{ __('ui.fg.users.delete_hint') }}</p>
+            <div class="inline-error hidden" id="d-error" style="margin-top:.6rem"><x-icon name="alert" :size="16" /><span id="d-error-text"></span></div>
+            <div class="modal-actions">
+                <button type="button" class="button button-ghost" data-delete-cancel><span>{{ __('ui.fg.users.cancel') }}</span></button>
+                <button type="button" class="button button-danger" id="delete-confirm">
+                    <x-icon name="trash" :size="18" />
+                    <span id="delete-confirm-label">{{ __('ui.fg.users.delete') }}</span>
                 </button>
             </div>
         </div>
@@ -207,33 +226,42 @@
         const canDelete = !(me && String(me.id) === String(u.id));
         $('modal-delete').classList.toggle('hidden', !canDelete);
         $('m-delete-hint').classList.toggle('hidden', !canDelete);
-        disarmDelete();
 
         $('user-modal').classList.remove('hidden');
     }
 
-    let deleteArmed = false;
-    function disarmDelete() {
-        deleteArmed = false;
-        $('modal-delete').disabled = false;
-        $('modal-delete-label').textContent = UI_TEXT.fg.users.delete;
+    function openDeleteConfirm() {
+        if (!editing) return;
+        $('delete-name').textContent = editing.name || UI_TEXT.common.dash;
+        $('delete-code').textContent = editing.membership_code ? '(' + editing.membership_code + ')' : '';
+        $('d-error').classList.add('hidden');
+        setDeleting(false);
+        $('delete-modal').classList.remove('hidden');
+        $('delete-confirm').focus();
+    }
+
+    function closeDeleteConfirm() {
+        $('delete-modal').classList.add('hidden');
+    }
+
+    function setDeleting(on) {
+        $('delete-confirm').disabled = on;
+        $('delete-confirm-label').textContent = on ? UI_TEXT.common.saving : UI_TEXT.fg.users.delete;
     }
 
     async function deleteUser() {
         if (!editing) return;
-        if (!deleteArmed) {
-            deleteArmed = true;
-            $('modal-delete-label').textContent = UI_TEXT.fg.users.delete_confirm;
-            return;
-        }
-        $('modal-delete').disabled = true;
-        $('m-error').classList.add('hidden');
+        setDeleting(true);
+        $('d-error').classList.add('hidden');
         const res = await Eftkad.api('/users/' + editing.id, { method: 'DELETE' });
+        setDeleting(false);
         if (!res.ok) {
-            modalError(res, UI_TEXT.user_edit.save_error);
-            disarmDelete();
+            const errs = res.data && res.data.errors;
+            $('d-error-text').textContent = (errs && Object.values(errs)[0] && Object.values(errs)[0][0]) || (res.data && res.data.message) || UI_TEXT.user_edit.save_error;
+            $('d-error').classList.remove('hidden');
             return;
         }
+        closeDeleteConfirm();
         closeModal();
         clearPeopleCache();
         Eftkad.toast(UI_TEXT.fg.users.deleted);
@@ -343,7 +371,12 @@
         $('modal-close').addEventListener('click', closeModal);
         $('modal-cancel').addEventListener('click', closeModal);
         $('modal-save').addEventListener('click', saveModal);
-        $('modal-delete').addEventListener('click', deleteUser);
+        $('modal-delete').addEventListener('click', openDeleteConfirm);
+        $('delete-confirm').addEventListener('click', deleteUser);
+        document.querySelectorAll('[data-delete-cancel]').forEach(function (el) { el.addEventListener('click', closeDeleteConfirm); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !$('delete-modal').classList.contains('hidden')) closeDeleteConfirm();
+        });
         $('add-user-btn').addEventListener('click', openAddModal);
         $('add-save').addEventListener('click', saveAdd);
         document.querySelectorAll('[data-add-close]').forEach(function (el) {
