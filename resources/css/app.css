@@ -130,6 +130,11 @@ html[data-font="2"] { font-size: 135%; }
 .install-copy { min-width: 0; display: flex; flex-direction: column; margin-inline-end: auto; }
 .install-copy strong { font-size: .82rem; }
 .install-copy span { color: var(--ink-soft); font-size: .72rem; }
+.install-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .7rem; }
+.install-steps li { display: flex; align-items: center; gap: .8rem; padding: .7rem .8rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); font-size: .85rem; }
+.install-step-icon { flex: none; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .8rem; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); overflow: hidden; }
+.install-step-icon img { width: 100%; height: 100%; object-fit: cover; }
+.install-note { margin: .9rem 0 1rem; color: var(--ink-soft); font-size: .72rem; }
 main { min-height: calc(100vh - 5rem); }
 .page-content { width: min(100%, 76rem); margin: 0 auto; padding: 2.25rem 2.2rem 6rem; }
 .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.6rem; }

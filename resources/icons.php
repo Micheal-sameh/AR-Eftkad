@@ -29,4 +29,8 @@ return [
     'edit' => '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" />',
     'location' => '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z" /><circle cx="12" cy="10" r="2.5" />',
     'arrow' => '<path d="M19 12H5M12 19l-7-7 7-7" />',
+    'download' => '<path d="M12 3v12M7 10l5 5 5-5M5 21h14" />',
+    // Safari's Share and "Add to Home Screen" symbols, for the iOS install steps.
+    'ios-share' => '<path d="M12 3v12M8 7l4-4 4 4" /><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2" />',
+    'add-square' => '<rect x="4" y="4" width="16" height="16" rx="3" /><path d="M12 8v8M8 12h8" />',
 ];

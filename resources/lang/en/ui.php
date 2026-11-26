@@ -311,6 +311,12 @@ return [
             'text' => 'Faster access, even on the go',
             'action' => 'Install',
             'manual' => 'Open the browser menu and choose “Install app” or “Add to Home Screen”.',
+            'ios_title' => 'Install Eftkad on your iPhone',
+            'ios_step1' => 'Tap the Share button in Safari’s toolbar',
+            'ios_step2' => 'Scroll down and tap “Add to Home Screen”',
+            'ios_step3' => 'Tap “Add” — the app icon appears on your home screen',
+            'ios_note' => 'iPhone only allows installing from Safari’s Share menu.',
+            'ios_done' => 'Got it',
         ],
         'visits' => [
             'eyebrow' => 'Pastoral care',

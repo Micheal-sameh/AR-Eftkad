@@ -60,6 +60,8 @@
                 <strong>{{ __('ui.fg.welcome') }}</strong>
             </div>
             <div class="topbar-actions">
+                {{-- Phones only, while the app isn't installed (see setupInstallButton). --}}
+                <button type="button" class="icon-button install-button hidden" id="install-button" aria-label="{{ __('ui.fg.install.title') }}" title="{{ __('ui.fg.install.title') }}"><x-icon name="download" /></button>
                 <button type="button" class="icon-button font-size-button" data-font-toggle aria-label="{{ __('ui.fg.font_size') }}" title="{{ __('ui.fg.font_size') }}">Aa</button>
                 {{-- Language and theme live on the profile page. --}}
                 <div class="profile-menu">
@@ -106,6 +108,25 @@
 </div>
 
 <div id="toast-root"></div>
+
+{{-- iOS install steps: Safari has no install API, so the install icon opens this guide instead. --}}
+<div class="sheet-wrap" id="ios-install-sheet" role="dialog" aria-modal="true" aria-labelledby="ios-install-title">
+    <div class="sheet-backdrop" data-ios-install-close></div>
+    <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="section-header">
+            <div class="section-title" id="ios-install-title">{{ __('ui.fg.install.ios_title') }}</div>
+            <button type="button" class="icon-button" data-ios-install-close aria-label="Close"><x-icon name="close" /></button>
+        </div>
+        <ol class="install-steps">
+            <li><span class="install-step-icon"><x-icon name="ios-share" :size="22" /></span><span>{{ __('ui.fg.install.ios_step1') }}</span></li>
+            <li><span class="install-step-icon"><x-icon name="add-square" :size="22" /></span><span>{{ __('ui.fg.install.ios_step2') }}</span></li>
+            <li><span class="install-step-icon"><img src="/icons/icon-192.png?v=2" alt="" /></span><span>{{ __('ui.fg.install.ios_step3') }}</span></li>
+        </ol>
+        <p class="install-note">{{ __('ui.fg.install.ios_note') }}</p>
+        <button type="button" class="button button-primary wide" data-ios-install-close>{{ __('ui.fg.install.ios_done') }}</button>
+    </div>
+</div>
 
 <div class="modal-wrap hidden" id="signout-modal" role="dialog" aria-modal="true" aria-labelledby="signout-title">
     <div class="modal-backdrop" id="signout-backdrop"></div>
@@ -189,6 +210,7 @@
         });
 
         setupInstallBanner();
+        setupInstallButton();
         Eftkad.enhanceSelects();
         Eftkad.initPullToRefresh();
 
@@ -452,6 +474,42 @@
         // beforeinstallprompt may fire after load, so wait a moment before deciding.
         setTimeout(show, 1200);
         window.addEventListener('beforeinstallprompt', function () { setTimeout(show, 0); });
+    }
+
+    // Install icon in the top bar: on phone-sized screens, when running in the browser (not the
+    // installed PWA, not the native app). Uses the browser's install prompt when it offers one;
+    // otherwise (iOS, other browsers) it opens the install banner with the manual steps.
+    function setupInstallButton() {
+        var btn = document.getElementById('install-button');
+        var native = window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform();
+        if (!btn || native || Eftkad.isStandalone() || !window.matchMedia('(max-width: 820px)').matches) return;
+
+        var banner = document.getElementById('install-banner');
+        var iosSheet = document.getElementById('ios-install-sheet');
+        btn.classList.remove('hidden');
+        iosSheet.querySelectorAll('[data-ios-install-close]').forEach(function (el) {
+            el.addEventListener('click', function () { iosSheet.classList.remove('open'); });
+        });
+
+        btn.addEventListener('click', async function () {
+            if (Eftkad.deferredInstallPrompt) {
+                var prompt = Eftkad.deferredInstallPrompt;
+                Eftkad.deferredInstallPrompt = null;
+                prompt.prompt();
+                var choice = await prompt.userChoice;
+                if (choice && choice.outcome === 'accepted') btn.classList.add('hidden');
+                return;
+            }
+            if (Eftkad.isIos()) {
+                iosSheet.classList.add('open');
+                return;
+            }
+            document.getElementById('install-text').textContent = Eftkad.isIos() ? UI_TEXT.install_prompt.text_ios : UI_TEXT.fg.install.manual;
+            document.getElementById('install-confirm').classList.add('hidden');
+            banner.classList.remove('hidden');
+        });
+        document.getElementById('install-dismiss').addEventListener('click', function () { banner.classList.add('hidden'); });
+        window.addEventListener('appinstalled', function () { btn.classList.add('hidden'); banner.classList.add('hidden'); });
     }
 </script>
 @yield('scripts')
