@@ -79,7 +79,10 @@ public class MainActivity extends BridgeActivity {
             + "try{"
             + "var r=await fetch('/api/user',{headers:{Accept:'application/json',Authorization:'Bearer '+t}});"
             + "if(r.status===401){localStorage.removeItem('eftkad_token');localStorage.removeItem('eftkad_user');EftkadNative.route('login');}"
-            + "else{EftkadNative.route('visits');}"
+            // Keep the user this check just fetched, so the page's Eftkad.syncUser doesn't fetch /api/user again.
+            + "else{if(r.ok){try{var j=await r.json(),u=j&&(j.data||j);"
+            + "if(u&&u.id){localStorage.setItem('eftkad_user',JSON.stringify(u));sessionStorage.setItem('eftkad_user_synced','1');}}catch(e){}}"
+            + "EftkadNative.route('visits');}"
             + "}catch(e){EftkadNative.route('visits');}"
             + "})();";
 

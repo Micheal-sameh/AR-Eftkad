@@ -19,6 +19,8 @@ services:
       - "127.0.0.1:${APP_PORT:-4000}:80"
     volumes:
       - ./storage:/var/www/html/storage
+      # Uploaded images (about page) live outside the image so redeploys keep them.
+      - ./uploads:/var/www/html/public/uploads
     networks:
       - eftkad
       - central_net

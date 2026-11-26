@@ -11,6 +11,10 @@ if ! grep -q "^APP_KEY=base64" /var/www/html/.env; then
     php artisan key:generate --force
 fi
 
+# public/uploads is a mounted volume (docker-compose.yml); make sure php-fpm can write to it.
+mkdir -p /var/www/html/public/uploads/about
+chown -R www-data:www-data /var/www/html/public/uploads
+
 echo "Waiting for database..."
 until php artisan tinker --execute="DB::connection()->getPdo();" > /dev/null 2>&1; do
     sleep 2
