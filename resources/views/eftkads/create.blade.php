@@ -380,6 +380,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         if (!Eftkad.requireAuth()) return;
 
+        // Default the visit date to today (local date, not UTC); it can still be changed.
+        const now = new Date();
+        $('f-date').value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+
         initToggles();
         loadEnums();
         loadAdminSelects();
