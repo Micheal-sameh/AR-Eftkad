@@ -21,8 +21,9 @@ class EftkadCreateRequest extends FormRequest
             'date' => 'required|date_format:d-m-Y',
             'type' => 'required|integer|in:'.implode(',', array_column(EftkadType::all(), 'value')),
             // At least one of father / servant is required; the other is optional.
-            'father_membership_code' => ['required_without:servant_membership_code', 'nullable', 'string', Rule::exists('users', 'membership_code')->where('type', UserType::FATHER)],
-            'servant_membership_code' => 'required_without:father_membership_code|nullable|string|exists:users,membership_code',
+            // Deleted (soft-deleted) users can't be put on new visits.
+            'father_membership_code' => ['required_without:servant_membership_code', 'nullable', 'string', Rule::exists('users', 'membership_code')->where('type', UserType::FATHER)->whereNull('deleted_at')],
+            'servant_membership_code' => ['required_without:father_membership_code', 'nullable', 'string', Rule::exists('users', 'membership_code')->whereNull('deleted_at')],
 
             'correspondence_address' => 'nullable|string|max:2000',
             'mass_attendence' => 'nullable|integer|in:'.implode(',', array_column(MassAttendanceType::all(), 'value')),

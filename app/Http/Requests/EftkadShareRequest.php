@@ -13,7 +13,7 @@ class EftkadShareRequest extends FormRequest
         return [
             'membership_codes' => 'required|array|min:1|max:20',
             // Visits are only shared with fathers and servants.
-            'membership_codes.*' => ['required', 'string', Rule::exists('users', 'membership_code')->whereIn('type', [UserType::FATHER, UserType::SERVANT])],
+            'membership_codes.*' => ['required', 'string', Rule::exists('users', 'membership_code')->whereIn('type', [UserType::FATHER, UserType::SERVANT])->whereNull('deleted_at')],
         ];
     }
 }

@@ -101,6 +101,7 @@ return [
     'internal_server_error' => 'حدث خطأ من جانبنا',
     'not_found' => 'غير موجود',
     'user not found' => 'المستخدم غير موجود',
+    'user deleted' => 'تم حذف المستخدم',
     'cannot demote owner' => 'لا يمكن إزالة صلاحية المالك عن آخر مالك',
     'forbidden user action' => 'غير مسموح لك بإجراء هذا التغيير على هذا المستخدم',
     'eftkad not found' => 'الزيارة غير موجودة',

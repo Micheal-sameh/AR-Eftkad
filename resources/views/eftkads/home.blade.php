@@ -117,7 +117,7 @@
         const [dir, res] = await Promise.all([Eftkad.cachedApi('/settings/filters'), Eftkad.homeData()]);
         if (dir.ok && dir.data) {
             const d = dir.data.data || {};
-            (d.fathers || []).concat(d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
+            (d.former || []).concat(d.fathers || [], d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
         }
 
         $('home-loading').classList.add('hidden');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\AvarewaseAccountNotFoundException;
 use Avarewase\SsoClient\Client\AvarewaseClient;
 use Avarewase\SsoClient\Exceptions\AvarewaseSsoException;
 use Avarewase\SsoClient\Http\Middleware\AuthenticateWithSso as SsoMiddleware;
@@ -55,7 +56,7 @@ class AuthenticateWithSsoOrSanctum
         $allowed = config('app.sso_allowed_client_ids', []);
 
         if (! $allowed) {
-            return $this->ssoMiddleware->handle($request, $next);
+            return $this->viaSso($request, $next);
         }
 
         // Raw SSO tokens are only accepted when issued to one of our own clients. The
@@ -66,7 +67,20 @@ class AuthenticateWithSsoOrSanctum
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        return $this->ssoMiddleware->handle($request, $next);
+        return $this->viaSso($request, $next);
+    }
+
+    /**
+     * The provisioner refuses identities with no usable local account (e.g. a deleted user);
+     * that is an authentication failure, not a server error.
+     */
+    protected function viaSso(Request $request, Closure $next): Response
+    {
+        try {
+            return $this->ssoMiddleware->handle($request, $next);
+        } catch (AvarewaseAccountNotFoundException) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
     }
 
     protected function userInfoClaims(string $token): ?array

@@ -46,6 +46,13 @@ class UserRepository
         return $user->load('roles');
     }
 
+    /** Soft delete, and sign the user out everywhere. */
+    public function delete(User $user): void
+    {
+        $user->tokens()->delete();
+        $user->delete();
+    }
+
     public function updateType(User $user, int $type): User
     {
         $user->update(['type' => $type]);

@@ -122,7 +122,7 @@
         const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const d = res.data.data || {};
-        (d.fathers || []).concat(d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
+        (d.former || []).concat(d.fathers || [], d.servants || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
     }
 
     function person(code) {

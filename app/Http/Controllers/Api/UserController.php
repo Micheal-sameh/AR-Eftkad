@@ -117,6 +117,33 @@ class UserController extends BaseController
         return $this->apiResponse(new UserResource($user));
     }
 
+    /**
+     * Soft delete: their visits stay (and keep showing their name), but they can no longer sign in.
+     * Same rank rule as editing; nobody deletes themselves, and the last owner stays.
+     */
+    public function destroy(Request $request, $id)
+    {
+        $target = $this->userService->show($id);
+
+        if (! $target) {
+            return $this->apiErrorResponse(message: trans('messages.user not found'), status_code: 404);
+        }
+
+        $actor = $request->user();
+
+        if ($target->is($actor) || ! $this->canManage($actor, $target)) {
+            return $this->apiErrorResponse(message: trans('messages.forbidden user action'), status_code: 403);
+        }
+
+        if ($target->hasRole(UserRole::OWNER) && User::role(UserRole::OWNER)->count() <= 1) {
+            return $this->apiErrorResponse(message: trans('messages.cannot demote owner'), status_code: 422);
+        }
+
+        $this->userService->delete($target);
+
+        return $this->apiResponse(message: trans('messages.user deleted'));
+    }
+
     private function rankOf(User $user): int
     {
         return UserRole::highestRank($user->roles->pluck('name'));

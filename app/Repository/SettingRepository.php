@@ -39,6 +39,11 @@ class SettingRepository
             return [
                 'fathers' => $byType(UserType::FATHER),
                 'servants' => $byType(UserType::SERVANT),
+                // Deleted fathers/servants: only for showing their names on past visits, never in pickers.
+                'former' => User::onlyTrashed()->get(['name', 'membership_code'])
+                    ->map->only(['name', 'membership_code'])
+                    ->values()
+                    ->all(),
             ];
         });
     }

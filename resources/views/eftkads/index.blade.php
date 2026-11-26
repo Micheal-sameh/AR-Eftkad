@@ -266,6 +266,8 @@
         const res = await Eftkad.cachedApi('/settings/filters');
         if (!res.ok || !res.data) return;
         const data = res.data.data || {};
+        // Deleted users still name their past visits, but aren't offered as filters.
+        (data.former || []).forEach(function (p) { memberNames[p.membership_code] = p.name; });
         function fill(id, people) {
             const select = $(id);
             people.forEach(function (p) {

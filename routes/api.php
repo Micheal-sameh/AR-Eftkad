@@ -60,6 +60,7 @@ Route::group(['middleware' => 'auth.sso_or_sanctum'], function () {
         Route::get('{id}', [UserController::class, 'show']);
         Route::patch('{id}/type', [UserController::class, 'updateType']);
         Route::patch('{id}/role', [UserController::class, 'updateRole'])->middleware('role:superadmin|owner');
+        Route::delete('{id}', [UserController::class, 'destroy'])->middleware('throttle:30,1');
     });
 
     Route::group(['as' => 'api.', 'prefix' => 'settings'], function () {

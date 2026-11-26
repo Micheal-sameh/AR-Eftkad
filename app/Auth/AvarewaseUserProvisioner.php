@@ -17,7 +17,8 @@ use Illuminate\Support\Str;
  * avatar, date of birth, email-verified status) from the latest SSO data,
  * so Avarewase stays the source of truth for identity fields. Users an admin
  * added beforehand (POST /users: no avarewase_sub yet) are linked here by
- * membership_code on their first login; their type and phone are kept. If no match
+ * membership_code on their first login; their type and phone are kept. Deleted
+ * (soft-deleted) users are refused. If no match
  * exists, creates one from the SSO identity (Avarewase now returns
  * membership_code).
  *
@@ -32,16 +33,22 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
 {
     public function resolve(AvarewaseUserInfo $userInfo): Authenticatable
     {
-        $user = User::query()->where('avarewase_sub', $userInfo->sub)->first();
+        $user = User::withTrashed()->where('avarewase_sub', $userInfo->sub)->first();
 
         if (! $user && $userInfo->membershipCode) {
-            $user = User::query()->where('membership_code', $userInfo->membershipCode)->first();
+            $user = User::withTrashed()->where('membership_code', $userInfo->membershipCode)->first();
         }
 
         // Email is only a safe link to an existing account when the SSO vouches for it;
         // otherwise anyone could claim a victim's address and inherit their role.
         if (! $user && $userInfo->email && $userInfo->emailVerified) {
-            $user = User::query()->where('email', $userInfo->email)->first();
+            $user = User::withTrashed()->where('email', $userInfo->email)->first();
+        }
+
+        // Lookups include deleted users so a deleted person is refused here, rather than missed
+        // and re-created with their old membership code (still reserved by the unique index).
+        if ($user && $user->trashed()) {
+            throw new AvarewaseAccountNotFoundException("Local user {$user->getKey()} has been deleted.");
         }
 
         // A user already linked to a different SSO identity must never be re-linked by a
@@ -67,12 +74,12 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
 
         // Never take over an identifier that already belongs to a different local user.
         $membershipCode = $userInfo->membershipCode;
-        if ($membershipCode && User::query()->where('membership_code', $membershipCode)->whereKeyNot($user->getKey() ?? 0)->exists()) {
+        if ($membershipCode && User::withTrashed()->where('membership_code', $membershipCode)->whereKeyNot($user->getKey() ?? 0)->exists()) {
             $membershipCode = null;
         }
 
         $email = $userInfo->email;
-        if ($email && User::query()->where('email', $email)->whereKeyNot($user->getKey() ?? 0)->exists()) {
+        if ($email && User::withTrashed()->where('email', $email)->whereKeyNot($user->getKey() ?? 0)->exists()) {
             $email = null;
         }
 

@@ -101,6 +101,7 @@ return [
     'internal_server_error' => 'Something went wrong on our side',
     'not_found' => 'Not found',
     'user not found' => 'User not found',
+    'user deleted' => 'User deleted',
     'cannot demote owner' => 'Cannot remove the owner role from the last owner',
     'forbidden user action' => 'You are not allowed to make this change to this user',
     'eftkad not found' => 'Visit not found',

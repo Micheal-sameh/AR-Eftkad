@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repository\UserRepository;
 
 class UserService
@@ -26,6 +27,11 @@ class UserService
     public function create(array $data)
     {
         return $this->userRepository->create($data);
+    }
+
+    public function delete(User $user): void
+    {
+        $this->userRepository->delete($user);
     }
 
     public function updateType($id, int $type)

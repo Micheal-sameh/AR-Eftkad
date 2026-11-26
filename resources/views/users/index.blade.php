@@ -60,7 +60,12 @@
                 <span class="field-label">{{ __('ui.fg.users.role') }}</span>
                 <span class="input-shell"><select id="m-role"></select><x-icon name="chevron" :size="16" /></span>
             </label>
+            <p class="hidden" id="m-delete-hint" style="margin: .8rem 0 0; color: var(--ink-soft); font-size: .72rem">{{ __('ui.fg.users.delete_hint') }}</p>
             <div class="modal-actions">
+                {{-- Two taps: the first arms it (label changes), the second deletes. --}}
+                <button type="button" class="button button-danger hidden" id="modal-delete" style="margin-inline-end: auto">
+                    <span id="modal-delete-label">{{ __('ui.fg.users.delete') }}</span>
+                </button>
                 <button type="button" class="button button-ghost" id="modal-cancel"><span>{{ __('ui.fg.users.cancel') }}</span></button>
                 <button type="button" class="button button-primary" id="modal-save">
                     <x-icon name="check" :size="18" />
@@ -197,7 +202,50 @@
         $('m-role-field').classList.toggle('hidden', !canAssignRole);
         if (canAssignRole) $('m-role').innerHTML = optionsHtml(roles, u.role ? u.role.value : '');
 
+        // Nobody deletes themselves (the API enforces this too).
+        const me = Eftkad.user();
+        const canDelete = !(me && String(me.id) === String(u.id));
+        $('modal-delete').classList.toggle('hidden', !canDelete);
+        $('m-delete-hint').classList.toggle('hidden', !canDelete);
+        disarmDelete();
+
         $('user-modal').classList.remove('hidden');
+    }
+
+    let deleteArmed = false;
+    function disarmDelete() {
+        deleteArmed = false;
+        $('modal-delete').disabled = false;
+        $('modal-delete-label').textContent = UI_TEXT.fg.users.delete;
+    }
+
+    async function deleteUser() {
+        if (!editing) return;
+        if (!deleteArmed) {
+            deleteArmed = true;
+            $('modal-delete-label').textContent = UI_TEXT.fg.users.delete_confirm;
+            return;
+        }
+        $('modal-delete').disabled = true;
+        $('m-error').classList.add('hidden');
+        const res = await Eftkad.api('/users/' + editing.id, { method: 'DELETE' });
+        if (!res.ok) {
+            modalError(res, UI_TEXT.user_edit.save_error);
+            disarmDelete();
+            return;
+        }
+        closeModal();
+        clearPeopleCache();
+        Eftkad.toast(UI_TEXT.fg.users.deleted);
+        loadUsers();
+    }
+
+    // The father/servant lists are cached in the browser; drop them so other pages pick up the change.
+    function clearPeopleCache() {
+        try {
+            Object.keys(localStorage).filter(function (k) { return k.indexOf(Eftkad.CACHE_PREFIX) === 0 && k.indexOf('/settings/filters') !== -1; })
+                .forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
     }
 
     function closeModal() {
@@ -270,10 +318,7 @@
         }
         $('add-modal').classList.add('hidden');
         // The new person must show up in the father/servant pickers on other pages.
-        try {
-            Object.keys(localStorage).filter(function (k) { return k.indexOf(Eftkad.CACHE_PREFIX) === 0 && k.indexOf('/settings/filters') !== -1; })
-                .forEach(function (k) { localStorage.removeItem(k); });
-        } catch (e) {}
+        clearPeopleCache();
         Eftkad.toast(UI_TEXT.fg.users.added);
         loadUsers();
     }
@@ -298,6 +343,7 @@
         $('modal-close').addEventListener('click', closeModal);
         $('modal-cancel').addEventListener('click', closeModal);
         $('modal-save').addEventListener('click', saveModal);
+        $('modal-delete').addEventListener('click', deleteUser);
         $('add-user-btn').addEventListener('click', openAddModal);
         $('add-save').addEventListener('click', saveAdd);
         document.querySelectorAll('[data-add-close]').forEach(function (el) {
