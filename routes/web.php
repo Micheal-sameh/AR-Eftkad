@@ -41,6 +41,8 @@ Route::withoutMiddleware([
 
     Route::view('/directory', 'directory.index')->name('directory.index');
 
+    Route::view('/church-week', 'church-week.index')->name('church-week');
+
     Route::view('/about', 'about.index')->name('about');
     Route::view('/about/info', 'about.public')->name('about.public'); // signed-out version, linked from the login page
 

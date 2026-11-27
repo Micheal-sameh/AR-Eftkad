@@ -28,7 +28,11 @@ return [
     'menu' => '<path d="M4 6h16M4 12h16M4 18h16" />',
     'edit' => '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z" />',
     'location' => '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z" /><circle cx="12" cy="10" r="2.5" />',
-    'arrow' => '<path d="M19 12H5M12 19l-7-7 7-7" />',
+    'minus' => '<path d="M5 12h14" />',
+    'expand' => '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />',
+    'shrink' => '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />',
+    'external' =>'<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />',
+    'arrow' =>'<path d="M19 12H5M12 19l-7-7 7-7" />',
     'trash' => '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />',
     'download' =>'<path d="M12 3v12M7 10l5 5 5-5M5 21h14" />',
     // Safari's Share and "Add to Home Screen" symbols, for the iOS install steps.
