@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends BaseController
 {
@@ -68,7 +69,13 @@ class AuthController extends BaseController
             $userInfo = $client->userInfo($tokens->accessToken);
             $user = $provisioner->resolve($userInfo);
         } catch (AvarewaseAccountNotFoundException $e) {
-            return $this->apiErrorResponse(message: trans('messages.avarewase no matching account'), status_code: 404);
+            // Logged so the real cause is visible (the user only sees the matching message).
+            Log::warning('Avarewase sign-in refused: '.$e->getMessage(), [
+                'reason' => $e->reason,
+                'sso_sent_membership_code' => isset($userInfo) && filled($userInfo->membershipCode),
+            ]);
+
+            return $this->apiErrorResponse(message: trans($e->messageKey()), status_code: 404);
         } catch (AvarewaseConnectionException $e) {
             return $this->apiErrorResponse(message: trans('messages.avarewase sso unavailable'), status_code: 503);
         } catch (AvarewaseTokenException $e) {

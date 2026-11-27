@@ -107,6 +107,8 @@ return [
     'eftkad not found' => 'Visit not found',
     'logout successfuly' => 'Signed out successfully',
     'avarewase no matching account' => 'Your Avarewase account has no membership code on file, so an AR-Eftkad account could not be created automatically. Contact an administrator.',
+    'avarewase account linked elsewhere' => 'This membership code or email is already linked to a different Avarewase account. Sign in with that account, or contact an administrator.',
+    'avarewase account deleted' => 'This account has been deleted. Contact an administrator.',
     'avarewase login failed' => 'Avarewase login failed. Please try again.',
     'avarewase sso unavailable' => 'The Avarewase login server is unreachable right now. Please try again shortly.',
     'value for exists in users table' => 'The value for the en language already exists in the users table',

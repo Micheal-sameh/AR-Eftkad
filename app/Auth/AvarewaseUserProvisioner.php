@@ -48,7 +48,10 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
         // Lookups include deleted users so a deleted person is refused here, rather than missed
         // and re-created with their old membership code (still reserved by the unique index).
         if ($user && $user->trashed()) {
-            throw new AvarewaseAccountNotFoundException("Local user {$user->getKey()} has been deleted.");
+            throw new AvarewaseAccountNotFoundException(
+                "Local user {$user->getKey()} has been deleted.",
+                AvarewaseAccountNotFoundException::DELETED,
+            );
         }
 
         // A user already linked to a different SSO identity must never be re-linked by a
@@ -56,6 +59,7 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
         if ($user && $user->avarewase_sub && $user->avarewase_sub !== $userInfo->sub) {
             throw new AvarewaseAccountNotFoundException(
                 "Local user {$user->getKey()} is already linked to a different Avarewase identity than {$userInfo->sub}.",
+                AvarewaseAccountNotFoundException::LINKED_ELSEWHERE,
             );
         }
 
@@ -63,6 +67,7 @@ class AvarewaseUserProvisioner implements ProvisionsAvarewaseUsers
             if (! $userInfo->membershipCode) {
                 throw new AvarewaseAccountNotFoundException(
                     "No AR-Eftkad account matches Avarewase identity {$userInfo->sub}, and it carries no membership_code to create one with.",
+                    AvarewaseAccountNotFoundException::NO_MEMBERSHIP_CODE,
                 );
             }
 
